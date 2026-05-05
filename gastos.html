@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gastos — Flucy y Neitor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;padding:1rem}
+.app{max-width:600px;margin:0 auto}
+h1{font-size:18px;font-weight:500;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+h1 span{font-size:13px;font-weight:400;color:#888;margin-left:auto}
+.card{background:#fff;border:0.5px solid #e0e0dc;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.btn{cursor:pointer;font-size:13px;padding:6px 14px;border-radius:8px;border:0.5px solid #ccc;background:transparent;color:#1a1a1a;font-family:inherit}
+.btn:hover{background:#f5f5f3}
+.btn:active{transform:scale(0.98)}
+.btn-primary{background:#e6f1fb;border-color:#b5d4f4;color:#185fa5}
+.btn-sm{padding:3px 9px;font-size:11px}
+.btn-danger{border-color:#f7c1c1;color:#a32d2d}
+.btn-full{width:100%}
+input,select{font-size:13px;padding:7px 10px;border-radius:8px;border:0.5px solid #ccc;background:#fff;color:#1a1a1a;width:100%;font-family:inherit}
+input:focus,select:focus{outline:none;border-color:#378ADD}
+label.lbl{font-size:11px;color:#888;display:block;margin-bottom:3px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid #eee;gap:8px}
+.row:last-child{border-bottom:none}
+.tabs{display:flex;gap:4px;margin-bottom:1rem}
+.tab{cursor:pointer;font-size:13px;padding:7px 16px;border-radius:8px;border:0.5px solid transparent;color:#888}
+.tab.active{border-color:#ccc;color:#1a1a1a;background:#fff}
+.pill{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500;white-space:nowrap}
+.pill-shared{background:#e6f1fb;color:#185fa5}
+.pill-flucy{background:#EEEDFE;color:#3C3489}
+.pill-neitor{background:#E1F5EE;color:#085041}
+.pill-warn{background:#FAEEDA;color:#854F0B}
+.pill-ok{background:#EAF3DE;color:#3B6D11}
+.g-title{font-size:13px;font-weight:500;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.g-sub{font-size:11px;color:#888;margin-top:3px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.g-cuota{font-size:11px;color:#888;margin-top:2px}
+.metric{background:#f5f5f3;border-radius:8px;padding:12px}
+.metric p:first-child{font-size:11px;color:#888;margin-bottom:3px}
+.metric p:last-child{font-size:20px;font-weight:500}
+.catdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;flex-shrink:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.section-title{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem}
+.modal{background:#fff;border-radius:12px;padding:1.25rem;width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:500;margin-bottom:1rem}
+.sync-bar{font-size:11px;color:#888;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-ok{background:#639922}
+.dot-loading{background:#BA7517}
+.dot-error{background:#E24B4A}
+.empty{font-size:13px;color:#aaa;text-align:center;padding:2rem 0}
+.amounts{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.amount-main{font-size:15px;font-weight:500}
+.balance-card{border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.balance-ok{background:#EAF3DE;border:1.5px solid #C0DD97}
+.balance-warn{background:#FAEEDA;border:1.5px solid #FAC775}
+.balance-text{font-size:17px;font-weight:500}
+.balance-sub{font-size:12px;color:#666;margin-top:4px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:480px){.charts-grid{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>💸 Gastos <span id="sync-bar"><span class="dot dot-loading"></span> Cargando...</span></h1>
+
+  <div class="tabs">
+    <div class="tab active" onclick="setTab('historial')">Historial</div>
+    <div class="tab" onclick="setTab('resumen')">Resumen</div>
+  </div>
+
+  <div id="view-historial"></div>
+  <div id="view-resumen" style="display:none"></div>
+  <div id="modal-container"></div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzorSADHLjeK-vGZsxeUMVnbMzuE5o-QuXGQI1H8jMAQRV75i9TZLZSfJGUES_dtAVlOA/exec";
+
+const CATS = [
+  {id:'super',label:'Supermercado',color:'#1D9E75'},
+  {id:'salidas',label:'Salidas',color:'#7F77DD'},
+  {id:'servicios',label:'Servicios',color:'#378ADD'},
+  {id:'ropa',label:'Ropa',color:'#D4537E'},
+  {id:'transporte',label:'Transporte',color:'#BA7517'},
+  {id:'salud',label:'Salud',color:'#E24B4A'},
+  {id:'otro',label:'Otro',color:'#888780'},
+];
+const catMap = {};
+CATS.forEach(c => catMap[c.id] = c);
+
+const HEADERS = ['id','fecha','desc','cat','tipo','pagador','beneficiario','monto','frecuencia','cuotas','notas'];
+
+let state = {
+  tab: 'historial',
+  gastos: [],
+  nextId: 1,
+  modal: null,
+  editando: false,
+  filtroMes: new Date().toISOString().slice(0,7),
+  syncStatus: 'loading',
+  syncMsg: 'Cargando...',
+};
+let charts = {};
+
+// --- SHEETS ---
+function rowToGasto(row) {
+  if (!row || row.length < 11) return null;
+  return {
+    id: parseInt(row[0]),
+    fecha: row[1] || '',
+    desc: row[2] || '',
+    cat: row[3] || 'otro',
+    tipo: row[4] || 'compartido',
+    pagador: row[5] || 'Flucy',
+    beneficiario: row[6] || null,
+    monto: parseFloat(row[7]) || 0,
+    frecuencia: row[8] || 'unica',
+    cuotas: row[9] ? parseInt(row[9]) : null,
+    notas: row[10] || '',
+  };
+}
+function gastoToRow(g) {
+  return [g.id, g.fecha, g.desc, g.cat, g.tipo, g.pagador, g.beneficiario||'', g.monto, g.frecuencia, g.cuotas||'', g.notas||''];
+}
+async function sheetRead() {
+  const res = await fetch(SCRIPT_URL + "?action=read");
+  const data = await res.json();
+  if (!Array.isArray(data) || data.length < 2) return [];
+  return data.slice(1).map(rowToGasto).filter(Boolean);
+}
+async function sheetWrite() {
+  const rows = [HEADERS, ...state.gastos.map(gastoToRow)];
+  await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({action:'write', rows}) });
+}
+async function loadData() {
+  setSyncStatus('loading','Sincronizando...');
+  try {
+    const gastos = await sheetRead();
+    state.gastos = gastos;
+    state.nextId = gastos.length > 0 ? Math.max(...gastos.map(g=>g.id)) + 1 : 1;
+    setSyncStatus('ok','Sincronizado ✓');
+  } catch(e) {
+    setSyncStatus('error','Error de conexión');
+  }
+  render();
+}
+async function saveData() {
+  setSyncStatus('loading','Guardando...');
+  renderSyncBar();
+  try {
+    await sheetWrite();
+    setSyncStatus('ok','Guardado ✓');
+  } catch(e) {
+    setSyncStatus('error','Error al guardar');
+  }
+  renderSyncBar();
+}
+
+function setSyncStatus(s, msg) { state.syncStatus = s; state.syncMsg = msg; }
+function renderSyncBar() {
+  const cls = state.syncStatus === 'ok' ? 'dot-ok' : state.syncStatus === 'loading' ? 'dot-loading' : 'dot-error';
+  document.getElementById('sync-bar').innerHTML = `<span class="dot ${cls}"></span> ${state.syncMsg} <button class="btn btn-sm" onclick="loadData()" style="margin-left:8px">↻</button>`;
+}
+
+// --- HELPERS ---
+function fmt(n) { return '$' + Math.round(n).toLocaleString('es-AR'); }
+function hoy() { return new Date().toISOString().slice(0,10); }
+
+function gastosMes(mes) {
+  return state.gastos.filter(g => {
+    if (g.frecuencia === 'mensual') return true;
+    if (g.frecuencia === 'cuotas') {
+      const [gy,gm] = g.fecha.slice(0,7).split('-').map(Number);
+      const [fy,fm] = mes.split('-').map(Number);
+      const diff = (fy-gy)*12 + (fm-gm);
+      return diff >= 0 && diff < g.cuotas;
+    }
+    return g.fecha.slice(0,7) === mes;
+  });
+}
+function montoMensual(g) { return g.frecuencia === 'cuotas' ? g.monto / g.cuotas : g.monto; }
+function cuotasRestantes(g) {
+  if (g.frecuencia !== 'cuotas') return null;
+  const [gy,gm] = g.fecha.slice(0,7).split('-').map(Number);
+  const now = new Date();
+  const diff = (now.getFullYear()-gy)*12 + (now.getMonth()+1-gm);
+  return Math.max(0, g.cuotas - diff);
+}
+function calcBalance(mes) {
+  const gs = gastosMes(mes);
+  let fG=0,nG=0,fP=0,nP=0;
+  gs.forEach(g => {
+    const m = montoMensual(g);
+    if (g.tipo === 'compartido') {
+      fG += m/2; nG += m/2;
+      if (g.pagador === 'Flucy') fP += m; else nP += m;
+    } else {
+      if (g.beneficiario === 'Flucy') { fG += m; fP += m; }
+      else { nG += m; nP += m; }
+    }
+  });
+  return { flucyGasta:fG, neitorGasta:nG, flucyPaga:fP, neitorPaga:nP, flucyBalance:fP-fG, neitorBalance:nP-nG };
+}
+
+// --- RENDER ---
+function setTab(t) {
+  state.tab = t;
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', ['historial','resumen'][i] === t));
+  document.getElementById('view-historial').style.display = t === 'historial' ? '' : 'none';
+  document.getElementById('view-resumen').style.display = t === 'resumen' ? '' : 'none';
+  render();
+}
+
+function render() {
+  destroyCharts();
+  renderSyncBar();
+  if (state.tab === 'historial') renderHistorial();
+  else renderResumen();
+  renderModal();
+}
+
+function renderHistorial() {
+  const gs = [...state.gastos].sort((a,b) => b.fecha.localeCompare(a.fecha));
+  const rows = gs.map(g => {
+    const cat = catMap[g.cat] || catMap['otro'];
+    const cuotasR = cuotasRestantes(g);
+    const m = montoMensual(g);
+    let frecTag = '';
+    if (g.frecuencia === 'mensual') frecTag = `<span class="pill pill-ok" style="margin-left:2px">mensual</span>`;
+    if (g.frecuencia === 'cuotas') frecTag = `<span class="pill pill-warn" style="margin-left:2px">${cuotasR} cuotas</span>`;
+    const tipoTag = g.tipo === 'compartido'
+      ? `<span class="pill pill-shared">compartido</span>`
+      : `<span class="pill ${g.beneficiario==='Flucy'?'pill-flucy':'pill-neitor'}">${g.beneficiario}</span>`;
+    const pagTag = `<span class="pill ${g.pagador==='Flucy'?'pill-flucy':'pill-neitor'}">pagó ${g.pagador}</span>`;
+    return `<div class="row">
+      <div style="flex:1;min-width:0">
+        <div class="g-title"><span class="catdot" style="background:${cat.color}"></span>${escHtml(g.desc)}${frecTag}</div>
+        <div class="g-sub">${tipoTag}${pagTag}<span>${g.fecha}</span>${g.notas?`<span>· ${escHtml(g.notas)}</span>`:''}</div>
+        ${g.frecuencia==='cuotas'?`<div class="g-cuota">cuota: ${fmt(m)} · total: ${fmt(g.monto)} · ${cuotasR} restantes</div>`:''}
+      </div>
+      <div class="amounts">
+        <span class="amount-main">${fmt(g.frecuencia==='cuotas'?m:g.monto)}</span>
+        <button class="btn btn-sm" onclick="abrirEditar(${g.id})">✏️</button>
+        <button class="btn btn-sm btn-danger" onclick="borrar(${g.id})">✕</button>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty">Sin gastos todavía.<br>¡Agregá el primero!</div>';
+
+  document.getElementById('view-historial').innerHTML = `
+    <div class="card"><button class="btn btn-primary btn-full" onclick="abrirNuevo()">+ Nuevo gasto</button></div>
+    <div class="card"><p class="section-title">Todos los gastos</p>${rows}</div>`;
+}
+
+function renderResumen() {
+  const mes = state.filtroMes;
+  const bal = calcBalance(mes);
+  const gs = gastosMes(mes);
+  const total = gs.reduce((s,g) => s+montoMensual(g), 0);
+  let quien='', quienMonto=0;
+  if (bal.flucyBalance < -0.5) { quien='Flucy le pasa a Neitor'; quienMonto=-bal.flucyBalance; }
+  else if (bal.neitorBalance < -0.5) { quien='Neitor le pasa a Flucy'; quienMonto=-bal.neitorBalance; }
+  else { quien='¡Están a mano! 🎉'; }
+
+  const meses=[];
+  for(let i=-3;i<=1;i++){const d=new Date();d.setMonth(d.getMonth()+i);meses.push(d.toISOString().slice(0,7));}
+  const mOpts = meses.map(m=>`<option value="${m}" ${m===mes?'selected':''}>${m}</option>`).join('');
+
+  const catData = CATS.map(c=>({...c, total: gs.filter(g=>g.cat===c.id).reduce((s,g)=>s+montoMensual(g),0)})).filter(c=>c.total>0);
+  const legendCat = catData.map(c=>`
+    <div class="legend-item">
+      <span style="width:10px;height:10px;border-radius:50%;background:${c.color};display:inline-block;flex-shrink:0"></span>
+      <span style="flex:1">${c.label}</span>
+      <span style="font-weight:500">${fmt(c.total)}</span>
+      <span style="color:#aaa;font-size:11px">${total>0?Math.round(c.total/total*100):0}%</span>
+    </div>`).join('');
+
+  document.getElementById('view-resumen').innerHTML = `
+    <div style="margin-bottom:1rem">
+      <label class="lbl">Período</label>
+      <select id="filtro-mes" onchange="setMes(this.value)" style="max-width:180px">${mOpts}</select>
+    </div>
+    <div class="g3" style="margin-bottom:1rem">
+      <div class="metric"><p>Total mes</p><p>${fmt(total)}</p></div>
+      <div class="metric"><p>Flucy gastó</p><p style="color:#3C3489">${fmt(bal.flucyGasta)}</p></div>
+      <div class="metric"><p>Neitor gastó</p><p style="color:#085041">${fmt(bal.neitorGasta)}</p></div>
+    </div>
+    <div class="${quienMonto>0?'balance-warn':'balance-ok'} balance-card">
+      <div class="section-title">Quién pasa plata este mes</div>
+      <div class="balance-text">${quien}${quienMonto>0?' '+fmt(quienMonto):''}</div>
+      ${quienMonto>0?`<div class="balance-sub">Flucy pagó ${fmt(bal.flucyPaga)} · Neitor pagó ${fmt(bal.neitorPaga)}</div>`:''}
+    </div>
+    <div class="charts-grid">
+      <div class="card" style="margin-bottom:0">
+        <p class="section-title">Por categoría</p>
+        <canvas id="chart-cat"></canvas>
+        <div style="margin-top:10px">${legendCat||'<p style="font-size:12px;color:#aaa">Sin datos</p>'}</div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <p class="section-title">Flucy vs Neitor</p>
+        <canvas id="chart-per"></canvas>
+        <div style="margin-top:10px">
+          <div class="legend-item"><span style="width:10px;height:10px;border-radius:50%;background:#7F77DD;display:inline-block"></span><span style="flex:1">Flucy</span><span style="font-weight:500">${fmt(bal.flucyGasta)}</span></div>
+          <div class="legend-item"><span style="width:10px;height:10px;border-radius:50%;background:#1D9E75;display:inline-block"></span><span style="flex:1">Neitor</span><span style="font-weight:500">${fmt(bal.neitorGasta)}</span></div>
+        </div>
+      </div>
+    </div>`;
+
+  setTimeout(() => {
+    const catData2 = CATS.map(c=>({...c,total:gs.filter(g=>g.cat===c.id).reduce((s,g)=>s+montoMensual(g),0)})).filter(c=>c.total>0);
+    const opts = {responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}}};
+    const c1 = document.getElementById('chart-cat');
+    const c2 = document.getElementById('chart-per');
+    if (c1) charts.cat = new Chart(c1, {type:'doughnut',data:{labels:catData2.map(c=>c.label),datasets:[{data:catData2.map(c=>c.total),backgroundColor:catData2.map(c=>c.color),borderWidth:2,borderColor:'#fff',hoverOffset:4}]},options:{...opts,cutout:'65%'}});
+    if (c2) charts.per = new Chart(c2, {type:'doughnut',data:{labels:['Flucy','Neitor'],datasets:[{data:[bal.flucyGasta,bal.neitorGasta],backgroundColor:['#7F77DD','#1D9E75'],borderWidth:2,borderColor:'#fff',hoverOffset:4}]},options:{...opts,cutout:'65%'}});
+  }, 50);
+}
+
+function destroyCharts() { Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}}); charts={}; }
+function setMes(m) { state.filtroMes=m; renderResumen(); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// --- MODAL ---
+function abrirNuevo() {
+  state.modal = {id:null,desc:'',cat:'otro',tipo:'compartido',pagador:'Flucy',beneficiario:'Flucy',monto:'',fecha:hoy(),frecuencia:'unica',cuotas:12,notas:''};
+  state.editando = false;
+  renderModal();
+}
+function abrirEditar(id) {
+  const g = state.gastos.find(x=>x.id===id);
+  if (!g) return;
+  state.modal = {...g};
+  state.editando = true;
+  renderModal();
+}
+function cerrarModal() { state.modal=null; state.editando=false; renderModal(); }
+
+function renderModal() {
+  const container = document.getElementById('modal-container');
+  if (!state.modal) { container.innerHTML=''; return; }
+  const g = state.modal;
+  const esCuotas = g.frecuencia === 'cuotas';
+  const esComp = g.tipo === 'compartido';
+  const catOpts = CATS.map(c=>`<option value="${c.id}" ${c.id===g.cat?'selected':''}>${c.label}</option>`).join('');
+  container.innerHTML = `
+  <div class="overlay" onclick="if(event.target===this)cerrarModal()">
+    <div class="modal">
+      <div class="modal-title">${state.editando?'Editar gasto':'Nuevo gasto'}</div>
+      <div style="margin-bottom:8px"><label class="lbl">Descripción</label><input id="m-desc" value="${escHtml(g.desc)}" placeholder="Ej: Supermercado"></div>
+      <div class="g2" style="margin-bottom:8px">
+        <div><label class="lbl">Monto total ($)</label><input id="m-monto" type="number" value="${g.monto||''}" min="0" step="1"></div>
+        <div><label class="lbl">Fecha</label><input id="m-fecha" type="date" value="${g.fecha}"></div>
+      </div>
+      <div class="g2" style="margin-bottom:8px">
+        <div><label class="lbl">Categoría</label><select id="m-cat">${catOpts}</select></div>
+        <div><label class="lbl">Pagó</label><select id="m-pagador"><option value="Flucy" ${g.pagador==='Flucy'?'selected':''}>Flucy</option><option value="Neitor" ${g.pagador==='Neitor'?'selected':''}>Neitor</option></select></div>
+      </div>
+      <div class="g2" style="margin-bottom:8px">
+        <div><label class="lbl">Tipo</label>
+          <select id="m-tipo" onchange="onTipoChange(this.value)">
+            <option value="compartido" ${g.tipo==='compartido'?'selected':''}>Compartido 50/50</option>
+            <option value="individual" ${g.tipo==='individual'?'selected':''}>Individual</option>
+          </select>
+        </div>
+        <div id="m-benef-wrap" style="${esComp?'opacity:.4;pointer-events:none':''}">
+          <label class="lbl">Beneficiario</label>
+          <select id="m-beneficiario"><option value="Flucy" ${g.beneficiario==='Flucy'?'selected':''}>Flucy</option><option value="Neitor" ${g.beneficiario==='Neitor'?'selected':''}>Neitor</option></select>
+        </div>
+      </div>
+      <div style="margin-bottom:8px"><label class="lbl">Frecuencia</label>
+        <select id="m-frec" onchange="onFrecChange(this.value)">
+          <option value="unica" ${g.frecuencia==='unica'?'selected':''}>Única vez</option>
+          <option value="mensual" ${g.frecuencia==='mensual'?'selected':''}>Mensual (recurrente)</option>
+          <option value="cuotas" ${g.frecuencia==='cuotas'?'selected':''}>En cuotas</option>
+        </select>
+      </div>
+      <div id="m-cuotas-wrap" style="${esCuotas?'':'display:none'}margin-bottom:8px">
+        <label class="lbl">Cantidad de cuotas</label>
+        <input id="m-cuotas" type="number" min="2" max="120" value="${g.cuotas||12}" oninput="updateCuotaPreview()">
+        <p id="m-cuota-preview" style="font-size:12px;color:#888;margin-top:4px"></p>
+      </div>
+      <div style="margin-bottom:1rem"><label class="lbl">Notas (opcional)</label><input id="m-notas" value="${escHtml(g.notas||'')}" placeholder="Aclaración adicional"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarGasto()">Guardar</button>
+      </div>
+    </div>
+  </div>`;
+  updateCuotaPreview();
+  document.getElementById('m-monto').addEventListener('input', updateCuotaPreview);
+}
+
+function onTipoChange(val) {
+  const w = document.getElementById('m-benef-wrap');
+  if (w) { w.style.opacity = val==='compartido'?'0.4':'1'; w.style.pointerEvents = val==='compartido'?'none':'auto'; }
+}
+function onFrecChange(val) {
+  const w = document.getElementById('m-cuotas-wrap');
+  if (w) w.style.display = val==='cuotas' ? '' : 'none';
+  updateCuotaPreview();
+}
+function updateCuotaPreview() {
+  const wrap = document.getElementById('m-cuotas-wrap');
+  if (!wrap || wrap.style.display==='none') return;
+  const monto = parseFloat(document.getElementById('m-monto')?.value)||0;
+  const cuotas = parseInt(document.getElementById('m-cuotas')?.value)||1;
+  const prev = document.getElementById('m-cuota-preview');
+  if (prev && monto>0) prev.textContent = `→ ${fmt(monto/cuotas)} por cuota`;
+}
+
+async function guardarGasto() {
+  const desc = (document.getElementById('m-desc')?.value||'').trim();
+  const monto = parseFloat(document.getElementById('m-monto')?.value);
+  const fecha = document.getElementById('m-fecha')?.value || hoy();
+  const cat = document.getElementById('m-cat')?.value || 'otro';
+  const pagador = document.getElementById('m-pagador')?.value || 'Flucy';
+  const tipo = document.getElementById('m-tipo')?.value || 'compartido';
+  const beneficiario = tipo==='compartido' ? null : document.getElementById('m-beneficiario')?.value;
+  const frecuencia = document.getElementById('m-frec')?.value || 'unica';
+  const cuotas = frecuencia==='cuotas' ? parseInt(document.getElementById('m-cuotas')?.value)||12 : null;
+  const notas = (document.getElementById('m-notas')?.value||'').trim();
+  if (!desc || isNaN(monto) || monto<=0) { alert('Completá descripción y monto.'); return; }
+  if (state.editando) {
+    const idx = state.gastos.findIndex(g=>g.id===state.modal.id);
+    if (idx>-1) state.gastos[idx] = {...state.gastos[idx],desc,monto,fecha,cat,pagador,tipo,beneficiario,frecuencia,cuotas,notas};
+  } else {
+    state.gastos.push({id:state.nextId++,desc,monto,fecha,cat,pagador,tipo,beneficiario,frecuencia,cuotas,notas});
+  }
+  state.modal=null; state.editando=false;
+  render();
+  await saveData();
+}
+
+async function borrar(id) {
+  if (!confirm('¿Borrar este gasto?')) return;
+  state.gastos = state.gastos.filter(g=>g.id!==id);
+  render();
+  await saveData();
+}
+
+loadData();
+</script>
+</body>
+</html>
