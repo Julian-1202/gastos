@@ -1,72 +1,140 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gastos — Flucy y Neitor</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
+:root {
+  --bg: #f5f5f3;
+  --surface: #ffffff;
+  --surface2: #f5f5f3;
+  --border: #e0e0dc;
+  --border2: #ececea;
+  --text: #1a1a1a;
+  --text2: #666;
+  --text3: #aaa;
+  --btn-bg: #ffffff;
+  --btn-hover: #f0f0ee;
+  --input-bg: #ffffff;
+  --primary-bg: #e6f1fb;
+  --primary-border: #b5d4f4;
+  --primary-text: #185fa5;
+  --overlay: rgba(0,0,0,0.4);
+  --shadow: 0 1px 4px rgba(0,0,0,0.06);
+  --balance-ok-bg: #EAF3DE;
+  --balance-ok-border: #C0DD97;
+  --balance-warn-bg: #FAEEDA;
+  --balance-warn-border: #FAC775;
+  --saldado-bg: #EAF3DE;
+  --saldado-border: #C0DD97;
+  --saldado-text: #3B6D11;
+}
+[data-theme="dark"] {
+  --bg: #111110;
+  --surface: #1c1c1b;
+  --surface2: #252524;
+  --border: #2e2e2c;
+  --border2: #333331;
+  --text: #e8e8e5;
+  --text2: #999;
+  --text3: #555;
+  --btn-bg: #1c1c1b;
+  --btn-hover: #2a2a28;
+  --input-bg: #1c1c1b;
+  --primary-bg: #1a2e44;
+  --primary-border: #2a4d72;
+  --primary-text: #7ab8f5;
+  --overlay: rgba(0,0,0,0.65);
+  --shadow: 0 1px 4px rgba(0,0,0,0.3);
+  --balance-ok-bg: #1a2e14;
+  --balance-ok-border: #2d5020;
+  --balance-warn-bg: #2e2210;
+  --balance-warn-border: #5a3e10;
+  --saldado-bg: #1a2e14;
+  --saldado-border: #2d5020;
+  --saldado-text: #7ec84a;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;padding:1rem}
-.app{max-width:600px;margin:0 auto}
-h1{font-size:18px;font-weight:500;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
-h1 span{font-size:13px;font-weight:400;color:#888;margin-left:auto}
-.card{background:#fff;border:0.5px solid #e0e0dc;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
-.btn{cursor:pointer;font-size:13px;padding:6px 14px;border-radius:8px;border:0.5px solid #ccc;background:transparent;color:#1a1a1a;font-family:inherit}
-.btn:hover{background:#f5f5f3}
-.btn:active{transform:scale(0.98)}
-.btn-primary{background:#e6f1fb;border-color:#b5d4f4;color:#185fa5}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1rem;transition:background .2s,color .2s}
+.app{max-width:620px;margin:0 auto}
+.topbar{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+.topbar h1{font-size:17px;font-weight:500;flex:1}
+.sync-info{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-ok{background:#639922}.dot-loading{background:#BA7517}.dot-error{background:#E24B4A}
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.btn{cursor:pointer;font-size:13px;padding:6px 14px;border-radius:8px;border:0.5px solid var(--border);background:var(--btn-bg);color:var(--text);font-family:inherit;transition:background .15s}
+.btn:hover{background:var(--btn-hover)}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--primary-bg);border-color:var(--primary-border);color:var(--primary-text)}
 .btn-sm{padding:3px 9px;font-size:11px}
 .btn-danger{border-color:#f7c1c1;color:#a32d2d}
+[data-theme="dark"] .btn-danger{border-color:#5a2020;color:#f08080}
 .btn-full{width:100%}
-input,select{font-size:13px;padding:7px 10px;border-radius:8px;border:0.5px solid #ccc;background:#fff;color:#1a1a1a;width:100%;font-family:inherit}
-input:focus,select:focus{outline:none;border-color:#378ADD}
-label.lbl{font-size:11px;color:#888;display:block;margin-bottom:3px}
-.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid #eee;gap:8px}
+.btn-icon{padding:5px 9px;font-size:15px;line-height:1}
+input,select{font-size:13px;padding:7px 10px;border-radius:8px;border:0.5px solid var(--border);background:var(--input-bg);color:var(--text);width:100%;font-family:inherit;transition:border-color .15s}
+input:focus,select:focus{outline:none;border-color:var(--primary-text)}
+label.lbl{font-size:11px;color:var(--text2);display:block;margin-bottom:3px}
+.row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--border2);gap:8px}
 .row:last-child{border-bottom:none}
 .tabs{display:flex;gap:4px;margin-bottom:1rem}
-.tab{cursor:pointer;font-size:13px;padding:7px 16px;border-radius:8px;border:0.5px solid transparent;color:#888}
-.tab.active{border-color:#ccc;color:#1a1a1a;background:#fff}
+.tab{cursor:pointer;font-size:13px;padding:7px 16px;border-radius:8px;border:0.5px solid transparent;color:var(--text2);transition:all .15s}
+.tab.active{border-color:var(--border);color:var(--text);background:var(--surface)}
 .pill{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500;white-space:nowrap}
 .pill-shared{background:#e6f1fb;color:#185fa5}
+[data-theme="dark"] .pill-shared{background:#1a2e44;color:#7ab8f5}
 .pill-flucy{background:#EEEDFE;color:#3C3489}
+[data-theme="dark"] .pill-flucy{background:#1e1a40;color:#9b93f5}
 .pill-neitor{background:#E1F5EE;color:#085041}
+[data-theme="dark"] .pill-neitor{background:#0d2920;color:#4ec99a}
 .pill-warn{background:#FAEEDA;color:#854F0B}
+[data-theme="dark"] .pill-warn{background:#2e2210;color:#f5b84a}
 .pill-ok{background:#EAF3DE;color:#3B6D11}
+[data-theme="dark"] .pill-ok{background:#1a2e14;color:#7ec84a}
 .g-title{font-size:13px;font-weight:500;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
-.g-sub{font-size:11px;color:#888;margin-top:3px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-.g-cuota{font-size:11px;color:#888;margin-top:2px}
-.metric{background:#f5f5f3;border-radius:8px;padding:12px}
-.metric p:first-child{font-size:11px;color:#888;margin-bottom:3px}
-.metric p:last-child{font-size:20px;font-weight:500}
+.g-sub{font-size:11px;color:var(--text2);margin-top:3px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.g-cuota{font-size:11px;color:var(--text3);margin-top:2px}
+.metric{background:var(--surface2);border-radius:8px;padding:12px}
+.metric p:first-child{font-size:11px;color:var(--text2);margin-bottom:3px}
+.metric p:last-child{font-size:19px;font-weight:500}
 .catdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;flex-shrink:0}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.section-title{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.section-title{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
 .legend-item{display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0}
-.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem}
-.modal{background:#fff;border-radius:12px;padding:1.25rem;width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem}
+.modal{background:var(--surface);border-radius:12px;padding:1.25rem;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;border:0.5px solid var(--border)}
 .modal-title{font-size:15px;font-weight:500;margin-bottom:1rem}
-.sync-bar{font-size:11px;color:#888;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
-.dot-ok{background:#639922}
-.dot-loading{background:#BA7517}
-.dot-error{background:#E24B4A}
-.empty{font-size:13px;color:#aaa;text-align:center;padding:2rem 0}
 .amounts{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .amount-main{font-size:15px;font-weight:500}
 .balance-card{border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
-.balance-ok{background:#EAF3DE;border:1.5px solid #C0DD97}
-.balance-warn{background:#FAEEDA;border:1.5px solid #FAC775}
+.balance-ok{background:var(--balance-ok-bg);border:1.5px solid var(--balance-ok-border)}
+.balance-warn{background:var(--balance-warn-bg);border:1.5px solid var(--balance-warn-border)}
 .balance-text{font-size:17px;font-weight:500}
-.balance-sub{font-size:12px;color:#666;margin-top:4px}
+.balance-sub{font-size:12px;color:var(--text2);margin-top:4px}
 .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
-@media(max-width:480px){.charts-grid{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.filters select{width:auto;font-size:12px;padding:5px 8px}
+.filters input{width:auto;font-size:12px;padding:5px 8px;flex:1;min-width:120px}
+.empty{font-size:13px;color:var(--text3);text-align:center;padding:2rem 0}
+.toggle-dark{background:none;border:0.5px solid var(--border);border-radius:8px;padding:5px 9px;cursor:pointer;font-size:15px;color:var(--text);transition:background .15s}
+.toggle-dark:hover{background:var(--btn-hover)}
+.saldado-banner{background:var(--saldado-bg);border:1px solid var(--saldado-border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:8px}
+.saldado-banner p{font-size:13px;color:var(--saldado-text);font-weight:500}
+.saldado-banner small{font-size:11px;color:var(--text2);display:block;font-weight:400}
+.chip-active{background:var(--primary-bg);border-color:var(--primary-border);color:var(--primary-text)}
+@media(max-width:480px){.charts-grid{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}.filters{gap:4px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <h1>💸 Gastos <span id="sync-bar"><span class="dot dot-loading"></span> Cargando...</span></h1>
+  <div class="topbar">
+    <h1>💸 Flucy y Neitor</h1>
+    <div class="sync-info" id="sync-bar"><span class="dot dot-loading"></span> Cargando...</div>
+    <button class="toggle-dark" onclick="toggleDark()" id="dark-btn" title="Modo oscuro">🌙</button>
+  </div>
 
   <div class="tabs">
     <div class="tab active" onclick="setTab('historial')">Historial</div>
@@ -93,62 +161,123 @@ const CATS = [
 const catMap = {};
 CATS.forEach(c => catMap[c.id] = c);
 
-const HEADERS = ['id','fecha','desc','cat','tipo','pagador','beneficiario','monto','frecuencia','cuotas','notas'];
+const HEADERS_GASTOS = ['id','fecha','desc','cat','tipo','pagador','beneficiario','monto','frecuencia','cuotas','notas'];
+const HEADERS_SALDADOS = ['mes','fecha','monto','quien','nota'];
 
+let charts = {};
 let state = {
   tab: 'historial',
   gastos: [],
+  saldados: [], // {mes, fecha, monto, quien, nota}
   nextId: 1,
   modal: null,
   editando: false,
+  modalSaldado: false,
   filtroMes: new Date().toISOString().slice(0,7),
+  filtroCat: 'todas',
+  filtroPagador: 'todos',
+  filtroBusqueda: '',
   syncStatus: 'loading',
   syncMsg: 'Cargando...',
 };
-let charts = {};
+
+// --- DARK MODE ---
+function initTheme() {
+  const saved = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateDarkBtn(saved);
+}
+function toggleDark() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  updateDarkBtn(next);
+}
+function updateDarkBtn(theme) {
+  const btn = document.getElementById('dark-btn');
+  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
 
 // --- SHEETS ---
 function rowToGasto(row) {
   if (!row || row.length < 11) return null;
   return {
     id: parseInt(row[0]),
-    fecha: row[1] || '',
-    desc: row[2] || '',
-    cat: row[3] || 'otro',
-    tipo: row[4] || 'compartido',
-    pagador: row[5] || 'Flucy',
-    beneficiario: row[6] || null,
-    monto: parseFloat(row[7]) || 0,
-    frecuencia: row[8] || 'unica',
+    fecha: row[1]||'',
+    desc: row[2]||'',
+    cat: row[3]||'otro',
+    tipo: row[4]||'compartido',
+    pagador: row[5]||'Flucy',
+    beneficiario: row[6]||null,
+    monto: parseFloat(row[7])||0,
+    frecuencia: row[8]||'unica',
     cuotas: row[9] ? parseInt(row[9]) : null,
-    notas: row[10] || '',
+    notas: row[10]||'',
   };
 }
 function gastoToRow(g) {
-  return [g.id, g.fecha, g.desc, g.cat, g.tipo, g.pagador, g.beneficiario||'', g.monto, g.frecuencia, g.cuotas||'', g.notas||''];
+  return [g.id,g.fecha,g.desc,g.cat,g.tipo,g.pagador,g.beneficiario||'',g.monto,g.frecuencia,g.cuotas||'',g.notas||''];
 }
+function rowToSaldado(row) {
+  if (!row || row.length < 4) return null;
+  return { mes:row[0], fecha:row[1], monto:parseFloat(row[2])||0, quien:row[3], nota:row[4]||'' };
+}
+function saldadoToRow(s) {
+  return [s.mes, s.fecha, s.monto, s.quien, s.nota||''];
+}
+
 async function sheetRead() {
   const res = await fetch(SCRIPT_URL + "?action=read");
   const data = await res.json();
-  if (!Array.isArray(data) || data.length < 2) return [];
-  return data.slice(1).map(rowToGasto).filter(Boolean);
+  if (!Array.isArray(data)) return { gastos:[], saldados:[] };
+
+  // Sheet "Gastos" data
+  const gastos = data.gastos
+    ? data.gastos.slice(1).map(rowToGasto).filter(Boolean)
+    : data.slice ? data.slice(1).map(rowToGasto).filter(Boolean) : [];
+
+  const saldados = data.saldados
+    ? data.saldados.slice(1).map(rowToSaldado).filter(Boolean)
+    : [];
+
+  return { gastos, saldados };
 }
+
 async function sheetWrite() {
-  const rows = [HEADERS, ...state.gastos.map(gastoToRow)];
-  await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({action:'write', rows}) });
+  const gastosRows = [HEADERS_GASTOS, ...state.gastos.map(gastoToRow)];
+  const saldadosRows = [HEADERS_SALDADOS, ...state.saldados.map(saldadoToRow)];
+  await fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action:'write', rows: gastosRows, saldadosRows }),
+  });
 }
+
 async function loadData() {
   setSyncStatus('loading','Sincronizando...');
   try {
-    const gastos = await sheetRead();
+    const { gastos, saldados } = await sheetRead();
     state.gastos = gastos;
-    state.nextId = gastos.length > 0 ? Math.max(...gastos.map(g=>g.id)) + 1 : 1;
+    state.saldados = saldados;
+    state.nextId = gastos.length > 0 ? Math.max(...gastos.map(g=>g.id))+1 : 1;
     setSyncStatus('ok','Sincronizado ✓');
   } catch(e) {
-    setSyncStatus('error','Error de conexión');
+    // fallback: try old format
+    try {
+      const res = await fetch(SCRIPT_URL + "?action=read");
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 1) {
+        state.gastos = data.slice(1).map(rowToGasto).filter(Boolean);
+        state.nextId = state.gastos.length > 0 ? Math.max(...state.gastos.map(g=>g.id))+1 : 1;
+      }
+      setSyncStatus('ok','Sincronizado ✓');
+    } catch(e2) {
+      setSyncStatus('error','Error de conexión');
+    }
   }
   render();
 }
+
 async function saveData() {
   setSyncStatus('loading','Guardando...');
   renderSyncBar();
@@ -161,82 +290,137 @@ async function saveData() {
   renderSyncBar();
 }
 
-function setSyncStatus(s, msg) { state.syncStatus = s; state.syncMsg = msg; }
+function setSyncStatus(s, msg) { state.syncStatus=s; state.syncMsg=msg; }
 function renderSyncBar() {
-  const cls = state.syncStatus === 'ok' ? 'dot-ok' : state.syncStatus === 'loading' ? 'dot-loading' : 'dot-error';
-  document.getElementById('sync-bar').innerHTML = `<span class="dot ${cls}"></span> ${state.syncMsg} <button class="btn btn-sm" onclick="loadData()" style="margin-left:8px">↻</button>`;
+  const cls = state.syncStatus==='ok'?'dot-ok':state.syncStatus==='loading'?'dot-loading':'dot-error';
+  const el = document.getElementById('sync-bar');
+  if (el) el.innerHTML = `<span class="dot ${cls}"></span> ${state.syncMsg} <button class="btn btn-sm" onclick="loadData()" style="margin-left:4px">↻</button>`;
 }
 
 // --- HELPERS ---
-function fmt(n) { return '$' + Math.round(n).toLocaleString('es-AR'); }
+function fmt(n) { return '$'+Math.round(n).toLocaleString('es-AR'); }
 function hoy() { return new Date().toISOString().slice(0,10); }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function gastosMes(mes) {
   return state.gastos.filter(g => {
-    if (g.frecuencia === 'mensual') return true;
-    if (g.frecuencia === 'cuotas') {
-      const [gy,gm] = g.fecha.slice(0,7).split('-').map(Number);
-      const [fy,fm] = mes.split('-').map(Number);
-      const diff = (fy-gy)*12 + (fm-gm);
-      return diff >= 0 && diff < g.cuotas;
+    if (g.frecuencia==='mensual') return true;
+    if (g.frecuencia==='cuotas') {
+      const [gy,gm]=g.fecha.slice(0,7).split('-').map(Number);
+      const [fy,fm]=mes.split('-').map(Number);
+      const diff=(fy-gy)*12+(fm-gm);
+      return diff>=0 && diff<g.cuotas;
     }
-    return g.fecha.slice(0,7) === mes;
+    return g.fecha.slice(0,7)===mes;
   });
 }
-function montoMensual(g) { return g.frecuencia === 'cuotas' ? g.monto / g.cuotas : g.monto; }
+function montoMensual(g) { return g.frecuencia==='cuotas' ? g.monto/g.cuotas : g.monto; }
 function cuotasRestantes(g) {
-  if (g.frecuencia !== 'cuotas') return null;
-  const [gy,gm] = g.fecha.slice(0,7).split('-').map(Number);
-  const now = new Date();
-  const diff = (now.getFullYear()-gy)*12 + (now.getMonth()+1-gm);
-  return Math.max(0, g.cuotas - diff);
+  if (g.frecuencia!=='cuotas') return null;
+  const [gy,gm]=g.fecha.slice(0,7).split('-').map(Number);
+  const now=new Date();
+  return Math.max(0, g.cuotas - ((now.getFullYear()-gy)*12+(now.getMonth()+1-gm)));
 }
 function calcBalance(mes) {
-  const gs = gastosMes(mes);
+  const gs=gastosMes(mes);
   let fG=0,nG=0,fP=0,nP=0;
-  gs.forEach(g => {
-    const m = montoMensual(g);
-    if (g.tipo === 'compartido') {
-      fG += m/2; nG += m/2;
-      if (g.pagador === 'Flucy') fP += m; else nP += m;
-    } else {
-      if (g.beneficiario === 'Flucy') { fG += m; fP += m; }
-      else { nG += m; nP += m; }
-    }
+  gs.forEach(g=>{
+    const m=montoMensual(g);
+    if(g.tipo==='compartido'){fG+=m/2;nG+=m/2;if(g.pagador==='Flucy')fP+=m;else nP+=m;}
+    else{if(g.beneficiario==='Flucy'){fG+=m;fP+=m;}else{nG+=m;nP+=m;}}
   });
-  return { flucyGasta:fG, neitorGasta:nG, flucyPaga:fP, neitorPaga:nP, flucyBalance:fP-fG, neitorBalance:nP-nG };
+  return{flucyGasta:fG,neitorGasta:nG,flucyPaga:fP,neitorPaga:nP,flucyBalance:fP-fG,neitorBalance:nP-nG};
+}
+function getSaldadoMes(mes) {
+  return state.saldados.find(s=>s.mes===mes)||null;
 }
 
-// --- RENDER ---
+// --- TABS ---
 function setTab(t) {
-  state.tab = t;
-  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', ['historial','resumen'][i] === t));
-  document.getElementById('view-historial').style.display = t === 'historial' ? '' : 'none';
-  document.getElementById('view-resumen').style.display = t === 'resumen' ? '' : 'none';
+  state.tab=t;
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['historial','resumen'][i]===t));
+  document.getElementById('view-historial').style.display=t==='historial'?'':'none';
+  document.getElementById('view-resumen').style.display=t==='resumen'?'':'none';
   render();
 }
 
 function render() {
   destroyCharts();
   renderSyncBar();
-  if (state.tab === 'historial') renderHistorial();
+  if (state.tab==='historial') renderHistorial();
   else renderResumen();
   renderModal();
 }
 
+// --- HISTORIAL ---
 function renderHistorial() {
-  const gs = [...state.gastos].sort((a,b) => b.fecha.localeCompare(a.fecha));
+  // Build months list for filter
+  const mesesSet = new Set();
+  state.gastos.forEach(g => mesesSet.add(g.fecha.slice(0,7)));
+  for(let i=-1;i<=0;i++){const d=new Date();d.setMonth(d.getMonth()+i);mesesSet.add(d.toISOString().slice(0,7));}
+  const mesesList = [...mesesSet].sort().reverse();
+
+  const fMes = state.filtroMes;
+  const fCat = state.filtroCat;
+  const fPag = state.filtroPagador;
+  const fBus = state.filtroBusqueda.toLowerCase();
+
+  let gs = state.gastos.filter(g => {
+    // mes filter: check if gasto applies to that month
+    let enMes;
+    if (g.frecuencia==='mensual') enMes=true;
+    else if(g.frecuencia==='cuotas'){
+      const [gy,gm]=g.fecha.slice(0,7).split('-').map(Number);
+      const [fy,fm]=fMes.split('-').map(Number);
+      const diff=(fy-gy)*12+(fm-gm);
+      enMes=diff>=0&&diff<g.cuotas;
+    } else enMes=g.fecha.slice(0,7)===fMes;
+    if(!enMes) return false;
+    if(fCat!=='todas'&&g.cat!==fCat) return false;
+    if(fPag!=='todos'&&g.pagador!==fPag) return false;
+    if(fBus&&!g.desc.toLowerCase().includes(fBus)) return false;
+    return true;
+  }).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+
+  const mOpts = mesesList.map(m=>`<option value="${m}" ${m===fMes?'selected':''}>${m}</option>`).join('');
+  const catOpts = `<option value="todas">Todas las categorías</option>`+CATS.map(c=>`<option value="${c.id}" ${c.id===fCat?'selected':''}>${c.label}</option>`).join('');
+  const pagOpts = `<option value="todos">Cualquiera</option><option value="Flucy" ${fPag==='Flucy'?'selected':''}>Pagó Flucy</option><option value="Neitor" ${fPag==='Neitor'?'selected':''}>Pagó Neitor</option>`;
+
+  // Saldado banner
+  const saldado = getSaldadoMes(fMes);
+  const bal = calcBalance(fMes);
+  let saldadoBanner = '';
+  if (saldado) {
+    saldadoBanner = `<div class="saldado-banner">
+      <div>
+        <p>✅ Mes saldado</p>
+        <small>${saldado.quien} pasó ${fmt(saldado.monto)} el ${saldado.fecha}${saldado.nota?' · '+escHtml(saldado.nota):''}</small>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="borrarSaldado('${fMes}')">✕ Quitar</button>
+    </div>`;
+  } else if (Math.abs(bal.flucyBalance)>0.5 || Math.abs(bal.neitorBalance)>0.5) {
+    const quien = bal.flucyBalance < -0.5 ? 'Flucy' : 'Neitor';
+    const monto = Math.abs(bal.flucyBalance < -0.5 ? bal.flucyBalance : bal.neitorBalance);
+    saldadoBanner = `<div class="balance-card balance-warn" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:.8rem 1rem;margin-bottom:.75rem">
+      <div>
+        <div style="font-size:13px;font-weight:500">${quien} le debe ${fmt(monto)}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">¿Ya lo saldaron este mes?</div>
+      </div>
+      <button class="btn btn-sm btn-primary" onclick="abrirModalSaldado('${quien}',${monto})">Marcar saldado</button>
+    </div>`;
+  }
+
   const rows = gs.map(g => {
-    const cat = catMap[g.cat] || catMap['otro'];
+    const cat = catMap[g.cat]||catMap['otro'];
     const cuotasR = cuotasRestantes(g);
     const m = montoMensual(g);
-    let frecTag = '';
-    if (g.frecuencia === 'mensual') frecTag = `<span class="pill pill-ok" style="margin-left:2px">mensual</span>`;
-    if (g.frecuencia === 'cuotas') frecTag = `<span class="pill pill-warn" style="margin-left:2px">${cuotasR} cuotas</span>`;
-    const tipoTag = g.tipo === 'compartido'
-      ? `<span class="pill pill-shared">compartido</span>`
-      : `<span class="pill ${g.beneficiario==='Flucy'?'pill-flucy':'pill-neitor'}">${g.beneficiario}</span>`;
-    const pagTag = `<span class="pill ${g.pagador==='Flucy'?'pill-flucy':'pill-neitor'}">pagó ${g.pagador}</span>`;
+    let frecTag='';
+    if(g.frecuencia==='mensual') frecTag=`<span class="pill pill-ok" style="margin-left:2px">mensual</span>`;
+    if(g.frecuencia==='cuotas') frecTag=`<span class="pill pill-warn" style="margin-left:2px">${cuotasR} cuotas</span>`;
+    const tipoTag=g.tipo==='compartido'
+      ?`<span class="pill pill-shared">compartido</span>`
+      :`<span class="pill ${g.beneficiario==='Flucy'?'pill-flucy':'pill-neitor'}">${escHtml(g.beneficiario)}</span>`;
+    const pagTag=`<span class="pill ${g.pagador==='Flucy'?'pill-flucy':'pill-neitor'}">pagó ${g.pagador}</span>`;
     return `<div class="row">
       <div style="flex:1;min-width:0">
         <div class="g-title"><span class="catdot" style="background:${cat.color}"></span>${escHtml(g.desc)}${frecTag}</div>
@@ -245,50 +429,107 @@ function renderHistorial() {
       </div>
       <div class="amounts">
         <span class="amount-main">${fmt(g.frecuencia==='cuotas'?m:g.monto)}</span>
-        <button class="btn btn-sm" onclick="abrirEditar(${g.id})">✏️</button>
+        <button class="btn btn-sm btn-icon" onclick="abrirEditar(${g.id})">✏️</button>
         <button class="btn btn-sm btn-danger" onclick="borrar(${g.id})">✕</button>
       </div>
     </div>`;
-  }).join('') || '<div class="empty">Sin gastos todavía.<br>¡Agregá el primero!</div>';
+  }).join('')||`<div class="empty">Sin gastos para este filtro</div>`;
+
+  const totalFiltrado = gs.reduce((s,g)=>s+montoMensual(g),0);
+  const resumenFiltro = gs.length>0 ? `<div style="font-size:12px;color:var(--text2);margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border2);display:flex;justify-content:space-between"><span>${gs.length} gasto${gs.length!==1?'s':''}</span><span style="font-weight:500">${fmt(totalFiltrado)}</span></div>` : '';
 
   document.getElementById('view-historial').innerHTML = `
-    <div class="card"><button class="btn btn-primary btn-full" onclick="abrirNuevo()">+ Nuevo gasto</button></div>
-    <div class="card"><p class="section-title">Todos los gastos</p>${rows}</div>`;
+    <div class="card" style="margin-bottom:.75rem">
+      <button class="btn btn-primary btn-full" onclick="abrirNuevo()">+ Nuevo gasto</button>
+    </div>
+    <div class="filters">
+      <select onchange="setFiltro('mes',this.value)">${mOpts}</select>
+      <select onchange="setFiltro('cat',this.value)">${catOpts}</select>
+      <select onchange="setFiltro('pag',this.value)">${pagOpts}</select>
+      <input type="search" placeholder="Buscar..." value="${escHtml(state.filtroBusqueda)}" oninput="setFiltro('bus',this.value)">
+    </div>
+    ${saldadoBanner}
+    <div class="card">
+      <p class="section-title">Gastos del período</p>
+      ${rows}
+      ${resumenFiltro}
+    </div>`;
 }
 
+function setFiltro(tipo, val) {
+  if(tipo==='mes') state.filtroMes=val;
+  else if(tipo==='cat') state.filtroCat=val;
+  else if(tipo==='pag') state.filtroPagador=val;
+  else if(tipo==='bus') state.filtroBusqueda=val;
+  renderHistorial();
+}
+
+// --- SALDADO ---
+function abrirModalSaldado(quien, monto) {
+  state.modalSaldado = { mes: state.filtroMes, quien, monto };
+  renderModal();
+}
+async function borrarSaldado(mes) {
+  state.saldados = state.saldados.filter(s=>s.mes!==mes);
+  render();
+  await saveData();
+}
+async function guardarSaldado() {
+  const quien = document.getElementById('s-quien')?.value || state.modalSaldado.quien;
+  const monto = parseFloat(document.getElementById('s-monto')?.value)||0;
+  const nota = document.getElementById('s-nota')?.value||'';
+  const mes = state.modalSaldado.mes;
+  state.saldados = state.saldados.filter(s=>s.mes!==mes);
+  state.saldados.push({ mes, fecha: hoy(), monto, quien, nota });
+  state.modalSaldado = false;
+  render();
+  await saveData();
+}
+
+// --- RESUMEN ---
 function renderResumen() {
-  const mes = state.filtroMes;
-  const bal = calcBalance(mes);
-  const gs = gastosMes(mes);
-  const total = gs.reduce((s,g) => s+montoMensual(g), 0);
-  let quien='', quienMonto=0;
-  if (bal.flucyBalance < -0.5) { quien='Flucy le pasa a Neitor'; quienMonto=-bal.flucyBalance; }
-  else if (bal.neitorBalance < -0.5) { quien='Neitor le pasa a Flucy'; quienMonto=-bal.neitorBalance; }
-  else { quien='¡Están a mano! 🎉'; }
+  const mes=state.filtroMes;
+  const bal=calcBalance(mes);
+  const gs=gastosMes(mes);
+  const total=gs.reduce((s,g)=>s+montoMensual(g),0);
+  const saldado=getSaldadoMes(mes);
+
+  let quien='',quienMonto=0;
+  if(bal.flucyBalance<-0.5){quien='Flucy le pasa a Neitor';quienMonto=-bal.flucyBalance;}
+  else if(bal.neitorBalance<-0.5){quien='Neitor le pasa a Flucy';quienMonto=-bal.neitorBalance;}
+  else{quien='¡Están a mano! 🎉';}
 
   const meses=[];
   for(let i=-3;i<=1;i++){const d=new Date();d.setMonth(d.getMonth()+i);meses.push(d.toISOString().slice(0,7));}
-  const mOpts = meses.map(m=>`<option value="${m}" ${m===mes?'selected':''}>${m}</option>`).join('');
+  const mOpts=meses.map(m=>`<option value="${m}" ${m===mes?'selected':''}>${m}</option>`).join('');
 
-  const catData = CATS.map(c=>({...c, total: gs.filter(g=>g.cat===c.id).reduce((s,g)=>s+montoMensual(g),0)})).filter(c=>c.total>0);
-  const legendCat = catData.map(c=>`
+  const catData=CATS.map(c=>({...c,total:gs.filter(g=>g.cat===c.id).reduce((s,g)=>s+montoMensual(g),0)})).filter(c=>c.total>0);
+  const legendCat=catData.map(c=>`
     <div class="legend-item">
       <span style="width:10px;height:10px;border-radius:50%;background:${c.color};display:inline-block;flex-shrink:0"></span>
       <span style="flex:1">${c.label}</span>
       <span style="font-weight:500">${fmt(c.total)}</span>
-      <span style="color:#aaa;font-size:11px">${total>0?Math.round(c.total/total*100):0}%</span>
+      <span style="color:var(--text3);font-size:11px">${total>0?Math.round(c.total/total*100):0}%</span>
     </div>`).join('');
+
+  const saldadoBanner = saldado
+    ? `<div class="saldado-banner" style="margin-bottom:1rem">
+        <div><p>✅ Mes saldado</p><small>${saldado.quien} pasó ${fmt(saldado.monto)} el ${saldado.fecha}</small></div>
+        <button class="btn btn-sm btn-danger" onclick="borrarSaldado('${mes}')">✕ Quitar</button>
+       </div>`
+    : '';
 
   document.getElementById('view-resumen').innerHTML = `
     <div style="margin-bottom:1rem">
       <label class="lbl">Período</label>
-      <select id="filtro-mes" onchange="setMes(this.value)" style="max-width:180px">${mOpts}</select>
+      <select id="filtro-mes" onchange="setMesResumen(this.value)" style="max-width:180px">${mOpts}</select>
     </div>
     <div class="g3" style="margin-bottom:1rem">
       <div class="metric"><p>Total mes</p><p>${fmt(total)}</p></div>
-      <div class="metric"><p>Flucy gastó</p><p style="color:#3C3489">${fmt(bal.flucyGasta)}</p></div>
-      <div class="metric"><p>Neitor gastó</p><p style="color:#085041">${fmt(bal.neitorGasta)}</p></div>
+      <div class="metric"><p>Flucy gastó</p><p style="color:#7F77DD">${fmt(bal.flucyGasta)}</p></div>
+      <div class="metric"><p>Neitor gastó</p><p style="color:#1D9E75">${fmt(bal.neitorGasta)}</p></div>
     </div>
+    ${saldadoBanner}
     <div class="${quienMonto>0?'balance-warn':'balance-ok'} balance-card">
       <div class="section-title">Quién pasa plata este mes</div>
       <div class="balance-text">${quien}${quienMonto>0?' '+fmt(quienMonto):''}</div>
@@ -298,7 +539,7 @@ function renderResumen() {
       <div class="card" style="margin-bottom:0">
         <p class="section-title">Por categoría</p>
         <canvas id="chart-cat"></canvas>
-        <div style="margin-top:10px">${legendCat||'<p style="font-size:12px;color:#aaa">Sin datos</p>'}</div>
+        <div style="margin-top:10px">${legendCat||'<p style="font-size:12px;color:var(--text3)">Sin datos</p>'}</div>
       </div>
       <div class="card" style="margin-bottom:0">
         <p class="section-title">Flucy vs Neitor</p>
@@ -311,42 +552,66 @@ function renderResumen() {
     </div>`;
 
   setTimeout(() => {
-    const catData2 = CATS.map(c=>({...c,total:gs.filter(g=>g.cat===c.id).reduce((s,g)=>s+montoMensual(g),0)})).filter(c=>c.total>0);
-    const opts = {responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}}};
-    const c1 = document.getElementById('chart-cat');
-    const c2 = document.getElementById('chart-per');
-    if (c1) charts.cat = new Chart(c1, {type:'doughnut',data:{labels:catData2.map(c=>c.label),datasets:[{data:catData2.map(c=>c.total),backgroundColor:catData2.map(c=>c.color),borderWidth:2,borderColor:'#fff',hoverOffset:4}]},options:{...opts,cutout:'65%'}});
-    if (c2) charts.per = new Chart(c2, {type:'doughnut',data:{labels:['Flucy','Neitor'],datasets:[{data:[bal.flucyGasta,bal.neitorGasta],backgroundColor:['#7F77DD','#1D9E75'],borderWidth:2,borderColor:'#fff',hoverOffset:4}]},options:{...opts,cutout:'65%'}});
-  }, 50);
+    const opts={responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}}};
+    const c1=document.getElementById('chart-cat');
+    const c2=document.getElementById('chart-per');
+    if(c1&&catData.length) charts.cat=new Chart(c1,{type:'doughnut',data:{labels:catData.map(c=>c.label),datasets:[{data:catData.map(c=>c.total),backgroundColor:catData.map(c=>c.color),borderWidth:2,borderColor:'transparent',hoverOffset:4}]},options:{...opts,cutout:'65%'}});
+    if(c2&&(bal.flucyGasta+bal.neitorGasta)>0) charts.per=new Chart(c2,{type:'doughnut',data:{labels:['Flucy','Neitor'],datasets:[{data:[bal.flucyGasta,bal.neitorGasta],backgroundColor:['#7F77DD','#1D9E75'],borderWidth:2,borderColor:'transparent',hoverOffset:4}]},options:{...opts,cutout:'65%'}});
+  },50);
 }
 
-function destroyCharts() { Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}}); charts={}; }
-function setMes(m) { state.filtroMes=m; renderResumen(); }
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function setMesResumen(m) { state.filtroMes=m; renderResumen(); }
+function destroyCharts(){Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};}
 
 // --- MODAL ---
-function abrirNuevo() {
-  state.modal = {id:null,desc:'',cat:'otro',tipo:'compartido',pagador:'Flucy',beneficiario:'Flucy',monto:'',fecha:hoy(),frecuencia:'unica',cuotas:12,notas:''};
-  state.editando = false;
-  renderModal();
+function abrirNuevo(){
+  state.modal={id:null,desc:'',cat:'otro',tipo:'compartido',pagador:'Flucy',beneficiario:'Flucy',monto:'',fecha:hoy(),frecuencia:'unica',cuotas:12,notas:''};
+  state.editando=false; renderModal();
 }
-function abrirEditar(id) {
-  const g = state.gastos.find(x=>x.id===id);
-  if (!g) return;
-  state.modal = {...g};
-  state.editando = true;
-  renderModal();
+function abrirEditar(id){
+  const g=state.gastos.find(x=>x.id===id);
+  if(!g) return;
+  state.modal={...g}; state.editando=true; renderModal();
 }
-function cerrarModal() { state.modal=null; state.editando=false; renderModal(); }
+function cerrarModal(){state.modal=null;state.editando=false;state.modalSaldado=false;renderModal();}
 
-function renderModal() {
-  const container = document.getElementById('modal-container');
-  if (!state.modal) { container.innerHTML=''; return; }
-  const g = state.modal;
-  const esCuotas = g.frecuencia === 'cuotas';
-  const esComp = g.tipo === 'compartido';
-  const catOpts = CATS.map(c=>`<option value="${c.id}" ${c.id===g.cat?'selected':''}>${c.label}</option>`).join('');
-  container.innerHTML = `
+function renderModal(){
+  const container=document.getElementById('modal-container');
+  if(!container) return;
+
+  // Modal saldado
+  if(state.modalSaldado){
+    const s=state.modalSaldado;
+    container.innerHTML=`
+    <div class="overlay" onclick="if(event.target===this)cerrarModal()">
+      <div class="modal">
+        <div class="modal-title">Marcar mes saldado</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Registrá el pago que equilibra las cuentas de <strong>${s.mes}</strong>.</p>
+        <div class="g2" style="margin-bottom:8px">
+          <div><label class="lbl">Quién pagó</label>
+            <select id="s-quien">
+              <option value="Flucy" ${s.quien==='Flucy'?'selected':''}>Flucy</option>
+              <option value="Neitor" ${s.quien==='Neitor'?'selected':''}>Neitor</option>
+            </select>
+          </div>
+          <div><label class="lbl">Monto ($)</label><input id="s-monto" type="number" value="${Math.round(s.monto)}" min="0" step="1"></div>
+        </div>
+        <div style="margin-bottom:1rem"><label class="lbl">Nota (opcional)</label><input id="s-nota" placeholder="Ej: transferencia Mercado Pago"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn" onclick="cerrarModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardarSaldado()">Confirmar</button>
+        </div>
+      </div>
+    </div>`;
+    return;
+  }
+
+  if(!state.modal){container.innerHTML='';return;}
+  const g=state.modal;
+  const esCuotas=g.frecuencia==='cuotas';
+  const esComp=g.tipo==='compartido';
+  const catOpts=CATS.map(c=>`<option value="${c.id}" ${c.id===g.cat?'selected':''}>${c.label}</option>`).join('');
+  container.innerHTML=`
   <div class="overlay" onclick="if(event.target===this)cerrarModal()">
     <div class="modal">
       <div class="modal-title">${state.editando?'Editar gasto':'Nuevo gasto'}</div>
@@ -381,7 +646,7 @@ function renderModal() {
       <div id="m-cuotas-wrap" style="${esCuotas?'':'display:none'}margin-bottom:8px">
         <label class="lbl">Cantidad de cuotas</label>
         <input id="m-cuotas" type="number" min="2" max="120" value="${g.cuotas||12}" oninput="updateCuotaPreview()">
-        <p id="m-cuota-preview" style="font-size:12px;color:#888;margin-top:4px"></p>
+        <p id="m-cuota-preview" style="font-size:12px;color:var(--text2);margin-top:4px"></p>
       </div>
       <div style="margin-bottom:1rem"><label class="lbl">Notas (opcional)</label><input id="m-notas" value="${escHtml(g.notas||'')}" placeholder="Aclaración adicional"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
@@ -391,57 +656,58 @@ function renderModal() {
     </div>
   </div>`;
   updateCuotaPreview();
-  document.getElementById('m-monto').addEventListener('input', updateCuotaPreview);
+  document.getElementById('m-monto')?.addEventListener('input',updateCuotaPreview);
 }
 
-function onTipoChange(val) {
-  const w = document.getElementById('m-benef-wrap');
-  if (w) { w.style.opacity = val==='compartido'?'0.4':'1'; w.style.pointerEvents = val==='compartido'?'none':'auto'; }
+function onTipoChange(val){
+  const w=document.getElementById('m-benef-wrap');
+  if(w){w.style.opacity=val==='compartido'?'0.4':'1';w.style.pointerEvents=val==='compartido'?'none':'auto';}
 }
-function onFrecChange(val) {
-  const w = document.getElementById('m-cuotas-wrap');
-  if (w) w.style.display = val==='cuotas' ? '' : 'none';
+function onFrecChange(val){
+  const w=document.getElementById('m-cuotas-wrap');
+  if(w) w.style.display=val==='cuotas'?'':'none';
   updateCuotaPreview();
 }
-function updateCuotaPreview() {
-  const wrap = document.getElementById('m-cuotas-wrap');
-  if (!wrap || wrap.style.display==='none') return;
-  const monto = parseFloat(document.getElementById('m-monto')?.value)||0;
-  const cuotas = parseInt(document.getElementById('m-cuotas')?.value)||1;
-  const prev = document.getElementById('m-cuota-preview');
-  if (prev && monto>0) prev.textContent = `→ ${fmt(monto/cuotas)} por cuota`;
+function updateCuotaPreview(){
+  const wrap=document.getElementById('m-cuotas-wrap');
+  if(!wrap||wrap.style.display==='none') return;
+  const monto=parseFloat(document.getElementById('m-monto')?.value)||0;
+  const cuotas=parseInt(document.getElementById('m-cuotas')?.value)||1;
+  const prev=document.getElementById('m-cuota-preview');
+  if(prev&&monto>0) prev.textContent=`→ ${fmt(monto/cuotas)} por cuota`;
 }
 
-async function guardarGasto() {
-  const desc = (document.getElementById('m-desc')?.value||'').trim();
-  const monto = parseFloat(document.getElementById('m-monto')?.value);
-  const fecha = document.getElementById('m-fecha')?.value || hoy();
-  const cat = document.getElementById('m-cat')?.value || 'otro';
-  const pagador = document.getElementById('m-pagador')?.value || 'Flucy';
-  const tipo = document.getElementById('m-tipo')?.value || 'compartido';
-  const beneficiario = tipo==='compartido' ? null : document.getElementById('m-beneficiario')?.value;
-  const frecuencia = document.getElementById('m-frec')?.value || 'unica';
-  const cuotas = frecuencia==='cuotas' ? parseInt(document.getElementById('m-cuotas')?.value)||12 : null;
-  const notas = (document.getElementById('m-notas')?.value||'').trim();
-  if (!desc || isNaN(monto) || monto<=0) { alert('Completá descripción y monto.'); return; }
-  if (state.editando) {
-    const idx = state.gastos.findIndex(g=>g.id===state.modal.id);
-    if (idx>-1) state.gastos[idx] = {...state.gastos[idx],desc,monto,fecha,cat,pagador,tipo,beneficiario,frecuencia,cuotas,notas};
+async function guardarGasto(){
+  const desc=(document.getElementById('m-desc')?.value||'').trim();
+  const monto=parseFloat(document.getElementById('m-monto')?.value);
+  const fecha=document.getElementById('m-fecha')?.value||hoy();
+  const cat=document.getElementById('m-cat')?.value||'otro';
+  const pagador=document.getElementById('m-pagador')?.value||'Flucy';
+  const tipo=document.getElementById('m-tipo')?.value||'compartido';
+  const beneficiario=tipo==='compartido'?null:document.getElementById('m-beneficiario')?.value;
+  const frecuencia=document.getElementById('m-frec')?.value||'unica';
+  const cuotas=frecuencia==='cuotas'?parseInt(document.getElementById('m-cuotas')?.value)||12:null;
+  const notas=(document.getElementById('m-notas')?.value||'').trim();
+  if(!desc||isNaN(monto)||monto<=0){alert('Completá descripción y monto.');return;}
+  if(state.editando){
+    const idx=state.gastos.findIndex(g=>g.id===state.modal.id);
+    if(idx>-1) state.gastos[idx]={...state.gastos[idx],desc,monto,fecha,cat,pagador,tipo,beneficiario,frecuencia,cuotas,notas};
   } else {
     state.gastos.push({id:state.nextId++,desc,monto,fecha,cat,pagador,tipo,beneficiario,frecuencia,cuotas,notas});
   }
-  state.modal=null; state.editando=false;
+  state.modal=null;state.editando=false;
   render();
   await saveData();
 }
 
-async function borrar(id) {
-  if (!confirm('¿Borrar este gasto?')) return;
-  state.gastos = state.gastos.filter(g=>g.id!==id);
+async function borrar(id){
+  if(!confirm('¿Borrar este gasto?')) return;
+  state.gastos=state.gastos.filter(g=>g.id!==id);
   render();
   await saveData();
 }
 
+initTheme();
 loadData();
 </script>
 </body>
