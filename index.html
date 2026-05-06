@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gastos — Cuchugastos</title>
+<title>Gastos — Flucy y Neitor</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
@@ -139,10 +139,12 @@ label.lbl{font-size:11px;color:var(--text2);display:block;margin-bottom:3px}
   <div class="tabs">
     <div class="tab active" onclick="setTab('historial')">Historial</div>
     <div class="tab" onclick="setTab('resumen')">Resumen</div>
+    <div class="tab" onclick="setTab('anual')">Anual</div>
   </div>
 
   <div id="view-historial"></div>
   <div id="view-resumen" style="display:none"></div>
+  <div id="view-anual" style="display:none"></div>
   <div id="modal-container"></div>
 </div>
 
@@ -168,12 +170,13 @@ let charts = {};
 let state = {
   tab: 'historial',
   gastos: [],
-  saldados: [], // {mes, fecha, monto, quien, nota}
+  saldados: [],
   nextId: 1,
   modal: null,
   editando: false,
   modalSaldado: false,
   filtroMes: new Date().toISOString().slice(0,7),
+  filtroAnio: new Date().getFullYear(),
   filtroCat: 'todas',
   filtroPagador: 'todos',
   filtroBusqueda: '',
@@ -316,7 +319,7 @@ function gastosMes(mes) {
 }
 function montoMensual(g) { return g.frecuencia==='cuotas' ? g.monto/g.cuotas : g.monto; }
 function cuotasRestantes(g) {
-  if (g.frecuencia!=='cuotas') return null;
+  if (g.frecuencia!=='cuotas' || !g.cuotas) return null;
   const [gy,gm]=g.fecha.slice(0,7).split('-').map(Number);
   const now=new Date();
   return Math.max(0, g.cuotas - ((now.getFullYear()-gy)*12+(now.getMonth()+1-gm)));
@@ -338,9 +341,10 @@ function getSaldadoMes(mes) {
 // --- TABS ---
 function setTab(t) {
   state.tab=t;
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['historial','resumen'][i]===t));
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['historial','resumen','anual'][i]===t));
   document.getElementById('view-historial').style.display=t==='historial'?'':'none';
   document.getElementById('view-resumen').style.display=t==='resumen'?'':'none';
+  document.getElementById('view-anual').style.display=t==='anual'?'':'none';
   render();
 }
 
@@ -348,7 +352,8 @@ function render() {
   destroyCharts();
   renderSyncBar();
   if (state.tab==='historial') renderHistorial();
-  else renderResumen();
+  else if (state.tab==='resumen') renderResumen();
+  else if (state.tab==='anual') renderAnual();
   renderModal();
 }
 
@@ -425,7 +430,7 @@ function renderHistorial() {
       <div style="flex:1;min-width:0">
         <div class="g-title"><span class="catdot" style="background:${cat.color}"></span>${escHtml(g.desc)}${frecTag}</div>
         <div class="g-sub">${tipoTag}${pagTag}<span>${g.fecha}</span>${g.notas?`<span>· ${escHtml(g.notas)}</span>`:''}</div>
-        ${g.frecuencia==='cuotas'?`<div class="g-cuota">cuota: ${fmt(m)} · total: ${fmt(g.monto)} · ${cuotasR} restantes</div>`:''}
+        ${g.frecuencia==='cuotas' && cuotasR!==null ?`<div class="g-cuota">cuota: ${fmt(m)} · total: ${fmt(g.monto)} · ${cuotasR} restantes</div>`:''}
       </div>
       <div class="amounts">
         <span class="amount-main">${fmt(g.frecuencia==='cuotas'?m:g.monto)}</span>
@@ -451,8 +456,7 @@ function renderHistorial() {
     ${saldadoBanner}
     <div class="card">
       <p class="section-title">Gastos del período</p>
-      ${rows}
-      ${resumenFiltro}
+      <div id="gastos-lista">${rows}${resumenFiltro}</div>
     </div>`;
 }
 
@@ -460,8 +464,60 @@ function setFiltro(tipo, val) {
   if(tipo==='mes') state.filtroMes=val;
   else if(tipo==='cat') state.filtroCat=val;
   else if(tipo==='pag') state.filtroPagador=val;
-  else if(tipo==='bus') state.filtroBusqueda=val;
+  else if(tipo==='bus'){ state.filtroBusqueda=val; renderGastosLista(); return; }
   renderHistorial();
+}
+
+function renderGastosLista() {
+  // Only re-renders the gastos list and summary, not the filters (so search input keeps focus)
+  const fMes=state.filtroMes, fCat=state.filtroCat, fPag=state.filtroPagador;
+  const fBus=state.filtroBusqueda.toLowerCase();
+  const gs = state.gastos.filter(g=>{
+    let enMes;
+    if(g.frecuencia==='mensual') enMes=true;
+    else if(g.frecuencia==='cuotas'){
+      const [gy,gm]=g.fecha.slice(0,7).split('-').map(Number);
+      const [fy,fm]=fMes.split('-').map(Number);
+      const diff=(fy-gy)*12+(fm-gm);
+      enMes=diff>=0&&diff<g.cuotas;
+    } else enMes=g.fecha.slice(0,7)===fMes;
+    if(!enMes) return false;
+    if(fCat!=='todas'&&g.cat!==fCat) return false;
+    if(fPag!=='todos'&&g.pagador!==fPag) return false;
+    if(fBus&&!g.desc.toLowerCase().includes(fBus)) return false;
+    return true;
+  }).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+
+  const rows = gs.map(g => {
+    const cat=catMap[g.cat]||catMap['otro'];
+    const cuotasR=cuotasRestantes(g);
+    const m=montoMensual(g);
+    let frecTag='';
+    if(g.frecuencia==='mensual') frecTag=`<span class="pill pill-ok" style="margin-left:2px">mensual</span>`;
+    if(g.frecuencia==='cuotas') frecTag=`<span class="pill pill-warn" style="margin-left:2px">${cuotasR} cuotas</span>`;
+    const tipoTag=g.tipo==='compartido'
+      ?`<span class="pill pill-shared">compartido</span>`
+      :`<span class="pill ${g.beneficiario==='Flucy'?'pill-flucy':'pill-neitor'}">${escHtml(g.beneficiario)}</span>`;
+    const pagTag=`<span class="pill ${g.pagador==='Flucy'?'pill-flucy':'pill-neitor'}">pagó ${g.pagador}</span>`;
+    return `<div class="row">
+      <div style="flex:1;min-width:0">
+        <div class="g-title"><span class="catdot" style="background:${cat.color}"></span>${escHtml(g.desc)}${frecTag}</div>
+        <div class="g-sub">${tipoTag}${pagTag}<span>${g.fecha}</span>${g.notas?`<span>· ${escHtml(g.notas)}</span>`:''}</div>
+        ${g.frecuencia==='cuotas'&&cuotasR!==null?`<div class="g-cuota">cuota: ${fmt(m)} · total: ${fmt(g.monto)} · ${cuotasR} restantes</div>`:''}
+      </div>
+      <div class="amounts">
+        <span class="amount-main">${fmt(g.frecuencia==='cuotas'?m:g.monto)}</span>
+        <button class="btn btn-sm btn-icon" onclick="abrirEditar(${g.id})">✏️</button>
+        <button class="btn btn-sm btn-danger" onclick="borrar(${g.id})">✕</button>
+      </div>
+    </div>`;
+  }).join('')||`<div class="empty">Sin gastos para este filtro</div>`;
+
+  const totalFiltrado=gs.reduce((s,g)=>s+montoMensual(g),0);
+  const resumenFiltro=gs.length>0?`<div style="font-size:12px;color:var(--text2);margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border2);display:flex;justify-content:space-between"><span>${gs.length} gasto${gs.length!==1?'s':''}</span><span style="font-weight:500">${fmt(totalFiltrado)}</span></div>`:'';
+
+  const listContainer=document.getElementById('gastos-lista');
+  if(listContainer) listContainer.innerHTML=rows+resumenFiltro;
 }
 
 // --- SALDADO ---
@@ -562,6 +618,144 @@ function renderResumen() {
 
 function setMesResumen(m) { state.filtroMes=m; renderResumen(); }
 function destroyCharts(){Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};}
+
+// --- ANUAL ---
+function gastosAnio(anio) {
+  // For each month of the year, get the gastos that apply
+  const result = [];
+  for (let m=1; m<=12; m++) {
+    const mes = `${anio}-${String(m).padStart(2,'0')}`;
+    const gs = gastosMes(mes);
+    gs.forEach(g => {
+      if (!result.find(x=>x.id===g.id && x._mes===mes)) {
+        result.push({...g, _mes: mes, _montoMes: montoMensual(g)});
+      }
+    });
+  }
+  return result;
+}
+
+function renderAnual() {
+  const anio = state.filtroAnio;
+  const now = new Date();
+
+  // Collect available years from gastos
+  const aniosSet = new Set([now.getFullYear(), now.getFullYear()-1]);
+  state.gastos.forEach(g => aniosSet.add(parseInt(g.fecha.slice(0,4))));
+  const aniosList = [...aniosSet].sort().reverse();
+  const anioOpts = aniosList.map(a=>`<option value="${a}" ${a===anio?'selected':''}>${a}</option>`).join('');
+
+  // Build monthly totals for line chart
+  const meses = [];
+  const totalPorMes = [];
+  const flucyPorMes = [];
+  const neitorPorMes = [];
+
+  for (let m=1; m<=12; m++) {
+    const mes = `${anio}-${String(m).padStart(2,'0')}`;
+    // Skip future months
+    if (mes > now.toISOString().slice(0,7)) break;
+    meses.push(mes.slice(5)); // "01", "02"...
+    const gs = gastosMes(mes);
+    let total=0, flucy=0, neitor=0;
+    gs.forEach(g=>{
+      const mm = montoMensual(g);
+      total += mm;
+      if(g.tipo==='compartido'){ flucy+=mm/2; neitor+=mm/2; }
+      else if(g.beneficiario==='Flucy') flucy+=mm;
+      else neitor+=mm;
+    });
+    totalPorMes.push(Math.round(total));
+    flucyPorMes.push(Math.round(flucy));
+    neitorPorMes.push(Math.round(neitor));
+  }
+
+  // Annual totals
+  const totalAnio = totalPorMes.reduce((s,v)=>s+v,0);
+  const flucyAnio = flucyPorMes.reduce((s,v)=>s+v,0);
+  const neitorAnio = neitorPorMes.reduce((s,v)=>s+v,0);
+  const promMensual = meses.length ? Math.round(totalAnio/meses.length) : 0;
+
+  // Category breakdown for the year
+  const catAnio = CATS.map(c=>{
+    let tot=0;
+    for(let m=1;m<=12;m++){
+      const mes=`${anio}-${String(m).padStart(2,'0')}`;
+      if(mes>now.toISOString().slice(0,7)) break;
+      gastosMes(mes).filter(g=>g.cat===c.id).forEach(g=>tot+=montoMensual(g));
+    }
+    return {...c,total:Math.round(tot)};
+  }).filter(c=>c.total>0).sort((a,b)=>b.total-a.total);
+
+  const catRows = catAnio.map(c=>`
+    <div class="legend-item">
+      <span style="width:10px;height:10px;border-radius:50%;background:${c.color};display:inline-block;flex-shrink:0"></span>
+      <span style="flex:1">${c.label}</span>
+      <span style="font-weight:500">${fmt(c.total)}</span>
+      <span style="color:var(--text3);font-size:11px">${totalAnio>0?Math.round(c.total/totalAnio*100):0}%</span>
+    </div>`).join('') || '<p style="font-size:12px;color:var(--text3)">Sin datos</p>';
+
+  const mesLabels = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+  document.getElementById('view-anual').innerHTML = `
+    <div style="margin-bottom:1rem;display:flex;align-items:center;gap:8px">
+      <div style="flex:1"><label class="lbl">Año</label>
+        <select onchange="setAnio(this.value)" style="max-width:120px">${anioOpts}</select>
+      </div>
+    </div>
+    <div class="g3" style="margin-bottom:1rem">
+      <div class="metric"><p>Total ${anio}</p><p>${fmt(totalAnio)}</p></div>
+      <div class="metric"><p>Flucy gastó</p><p style="color:#7F77DD">${fmt(flucyAnio)}</p></div>
+      <div class="metric"><p>Neitor gastó</p><p style="color:#1D9E75">${fmt(neitorAnio)}</p></div>
+    </div>
+    <div class="g2" style="margin-bottom:1rem">
+      <div class="metric"><p>Promedio mensual</p><p>${fmt(promMensual)}</p></div>
+      <div class="metric"><p>Meses registrados</p><p>${meses.length}</p></div>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <p class="section-title">Evolución mensual</p>
+      <canvas id="chart-linea" height="160"></canvas>
+      <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">
+        <div class="legend-item"><span style="width:10px;height:3px;background:#7F77DD;display:inline-block;border-radius:2px"></span><span>Flucy</span></div>
+        <div class="legend-item"><span style="width:10px;height:3px;background:#1D9E75;display:inline-block;border-radius:2px"></span><span>Neitor</span></div>
+        <div class="legend-item"><span style="width:10px;height:3px;background:#378ADD;display:inline-block;border-radius:2px;border-top:2px dashed #378ADD"></span><span>Total</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <p class="section-title">Por categoría — año completo</p>
+      ${catRows}
+    </div>`;
+
+  setTimeout(()=>{
+    const ctx = document.getElementById('chart-linea');
+    if (!ctx || !meses.length) return;
+    const labels = meses.map(m => mesLabels[parseInt(m)-1]);
+    charts.linea = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label:'Flucy', data:flucyPorMes, borderColor:'#7F77DD', backgroundColor:'rgba(127,119,221,0.08)', tension:0.35, pointRadius:3, pointHoverRadius:5, fill:false },
+          { label:'Neitor', data:neitorPorMes, borderColor:'#1D9E75', backgroundColor:'rgba(29,158,117,0.08)', tension:0.35, pointRadius:3, pointHoverRadius:5, fill:false },
+          { label:'Total', data:totalPorMes, borderColor:'#378ADD', backgroundColor:'rgba(55,138,221,0.05)', tension:0.35, pointRadius:3, pointHoverRadius:5, fill:false, borderDash:[5,4] },
+        ]
+      },
+      options: {
+        responsive:true,
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
+        },
+        scales:{
+          y:{ticks:{callback:v=>fmt(v)},grid:{color:'rgba(128,128,128,0.1)'}},
+          x:{grid:{display:false}}
+        }
+      }
+    });
+  },50);
+}
+
+function setAnio(a) { state.filtroAnio=parseInt(a); renderAnual(); }
 
 // --- MODAL ---
 function abrirNuevo(){
