@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gastos — Cuchugastos</title>
+<title>Gastos — Flucy y Neitor</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
@@ -125,13 +125,27 @@ label.lbl{font-size:11px;color:var(--text2);display:block;margin-bottom:3px}
 .saldado-banner p{font-size:13px;color:var(--saldado-text);font-weight:500}
 .saldado-banner small{font-size:11px;color:var(--text2);display:block;font-weight:400}
 .chip-active{background:var(--primary-bg);border-color:var(--primary-border);color:var(--primary-text)}
-@media(max-width:480px){.charts-grid{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}.filters{gap:4px}}
+.view-toggle{display:flex;gap:4px;margin-bottom:1rem}
+.view-toggle button{flex:1;font-size:12px;padding:5px 0;border-radius:8px;border:0.5px solid var(--border);background:var(--btn-bg);color:var(--text2);cursor:pointer;transition:all .15s;font-family:inherit}
+.view-toggle button.active{background:var(--surface);border-color:var(--border);color:var(--text);font-weight:500}
+.kanban-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.kanban-col{background:var(--surface2);border-radius:10px;padding:10px}
+.kanban-col-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.kanban-col-title{font-size:12px;font-weight:500}
+.kanban-col-total{font-size:11px;color:var(--text2);margin-left:auto}
+.kanban-card{background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:box-shadow .15s}
+.kanban-card:last-child{margin-bottom:0}
+.kanban-card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.12)}
+.kanban-card-title{font-size:12px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kanban-card-amount{font-size:15px;font-weight:600;margin-bottom:4px}
+.kanban-card-meta{display:flex;flex-wrap:wrap;gap:3px}
+@media(max-width:480px){.charts-grid{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}.filters{gap:4px}.kanban-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="topbar">
-    <h1>💸 Cuchugastosr</h1>
+    <h1>💸 Flucy y Neitor</h1>
     <div class="sync-info" id="sync-bar"><span class="dot dot-loading"></span> Cargando...</div>
     <button class="toggle-dark" onclick="toggleDark()" id="dark-btn" title="Modo oscuro">🌙</button>
   </div>
@@ -180,6 +194,7 @@ let state = {
   filtroCat: 'todas',
   filtroPagador: 'todos',
   filtroBusqueda: '',
+  vistaHistorial: 'lista', // 'lista' | 'kanban'
   syncStatus: 'loading',
   syncMsg: 'Cargando...',
 };
@@ -443,6 +458,17 @@ function renderHistorial() {
   const totalFiltrado = gs.reduce((s,g)=>s+montoMensual(g),0);
   const resumenFiltro = gs.length>0 ? `<div style="font-size:12px;color:var(--text2);margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border2);display:flex;justify-content:space-between"><span>${gs.length} gasto${gs.length!==1?'s':''}</span><span style="font-weight:500">${fmt(totalFiltrado)}</span></div>` : '';
 
+  const isKanban = state.vistaHistorial === 'kanban';
+  const viewToggle = `<div class="view-toggle">
+    <button class="${!isKanban?'active':''}" onclick="setVista('lista')">☰ Lista</button>
+    <button class="${isKanban?'active':''}" onclick="setVista('kanban')">⊞ Categorías</button>
+  </div>`;
+
+  const mainContent = isKanban ? buildKanban(gs) : `<div class="card">
+      <p class="section-title">Gastos del período</p>
+      <div id="gastos-lista">${rows}${resumenFiltro}</div>
+    </div>`;
+
   document.getElementById('view-historial').innerHTML = `
     <div class="card" style="margin-bottom:.75rem">
       <button class="btn btn-primary btn-full" onclick="abrirNuevo()">+ Nuevo gasto</button>
@@ -453,14 +479,57 @@ function renderHistorial() {
       <select onchange="setFiltro('pag',this.value)">${pagOpts}</select>
       <input type="search" placeholder="Buscar..." value="${escHtml(state.filtroBusqueda)}" oninput="setFiltro('bus',this.value)">
     </div>
+    ${viewToggle}
     ${saldadoBanner}
-    <div class="card">
-      <p class="section-title">Gastos del período</p>
-      <div id="gastos-lista">${rows}${resumenFiltro}</div>
-    </div>`;
+    ${mainContent}`;
 }
 
-function setFiltro(tipo, val) {
+function setVista(v) { state.vistaHistorial=v; renderHistorial(); }
+
+function buildKanban(gs) {
+  // Group by category, only cats with gastos
+  const grupos = CATS.map(cat => {
+    const items = gs.filter(g => g.cat === cat.id);
+    return { cat, items, total: items.reduce((s,g)=>s+montoMensual(g),0) };
+  }).filter(g => g.items.length > 0);
+
+  if (!grupos.length) return `<div class="empty">Sin gastos para este filtro</div>`;
+
+  const cols = grupos.map(({cat, items, total}) => {
+    const cards = items.map(g => {
+      const m = montoMensual(g);
+      const cuotasR = cuotasRestantes(g);
+      let frecTag='';
+      if(g.frecuencia==='mensual') frecTag=`<span class="pill pill-ok">mensual</span>`;
+      if(g.frecuencia==='cuotas') frecTag=`<span class="pill pill-warn">${cuotasR}c</span>`;
+      const tipoTag = g.tipo==='compartido'
+        ? `<span class="pill pill-shared">50/50</span>`
+        : `<span class="pill ${g.beneficiario==='Flucy'?'pill-flucy':'pill-neitor'}">${escHtml(g.beneficiario)}</span>`;
+      const pagTag = `<span class="pill ${g.pagador==='Flucy'?'pill-flucy':'pill-neitor'}">${g.pagador}</span>`;
+      return `<div class="kanban-card" onclick="abrirEditar(${g.id})">
+        <div class="kanban-card-title">${escHtml(g.desc)}</div>
+        <div class="kanban-card-amount">${fmt(g.frecuencia==='cuotas'?m:g.monto)}</div>
+        <div class="kanban-card-meta">${tipoTag}${pagTag}${frecTag}</div>
+        ${g.frecuencia==='cuotas'&&cuotasR!==null?`<div style="font-size:10px;color:var(--text3);margin-top:3px">${cuotasR} cuotas restantes</div>`:''}
+      </div>`;
+    }).join('');
+
+    return `<div class="kanban-col">
+      <div class="kanban-col-header">
+        <span style="width:9px;height:9px;border-radius:50%;background:${cat.color};display:inline-block;flex-shrink:0"></span>
+        <span class="kanban-col-title">${cat.label}</span>
+        <span class="kanban-col-total">${fmt(total)}</span>
+      </div>
+      ${cards}
+    </div>`;
+  }).join('');
+
+  const totalAll = grupos.reduce((s,g)=>s+g.total,0);
+  return `<div class="kanban-grid">${cols}</div>
+    <div style="font-size:12px;color:var(--text2);text-align:right;margin-bottom:1rem">
+      ${grupos.reduce((s,g)=>s+g.items.length,0)} gastos · <strong>${fmt(totalAll)}</strong>
+    </div>`;
+}
   if(tipo==='mes') state.filtroMes=val;
   else if(tipo==='cat') state.filtroCat=val;
   else if(tipo==='pag') state.filtroPagador=val;
