@@ -530,6 +530,7 @@ function buildKanban(gs) {
       ${grupos.reduce((s,g)=>s+g.items.length,0)} gastos · <strong>${fmt(totalAll)}</strong>
     </div>`;
 }
+function setFiltro(tipo, val) {
   if(tipo==='mes') state.filtroMes=val;
   else if(tipo==='cat') state.filtroCat=val;
   else if(tipo==='pag') state.filtroPagador=val;
