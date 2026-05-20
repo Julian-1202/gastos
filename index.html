@@ -1270,6 +1270,121 @@
     color: var(--danger);
   }
 
+  /* ============ CUOTAS ============ */
+  .installment-tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: 9px;
+    font-weight: 800;
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+    margin-left: 4px;
+    vertical-align: middle;
+    gap: 3px;
+  }
+  .expense-item.installment {
+    border-left: 3px solid var(--primary);
+  }
+  .expense-amount-sub {
+    font-size: 10px;
+    color: var(--text-soft);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  /* Progreso de cuotas en el ticket */
+  .installment-progress {
+    background: var(--bg-soft);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .installment-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+  .installment-progress-header .title {
+    font-weight: 700;
+  }
+  .installment-progress-header .count {
+    color: var(--text-soft);
+    font-size: 12px;
+  }
+  .installment-bars {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .installment-bar {
+    flex: 1;
+    min-width: 14px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+  }
+  .installment-bar.paid { background: var(--success); }
+  .installment-bar.current { background: var(--primary); }
+  .installment-info {
+    font-size: 11px;
+    color: var(--text-soft);
+    line-height: 1.5;
+  }
+  /* Toggle de cuotas en formularios */
+  .installment-toggle-section {
+    background: var(--bg-soft);
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 12px;
+  }
+  .installment-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .installment-fields label {
+    font-size: 10px;
+    color: var(--text-soft);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: block;
+    margin-bottom: 5px;
+  }
+  .installment-fields input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--card);
+    color: var(--text);
+    font-weight: 600;
+  }
+  .installment-fields input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+  .installment-hint {
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    line-height: 1.4;
+    margin-top: 8px;
+    display: none;
+  }
+  .installment-hint.show { display: block; }
+
   /* ============ FAB (Floating Action Button) MOBILE ============ */
   .fab {
     display: none;
@@ -1651,6 +1766,26 @@
           <span class="capital-toggle-label">💰 Este es un aporte de capital (ingreso de dinero, suma al balance)</span>
         </label>
       </div>
+
+      <div class="installment-toggle-section">
+        <label class="capital-toggle">
+          <input type="checkbox" id="newInstallmentToggle" onchange="toggleInstallmentFields(this.checked)">
+          <span class="capital-toggle-label">📅 Pagar en cuotas</span>
+        </label>
+        <div class="installment-fields" id="installmentFields" style="display:none;">
+          <div>
+            <label>Total de cuotas</label>
+            <input type="number" id="newInstTotal" min="2" max="60" value="3" oninput="updateInstallmentHint()">
+          </div>
+          <div>
+            <label>Estoy pagando la cuota Nº</label>
+            <input type="number" id="newInstCurrent" min="1" value="1" oninput="updateInstallmentHint()">
+          </div>
+        </div>
+        <div class="installment-hint" id="installmentHint">
+          💡 El monto que cargás es el de <b>una cuota</b>. Las cuotas restantes aparecerán automáticamente en los próximos meses.
+        </div>
+      </div>
     </div>
 
     <div class="charts-grid">
@@ -1817,6 +1952,15 @@
         </div>
       </div>
 
+      <div class="installment-progress" id="ticketInstallmentBlock" style="display:none;">
+        <div class="installment-progress-header">
+          <span class="title">📅 Plan de cuotas</span>
+          <span class="count" id="ticketInstallmentCount"></span>
+        </div>
+        <div class="installment-bars" id="ticketInstallmentBars"></div>
+        <div class="installment-info" id="ticketInstallmentInfo"></div>
+      </div>
+
       <div class="comments-section">
         <h3 id="commentsTitle">Comentarios</h3>
         <div class="comments-list" id="commentsList"></div>
@@ -1877,6 +2021,23 @@
         <input type="checkbox" id="quickCapital">
         <span class="capital-toggle-label">💰 Es un aporte (ingreso, no gasto)</span>
       </label>
+    </div>
+
+    <div class="installment-toggle-section" style="margin-top: 10px;">
+      <label class="capital-toggle">
+        <input type="checkbox" id="quickInstallmentToggle" onchange="toggleQuickInstallmentFields(this.checked)">
+        <span class="capital-toggle-label">📅 Pagar en cuotas</span>
+      </label>
+      <div class="installment-fields" id="quickInstallmentFields" style="display:none;">
+        <div>
+          <label>Total cuotas</label>
+          <input type="number" id="quickInstTotal" min="2" max="60" value="3" inputmode="numeric">
+        </div>
+        <div>
+          <label>Cuota Nº</label>
+          <input type="number" id="quickInstCurrent" min="1" value="1" inputmode="numeric">
+        </div>
+      </div>
     </div>
 
     <button class="quick-submit-btn" onclick="submitQuickAdd()">Guardar movimiento</button>
@@ -2014,8 +2175,54 @@ function isCurrentMonth(dateStr) {
   return d.getFullYear() === currentDate.getFullYear()
       && d.getMonth() === currentDate.getMonth();
 }
+
+// ============ CUOTAS ============
+// Suma N meses a una fecha 'YYYY-MM-DD' y devuelve nueva fecha del mismo día (clamped)
+function addMonthsToDateStr(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00');
+  const day = d.getDate();
+  const newDate = new Date(d.getFullYear(), d.getMonth() + n, 1);
+  // intentar mantener el día, pero respetar fin de mes
+  const lastDayOfMonth = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
+  newDate.setDate(Math.min(day, lastDayOfMonth));
+  return newDate.toISOString().split('T')[0];
+}
+
+// Devuelve cuántos meses hay entre dateStr y el currentDate (puede ser negativo)
+function monthsDiffFromCurrent(dateStr) {
+  const d = new Date(dateStr + 'T00:00');
+  return (currentDate.getFullYear() - d.getFullYear()) * 12
+       + (currentDate.getMonth() - d.getMonth());
+}
+
+// Si un gasto tiene installments y nos da la cuota correspondiente al mes visualizado,
+// devuelve un "gasto virtual" con la cuota correcta. Si no aplica, devuelve null.
+function getVirtualInstallment(e) {
+  if (!e.installments || !e.installments.total || e.installments.total < 2) return null;
+  const diff = monthsDiffFromCurrent(e.date);
+  const cuotaThisMonth = (e.installments.currentAt || 1) + diff;
+  if (cuotaThisMonth < 1 || cuotaThisMonth > e.installments.total) return null;
+  // Devolver una copia con datos virtuales
+  return {
+    ...e,
+    _isVirtual: true,
+    _installmentNum: cuotaThisMonth, // qué cuota es ESTE mes
+    // El id virtual conserva el real para acciones (con prefijo para distinguir)
+    _realId: e.id,
+  };
+}
+
 function getCurrentMonthExpenses() {
-  return expenses.filter(e => isCurrentMonth(e.date));
+  const out = [];
+  expenses.forEach(e => {
+    if (e.installments && e.installments.total >= 2) {
+      const v = getVirtualInstallment(e);
+      if (v) out.push(v);
+    } else if (isCurrentMonth(e.date)) {
+      out.push(e);
+    }
+  });
+  return out;
 }
 
 function calculateBalance() {
@@ -2091,12 +2298,25 @@ function renderExpenseList() {
       ? `<span class="expense-comments-badge ${hasUnreadFromOther ? 'has-new' : ''}">💬 ${commentsCount}</span>`
       : '';
     const isCapital = e.capital === true;
-    const itemClass = 'expense-item' + (isCapital ? ' capital' : '');
+    const isInstallment = e._isVirtual === true;
+    const itemClass = 'expense-item'
+      + (isCapital ? ' capital' : '')
+      + (isInstallment ? ' installment' : '');
     const amountText = isCapital ? '+ ' + formatMoney(e.amount) : formatMoney(e.amount);
     const iconDisplay = isCapital ? '💰' : info.icon;
     const iconCls = isCapital ? 'cat-capital' : info.cls;
-    const nameDisplay = isCapital ? `<span class="capital-tag">APORTE</span> ${e.desc}` : e.desc;
-    return `<div class="${itemClass}" onclick="openTicket(${e.id})">
+    const installmentBadge = isInstallment
+      ? `<span class="installment-tag">📅 CUOTA ${e._installmentNum}/${e.installments.total}</span>`
+      : '';
+    const nameDisplay = (isCapital ? `<span class="capital-tag">APORTE</span> ` : '')
+      + e.desc
+      + installmentBadge;
+    const totalDisplay = isInstallment
+      ? `<div class="expense-amount-sub">de ${formatMoney(e.amount * e.installments.total)}</div>`
+      : '';
+    // Para click usamos el id real (no el virtual)
+    const clickId = isInstallment ? e._realId : e.id;
+    return `<div class="${itemClass}" onclick="openTicket(${clickId})">
       <div class="expense-icon ${iconCls}">${iconDisplay}</div>
       <div class="expense-info">
         <div class="name">${nameDisplay} ${commentsBadge}</div>
@@ -2104,8 +2324,11 @@ function renderExpenseList() {
       </div>
       <div class="expense-payer">${payerAvatar} ${payerName}</div>
       <span class="expense-split s${e.split}">${splitLabel}</span>
-      <div class="expense-amount ${isCapital ? 'capital-amount' : ''}">${amountText}</div>
-      <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${e.id})">✕</button>
+      <div class="expense-amount ${isCapital ? 'capital-amount' : ''}">
+        ${amountText}
+        ${totalDisplay}
+      </div>
+      <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${clickId})">✕</button>
     </div>`;
   }).join('');
 }
@@ -2113,8 +2336,12 @@ function renderExpenseList() {
 function deleteExpense(id) {
   const e = expenses.find(x => x.id === id);
   if (!e) return;
-  const label = e.capital ? 'aporte' : 'gasto';
-  if (!confirm(`¿Eliminar el ${label} "${e.desc}" de ${formatMoney(e.amount)}?\n\nEsta acción no se puede deshacer.`)) return;
+  let label = e.capital ? 'aporte' : 'gasto';
+  let extraMsg = '';
+  if (e.installments && e.installments.total >= 2) {
+    extraMsg = `\n\n⚠️ Este gasto está en ${e.installments.total} cuotas. Se eliminarán TODAS las cuotas (no solo la actual).`;
+  }
+  if (!confirm(`¿Eliminar el ${label} "${e.desc}" de ${formatMoney(e.amount)}?${extraMsg}\n\nEsta acción no se puede deshacer.`)) return;
   expenses = expenses.filter(x => x.id !== id);
   scheduleSave();
   render();
@@ -2126,7 +2353,21 @@ function addExpense() {
   if (!desc || !amount || amount <= 0) { alert('Completá descripción y monto'); return; }
   const isCapital = document.getElementById('newCapital')?.checked || false;
   let category = document.getElementById('newCategory').value;
-  if (category === '__add__') category = 'otros'; // por si quedó seleccionada la opción de agregar
+  if (category === '__add__') category = 'otros';
+
+  // Detectar cuotas
+  let installments = null;
+  const instToggle = document.getElementById('newInstallmentToggle');
+  if (instToggle && instToggle.checked) {
+    const total = parseInt(document.getElementById('newInstTotal').value);
+    const currentAt = parseInt(document.getElementById('newInstCurrent').value);
+    if (!total || total < 2 || !currentAt || currentAt < 1 || currentAt > total) {
+      alert('Datos de cuotas inválidos. Total debe ser ≥ 2 y la cuota actual entre 1 y el total.');
+      return;
+    }
+    installments = { total, currentAt };
+  }
+
   expenses.push({
     id: Date.now(),
     desc, amount,
@@ -2135,11 +2376,17 @@ function addExpense() {
     split: document.getElementById('newSplit').value,
     date: new Date().toISOString().split('T')[0],
     comments: [],
-    capital: isCapital
+    capital: isCapital,
+    installments
   });
+
   document.getElementById('newDesc').value = '';
   document.getElementById('newAmount').value = '';
   if (document.getElementById('newCapital')) document.getElementById('newCapital').checked = false;
+  if (instToggle) {
+    instToggle.checked = false;
+    toggleInstallmentFields(false);
+  }
   scheduleSave();
   render();
 }
@@ -2606,15 +2853,48 @@ window.addEventListener('DOMContentLoaded', () => {
 // ============ MODAL DE CARGA RAPIDA (mobile) ============
 let quickState = { payer: 'p1', split: '5050', category: 'comida' };
 
+// Toggle de cuotas - formulario desktop
+function toggleInstallmentFields(checked) {
+  const fields = document.getElementById('installmentFields');
+  const hint = document.getElementById('installmentHint');
+  if (fields) fields.style.display = checked ? 'grid' : 'none';
+  if (hint) hint.classList.toggle('show', checked);
+  updateInstallmentHint();
+}
+
+function updateInstallmentHint() {
+  const hint = document.getElementById('installmentHint');
+  const totalEl = document.getElementById('newInstTotal');
+  const currentEl = document.getElementById('newInstCurrent');
+  if (!hint || !totalEl || !currentEl) return;
+  const total = parseInt(totalEl.value) || 0;
+  const current = parseInt(currentEl.value) || 0;
+  if (total >= 2 && current >= 1 && current <= total) {
+    const restantes = total - current;
+    hint.innerHTML = `💡 El monto que cargás es el de <b>una cuota</b>. Te quedarán ${restantes} cuota${restantes !== 1 ? 's' : ''} más, que aparecerán automáticamente.`;
+  }
+}
+
+// Toggle de cuotas - modal mobile
+function toggleQuickInstallmentFields(checked) {
+  const fields = document.getElementById('quickInstallmentFields');
+  if (fields) fields.style.display = checked ? 'grid' : 'none';
+}
+
 function openQuickAdd() {
   quickState = { payer: 'p1', split: '5050', category: 'comida' };
   document.getElementById('quickAmount').value = '';
   document.getElementById('quickDesc').value = '';
   document.getElementById('quickCapital').checked = false;
+  const qInstToggle = document.getElementById('quickInstallmentToggle');
+  if (qInstToggle) {
+    qInstToggle.checked = false;
+    toggleQuickInstallmentFields(false);
+  }
+  document.getElementById('quickInstTotal').value = '3';
+  document.getElementById('quickInstCurrent').value = '1';
 
-  // Render chips de categorías
   renderQuickCategoryChips();
-  // Reset visual de payer/split chips
   document.querySelectorAll('#quickPayerChips .quick-chip').forEach(c => {
     c.classList.toggle('active', c.dataset.payer === 'p1');
   });
@@ -2681,6 +2961,20 @@ function submitQuickAdd() {
     return;
   }
   const isCapital = document.getElementById('quickCapital').checked;
+
+  // Detectar cuotas
+  let installments = null;
+  const instToggle = document.getElementById('quickInstallmentToggle');
+  if (instToggle && instToggle.checked) {
+    const total = parseInt(document.getElementById('quickInstTotal').value);
+    const currentAt = parseInt(document.getElementById('quickInstCurrent').value);
+    if (!total || total < 2 || !currentAt || currentAt < 1 || currentAt > total) {
+      alert('Datos de cuotas inválidos. Total debe ser ≥ 2 y la cuota actual entre 1 y el total.');
+      return;
+    }
+    installments = { total, currentAt };
+  }
+
   expenses.push({
     id: Date.now(),
     desc, amount,
@@ -2689,7 +2983,8 @@ function submitQuickAdd() {
     split: quickState.split,
     date: new Date().toISOString().split('T')[0],
     comments: [],
-    capital: isCapital
+    capital: isCapital,
+    installments
   });
   scheduleSave();
   closeQuickAdd();
@@ -2714,14 +3009,51 @@ function openTicket(id) {
   const splitLabel = { '5050': '50/50 compartido', '100p1': '100% Flucy', '100p2': '100% Neitor' }[e.split];
   const dateStr = new Date(e.date + 'T00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
   const isCapital = e.capital === true;
+  const isInstallment = e.installments && e.installments.total >= 2;
 
   const iconEl = document.getElementById('ticketIcon');
   iconEl.className = 'modal-header-icon ' + (isCapital ? 'cat-capital' : info.cls);
-  iconEl.textContent = isCapital ? '💰' : info.icon;
+  iconEl.textContent = isCapital ? '💰' : (isInstallment ? '📅' : info.icon);
   document.getElementById('ticketTitle').textContent = (isCapital ? '💰 APORTE: ' : '') + e.desc;
   document.getElementById('ticketSub').textContent = `${info.name} · ${dateStr}`;
-  document.getElementById('ticketAmount').textContent = (isCapital ? '+ ' : '') + formatMoney(e.amount);
+  document.getElementById('ticketAmount').textContent = (isCapital ? '+ ' : '') + formatMoney(e.amount) + (isInstallment ? ' / cuota' : '');
   document.getElementById('ticketSplit').textContent = `${splitLabel} · Pagó ${payerName}`;
+
+  // Sección de cuotas
+  const instBlock = document.getElementById('ticketInstallmentBlock');
+  if (isInstallment) {
+    const total = e.installments.total;
+    const startedAt = e.installments.currentAt || 1;
+    const diff = monthsDiffFromCurrent(e.date);
+    const cuotaActual = startedAt + diff;
+    const cuotaShow = Math.max(0, Math.min(total, cuotaActual));
+
+    document.getElementById('ticketInstallmentCount').textContent = `Cuota ${cuotaShow} de ${total}`;
+
+    // Barras
+    let bars = '';
+    for (let i = 1; i <= total; i++) {
+      let cls = '';
+      if (i < cuotaActual) cls = 'paid';
+      else if (i === cuotaActual) cls = 'current';
+      bars += `<div class="installment-bar ${cls}"></div>`;
+    }
+    document.getElementById('ticketInstallmentBars').innerHTML = bars;
+
+    // Info
+    const totalAmount = e.amount * total;
+    const restantes = Math.max(0, total - cuotaActual);
+    const endDate = addMonthsToDateStr(e.date, total - startedAt);
+    const endMonth = new Date(endDate + 'T00:00').toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+    document.getElementById('ticketInstallmentInfo').innerHTML = `
+      💰 Total compra: <b>${formatMoney(totalAmount)}</b><br>
+      📅 ${restantes} cuota${restantes !== 1 ? 's' : ''} restante${restantes !== 1 ? 's' : ''} · Termina en ${endMonth}
+    `;
+
+    instBlock.style.display = '';
+  } else {
+    instBlock.style.display = 'none';
+  }
 
   renderTicketComments();
   document.getElementById('ticketModal').classList.add('open');
