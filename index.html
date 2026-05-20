@@ -1159,19 +1159,6 @@
   /* Esconder app hasta loguearse */
   .app-hidden { display: none !important; }
 
-  /* Indicador de usuario activo */
-  .current-user-badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--card);
-    padding: 6px 12px 6px 6px;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    font-size: 13px;
-    font-weight: 600;
-  }
-
   /* Indicador de sincronización */
   .sync-indicator {
     display: flex;
@@ -1284,6 +1271,125 @@
     margin-left: 4px;
     vertical-align: middle;
     gap: 3px;
+  }
+
+  /* ============ USER MENU DROPDOWN ============ */
+  .user-menu-wrap {
+    position: relative;
+  }
+  .current-user-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    padding: 6px 12px 6px 6px;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .current-user-badge:hover { transform: translateY(-1px); }
+  .user-menu-chevron {
+    font-size: 10px;
+    color: var(--text-soft);
+    margin-left: 2px;
+    transition: transform 0.2s;
+  }
+  .user-menu-wrap.open .user-menu-chevron { transform: rotate(180deg); }
+  .user-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    padding: 6px;
+    z-index: 1000;
+    display: none;
+    border: 1px solid var(--border);
+    animation: fadeIn 0.15s;
+  }
+  .user-menu-wrap.open .user-menu { display: block; }
+  .user-menu-item {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .user-menu-item:hover { background: var(--bg-soft); }
+  .user-menu-item.danger { color: var(--danger); }
+  .user-menu-item.danger:hover { background: var(--danger-soft); }
+  .user-menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  /* Botón "Agregar gasto" desktop (reemplaza al form inline) */
+  .add-expense-btn-desktop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: linear-gradient(135deg, var(--p1), var(--p2));
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-family: inherit;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.2);
+    transition: all 0.2s;
+  }
+  .add-expense-btn-desktop:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(99,102,241,0.35);
+  }
+
+  /* Grid 2 columnas dentro del modal */
+  .quick-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Reintegro chip en lista de gastos */
+  .expense-item.reintegro {
+    border-left: 3px solid var(--success);
+    background: linear-gradient(to right, rgba(16,185,129,0.06), transparent 50%);
+  }
+  .reintegro-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 800;
+    background: var(--success);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+    margin-right: 4px;
+    vertical-align: middle;
   }
   .expense-item.installment {
     border-left: 3px solid var(--primary);
@@ -1414,21 +1520,23 @@
     background: rgba(0,0,0,0.55);
     backdrop-filter: blur(4px);
     display: none;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     z-index: 1500;
     animation: fadeIn 0.2s;
+    padding: 20px;
   }
   .quick-modal-overlay.open { display: flex; }
   .quick-modal {
     background: var(--card);
-    border-radius: 20px 20px 0 0;
+    border-radius: 16px;
     width: 100%;
-    max-width: 500px;
+    max-width: 520px;
     max-height: 90vh;
     overflow-y: auto;
-    padding: 22px 20px 30px;
+    padding: 24px 22px;
     animation: slideUp 0.3s;
+    box-shadow: var(--shadow-lg);
   }
   .quick-modal-header {
     display: flex;
@@ -1543,6 +1651,13 @@
 
   /* ============ MEDIA QUERIES MOBILE ============ */
   @media (max-width: 768px) {
+    /* Modal de carga rápida en mobile = bottom sheet */
+    .quick-modal-overlay { align-items: flex-end; padding: 0; }
+    .quick-modal {
+      border-radius: 20px 20px 0 0;
+      padding: 22px 20px 30px;
+      max-width: 100%;
+    }
     body { padding: 12px; }
     .container { max-width: 100%; }
 
@@ -1672,25 +1787,33 @@
   <div class="header">
     <h1><span class="icon">F&N</span> Flucy & Neitor</h1>
     <div class="header-actions">
-      <div class="current-user-badge" id="currentUserBadge">
-        <div class="avatar" id="currentUserAvatar">F</div>
-        <span id="currentUserName">Flucy</span>
-      </div>
       <div class="month-selector">
         <button onclick="changeMonth(-1)">‹</button>
         <span id="currentMonth">mayo 2026</span>
         <button onclick="changeMonth(1)">›</button>
       </div>
-      <div class="theme-toggle">
-        <button onclick="toggleTheme()" id="themeBtn" title="Cambiar tema">🌙</button>
-      </div>
       <div class="sync-indicator saved" id="syncIndicator">
         <span class="sync-dot"></span>
         <span id="syncText">Guardado</span>
       </div>
-      <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">
-        🚪 Salir
-      </button>
+      <div class="user-menu-wrap">
+        <button class="current-user-badge" id="currentUserBadge" onclick="toggleUserMenu(event)">
+          <div class="avatar" id="currentUserAvatar">F</div>
+          <span id="currentUserName">Flucy</span>
+          <span class="user-menu-chevron">▾</span>
+        </button>
+        <div class="user-menu" id="userMenu">
+          <button class="user-menu-item" onclick="toggleTheme()">
+            <span id="themeMenuIcon">🌙</span>
+            <span id="themeMenuLabel">Modo nocturno</span>
+          </button>
+          <div class="user-menu-divider"></div>
+          <button class="user-menu-item danger" onclick="doLogout()">
+            <span>🚪</span>
+            <span>Cerrar sesión</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1726,67 +1849,10 @@
       </div>
     </div>
 
-    <div class="quick-add">
-      <h2>+ Agregar gasto</h2>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Descripción</label>
-          <input type="text" id="newDesc" placeholder="Ej: Super del lunes">
-        </div>
-        <div class="form-group">
-          <label>Monto</label>
-          <input type="number" id="newAmount" placeholder="0" step="0.01">
-        </div>
-        <div class="form-group">
-          <label>Categoría</label>
-          <select id="newCategory" onchange="if(this.value==='__add__'){addCustomCategory(); this.value='comida';}">
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Pagó</label>
-          <select id="newPayer">
-            <option value="p1">Flucy</option>
-            <option value="p2">Neitor</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>División</label>
-          <select id="newSplit">
-            <option value="5050">50/50 compartido</option>
-            <option value="100p1">100% Flucy</option>
-            <option value="100p2">100% Neitor</option>
-          </select>
-        </div>
-        <button class="btn" onclick="addExpense()">+ Agregar</button>
-      </div>
-
-      <div class="capital-toggle-row">
-        <label class="capital-toggle">
-          <input type="checkbox" id="newCapital">
-          <span class="capital-toggle-label">💰 Este es un aporte de capital (ingreso de dinero, suma al balance)</span>
-        </label>
-      </div>
-
-      <div class="installment-toggle-section">
-        <label class="capital-toggle">
-          <input type="checkbox" id="newInstallmentToggle" onchange="toggleInstallmentFields(this.checked)">
-          <span class="capital-toggle-label">📅 Pagar en cuotas</span>
-        </label>
-        <div class="installment-fields" id="installmentFields" style="display:none;">
-          <div>
-            <label>Total de cuotas</label>
-            <input type="number" id="newInstTotal" min="2" max="60" value="3" oninput="updateInstallmentHint()">
-          </div>
-          <div>
-            <label>Estoy pagando la cuota Nº</label>
-            <input type="number" id="newInstCurrent" min="1" value="1" oninput="updateInstallmentHint()">
-          </div>
-        </div>
-        <div class="installment-hint" id="installmentHint">
-          💡 El monto que cargás es el de <b>una cuota</b>. Las cuotas restantes aparecerán automáticamente en los próximos meses.
-        </div>
-      </div>
-    </div>
+    <button class="add-expense-btn-desktop" onclick="openQuickAdd()">
+      <span style="font-size:18px;">+</span>
+      Agregar gasto
+    </button>
 
     <div class="charts-grid">
       <div class="card">
@@ -1980,7 +2046,7 @@
 <div class="quick-modal-overlay" id="quickAddModal" onclick="closeQuickAdd(event)">
   <div class="quick-modal" onclick="event.stopPropagation()">
     <div class="quick-modal-header">
-      <div class="quick-modal-title">Nuevo gasto</div>
+      <div class="quick-modal-title" id="quickModalTitle">Nuevo gasto</div>
       <button class="modal-close" onclick="closeQuickAdd()">✕</button>
     </div>
 
@@ -1992,6 +2058,17 @@
     <div class="quick-field">
       <label>¿Qué fue?</label>
       <input type="text" id="quickDesc" placeholder="Ej: Super del lunes">
+    </div>
+
+    <div class="quick-grid-2">
+      <div class="quick-field">
+        <label>Fecha</label>
+        <input type="date" id="quickDate">
+      </div>
+      <div class="quick-field">
+        <label>Reintegro ($)</label>
+        <input type="number" id="quickReintegro" placeholder="0" step="0.01" inputmode="decimal" min="0">
+      </div>
     </div>
 
     <div class="quick-field">
@@ -2016,28 +2093,26 @@
       </div>
     </div>
 
+    <div class="quick-field">
+      <label>📅 Cuotas <span style="font-weight:400; text-transform:none; color:var(--text-soft);">(opcional, dejá en 1 si es un pago único)</span></label>
+      <div class="quick-grid-2">
+        <div>
+          <input type="number" id="quickInstTotal" placeholder="Total cuotas" min="1" max="60" value="1" inputmode="numeric" oninput="onInstallmentsTotalChange()">
+        </div>
+        <div>
+          <input type="number" id="quickInstCurrent" placeholder="Cuota actual" min="1" value="1" inputmode="numeric" disabled>
+        </div>
+      </div>
+      <div class="installment-hint show" id="quickInstHint" style="display:none;">
+        💡 El monto que cargás es el de <b>una cuota</b>. Las cuotas restantes aparecerán automáticamente.
+      </div>
+    </div>
+
     <div class="quick-capital-row">
       <label class="capital-toggle">
         <input type="checkbox" id="quickCapital">
-        <span class="capital-toggle-label">💰 Es un aporte (ingreso, no gasto)</span>
+        <span class="capital-toggle-label">💰 Es un aporte (ingreso de plata, suma al balance)</span>
       </label>
-    </div>
-
-    <div class="installment-toggle-section" style="margin-top: 10px;">
-      <label class="capital-toggle">
-        <input type="checkbox" id="quickInstallmentToggle" onchange="toggleQuickInstallmentFields(this.checked)">
-        <span class="capital-toggle-label">📅 Pagar en cuotas</span>
-      </label>
-      <div class="installment-fields" id="quickInstallmentFields" style="display:none;">
-        <div>
-          <label>Total cuotas</label>
-          <input type="number" id="quickInstTotal" min="2" max="60" value="3" inputmode="numeric">
-        </div>
-        <div>
-          <label>Cuota Nº</label>
-          <input type="number" id="quickInstCurrent" min="1" value="1" inputmode="numeric">
-        </div>
-      </div>
     </div>
 
     <button class="quick-submit-btn" onclick="submitQuickAdd()">Guardar movimiento</button>
@@ -2123,8 +2198,6 @@ function addCustomCategory() {
   };
 
   scheduleSave();
-  // Re-rellenar todos los selects de categoría
-  document.querySelectorAll('select#newCategory').forEach(s => fillCategorySelect(s, key, true));
   return key;
 }
 
@@ -2144,10 +2217,28 @@ function formatUSD(n) {
 function toggleTheme() {
   darkMode = !darkMode;
   document.body.classList.toggle('dark', darkMode);
-  document.getElementById('themeBtn').textContent = darkMode ? '☀️' : '🌙';
+  const iconEl = document.getElementById('themeMenuIcon');
+  const labelEl = document.getElementById('themeMenuLabel');
+  if (iconEl) iconEl.textContent = darkMode ? '☀️' : '🌙';
+  if (labelEl) labelEl.textContent = darkMode ? 'Modo día' : 'Modo nocturno';
   renderCharts();
   renderSavingsCharts();
+  // Cerrar menu
+  document.getElementById('userMenuWrap')?.classList.remove('open');
+  document.querySelector('.user-menu-wrap')?.classList.remove('open');
 }
+
+function toggleUserMenu(event) {
+  if (event) event.stopPropagation();
+  const wrap = document.querySelector('.user-menu-wrap');
+  if (wrap) wrap.classList.toggle('open');
+}
+
+// Cerrar menu al clickear afuera
+document.addEventListener('click', (e) => {
+  const wrap = document.querySelector('.user-menu-wrap');
+  if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
+});
 
 // ============ TABS ============
 function switchTab(name) {
@@ -2215,11 +2306,34 @@ function getVirtualInstallment(e) {
 function getCurrentMonthExpenses() {
   const out = [];
   expenses.forEach(e => {
+    let virtualExpense = null;
+
     if (e.installments && e.installments.total >= 2) {
-      const v = getVirtualInstallment(e);
-      if (v) out.push(v);
+      virtualExpense = getVirtualInstallment(e);
     } else if (isCurrentMonth(e.date)) {
-      out.push(e);
+      virtualExpense = e;
+    }
+
+    if (virtualExpense) {
+      out.push(virtualExpense);
+
+      // Reintegro: solo aparece junto al primer mes del gasto
+      // - Gasto normal: si está en el mes actual + tiene reintegro
+      // - Cuotas: si la cuota visible es la 1 (currentAt - diff = 1) + tiene reintegro
+      if (e.reintegro && e.reintegro > 0) {
+        const showReintegro = e.installments
+          ? (virtualExpense._installmentNum === 1)
+          : true;
+        if (showReintegro) {
+          out.push({
+            ...e,
+            _isReintegro: true,
+            _realId: e.id,
+            amount: e.reintegro,
+            // Lo marcamos para que aparezca como crédito
+          });
+        }
+      }
     }
   });
   return out;
@@ -2231,14 +2345,17 @@ function calculateBalance() {
   monthExpenses.forEach(e => {
     const amt = e.amount;
     const isCapital = e.capital === true;
-    const sign = isCapital ? -1 : 1;
+    const isReintegro = e._isReintegro === true;
+    // capital y reintegro = +; gasto normal/cuota = -
+    const sign = (isCapital || isReintegro) ? -1 : 1;
+    const effectiveAmount = amt * sign;
 
-    if (e.payer === 'p1') p1Paid += amt * sign;
-    else p2Paid += amt * sign;
+    if (e.payer === 'p1') p1Paid += effectiveAmount;
+    else p2Paid += effectiveAmount;
 
-    if (e.split === '5050') { p1Owes += (amt * sign) / 2; p2Owes += (amt * sign) / 2; }
-    else if (e.split === '100p1') p1Owes += amt * sign;
-    else if (e.split === '100p2') p2Owes += amt * sign;
+    if (e.split === '5050') { p1Owes += effectiveAmount / 2; p2Owes += effectiveAmount / 2; }
+    else if (e.split === '100p1') p1Owes += effectiveAmount;
+    else if (e.split === '100p2') p2Owes += effectiveAmount;
   });
   return { p1Paid, p2Paid, p1Owes, p2Owes, p1Balance: p1Paid - p1Owes };
 }
@@ -2259,7 +2376,8 @@ function renderCategories() {
   let max = 0;
   const monthExpenses = getCurrentMonthExpenses();
   monthExpenses.forEach(e => {
-    if (e.capital === true) return; // los aportes no cuentan como categoría de gasto
+    if (e.capital === true) return; // los aportes no cuentan
+    if (e._isReintegro === true) return; // los reintegros tampoco
     totals[e.category] = (totals[e.category] || 0) + e.amount;
     if (totals[e.category] > max) max = totals[e.category];
   });
@@ -2285,7 +2403,14 @@ function renderExpenseList() {
     list.innerHTML = '<div class="empty">Todavía no hay gastos en este mes</div>';
     return;
   }
-  const sorted = [...monthExpenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sorted = [...monthExpenses].sort((a, b) => {
+    // Reintegros siempre debajo de su gasto pareja en el mismo día
+    const da = new Date(a.date), db = new Date(b.date);
+    if (db - da !== 0) return db - da;
+    if (a._isReintegro && !b._isReintegro) return 1;
+    if (!a._isReintegro && b._isReintegro) return -1;
+    return 0;
+  });
   list.innerHTML = sorted.map(e => {
     const info = getCategoryInfo(e.category);
     const payerAvatar = e.payer === 'p1' ? '<div class="avatar">F</div>' : '<div class="avatar p2">N</div>';
@@ -2297,6 +2422,23 @@ function renderExpenseList() {
     const commentsBadge = commentsCount > 0
       ? `<span class="expense-comments-badge ${hasUnreadFromOther ? 'has-new' : ''}">💬 ${commentsCount}</span>`
       : '';
+
+    // === Caso 1: ítem de reintegro (crédito verde) ===
+    if (e._isReintegro) {
+      return `<div class="expense-item reintegro" onclick="openTicket(${e._realId})">
+        <div class="expense-icon cat-capital">💸</div>
+        <div class="expense-info">
+          <div class="name"><span class="reintegro-tag">REINTEGRO</span>${e.desc}</div>
+          <div class="meta"><span>${dateStr}</span><span class="dot"></span><span>Crédito a favor</span></div>
+        </div>
+        <div class="expense-payer">${payerAvatar} ${payerName}</div>
+        <span class="expense-split s${e.split}">${splitLabel}</span>
+        <div class="expense-amount capital-amount">+ ${formatMoney(e.amount)}</div>
+        <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${e._realId})">✕</button>
+      </div>`;
+    }
+
+    // === Caso 2 y 3: gasto normal / aporte / cuota ===
     const isCapital = e.capital === true;
     const isInstallment = e._isVirtual === true;
     const itemClass = 'expense-item'
@@ -2314,7 +2456,6 @@ function renderExpenseList() {
     const totalDisplay = isInstallment
       ? `<div class="expense-amount-sub">de ${formatMoney(e.amount * e.installments.total)}</div>`
       : '';
-    // Para click usamos el id real (no el virtual)
     const clickId = isInstallment ? e._realId : e.id;
     return `<div class="${itemClass}" onclick="openTicket(${clickId})">
       <div class="expense-icon ${iconCls}">${iconDisplay}</div>
@@ -2347,49 +2488,7 @@ function deleteExpense(id) {
   render();
 }
 
-function addExpense() {
-  const desc = document.getElementById('newDesc').value.trim();
-  const amount = parseFloat(document.getElementById('newAmount').value);
-  if (!desc || !amount || amount <= 0) { alert('Completá descripción y monto'); return; }
-  const isCapital = document.getElementById('newCapital')?.checked || false;
-  let category = document.getElementById('newCategory').value;
-  if (category === '__add__') category = 'otros';
-
-  // Detectar cuotas
-  let installments = null;
-  const instToggle = document.getElementById('newInstallmentToggle');
-  if (instToggle && instToggle.checked) {
-    const total = parseInt(document.getElementById('newInstTotal').value);
-    const currentAt = parseInt(document.getElementById('newInstCurrent').value);
-    if (!total || total < 2 || !currentAt || currentAt < 1 || currentAt > total) {
-      alert('Datos de cuotas inválidos. Total debe ser ≥ 2 y la cuota actual entre 1 y el total.');
-      return;
-    }
-    installments = { total, currentAt };
-  }
-
-  expenses.push({
-    id: Date.now(),
-    desc, amount,
-    category,
-    payer: document.getElementById('newPayer').value,
-    split: document.getElementById('newSplit').value,
-    date: new Date().toISOString().split('T')[0],
-    comments: [],
-    capital: isCapital,
-    installments
-  });
-
-  document.getElementById('newDesc').value = '';
-  document.getElementById('newAmount').value = '';
-  if (document.getElementById('newCapital')) document.getElementById('newCapital').checked = false;
-  if (instToggle) {
-    instToggle.checked = false;
-    toggleInstallmentFields(false);
-  }
-  scheduleSave();
-  render();
-}
+// (addExpense viejo eliminado: ahora todo el alta se hace por submitQuickAdd)
 
 // ============ RECURRENTES ============
 function renderRecurring() {
@@ -2653,12 +2752,6 @@ function renderCharts() {
 function render() {
   const monthName = currentDate.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
   document.getElementById('currentMonth').textContent = monthName;
-  // Asegurar que el select de categoría esté actualizado con las custom
-  const catSelect = document.getElementById('newCategory');
-  if (catSelect) {
-    const currentVal = catSelect.value || 'comida';
-    fillCategorySelect(catSelect, currentVal, true);
-  }
   renderBalance();
   renderCategories();
   renderExpenseList();
@@ -2850,35 +2943,32 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ============ MODAL DE CARGA RAPIDA (mobile) ============
+// ============ MODAL DE CARGA UNIFICADO (desktop + mobile) ============
 let quickState = { payer: 'p1', split: '5050', category: 'comida' };
 
-// Toggle de cuotas - formulario desktop
-function toggleInstallmentFields(checked) {
-  const fields = document.getElementById('installmentFields');
-  const hint = document.getElementById('installmentHint');
-  if (fields) fields.style.display = checked ? 'grid' : 'none';
-  if (hint) hint.classList.toggle('show', checked);
-  updateInstallmentHint();
-}
-
-function updateInstallmentHint() {
-  const hint = document.getElementById('installmentHint');
-  const totalEl = document.getElementById('newInstTotal');
-  const currentEl = document.getElementById('newInstCurrent');
-  if (!hint || !totalEl || !currentEl) return;
-  const total = parseInt(totalEl.value) || 0;
-  const current = parseInt(currentEl.value) || 0;
-  if (total >= 2 && current >= 1 && current <= total) {
-    const restantes = total - current;
-    hint.innerHTML = `💡 El monto que cargás es el de <b>una cuota</b>. Te quedarán ${restantes} cuota${restantes !== 1 ? 's' : ''} más, que aparecerán automáticamente.`;
+// Cuando cambia el "Total de cuotas", habilitamos/deshabilitamos "Cuota actual"
+function onInstallmentsTotalChange() {
+  const totalEl = document.getElementById('quickInstTotal');
+  const currentEl = document.getElementById('quickInstCurrent');
+  const hint = document.getElementById('quickInstHint');
+  if (!totalEl || !currentEl) return;
+  const total = parseInt(totalEl.value) || 1;
+  if (total >= 2) {
+    currentEl.disabled = false;
+    currentEl.max = total;
+    if (parseInt(currentEl.value) > total) currentEl.value = total;
+    if (parseInt(currentEl.value) < 1) currentEl.value = 1;
+    const cur = parseInt(currentEl.value) || 1;
+    const restantes = total - cur;
+    if (hint) {
+      hint.style.display = 'block';
+      hint.innerHTML = `💡 El monto que cargás es el de <b>una cuota</b>. Te quedarán ${restantes} cuota${restantes !== 1 ? 's' : ''} más que aparecerán automáticamente.`;
+    }
+  } else {
+    currentEl.disabled = true;
+    currentEl.value = '1';
+    if (hint) hint.style.display = 'none';
   }
-}
-
-// Toggle de cuotas - modal mobile
-function toggleQuickInstallmentFields(checked) {
-  const fields = document.getElementById('quickInstallmentFields');
-  if (fields) fields.style.display = checked ? 'grid' : 'none';
 }
 
 function openQuickAdd() {
@@ -2886,13 +2976,23 @@ function openQuickAdd() {
   document.getElementById('quickAmount').value = '';
   document.getElementById('quickDesc').value = '';
   document.getElementById('quickCapital').checked = false;
-  const qInstToggle = document.getElementById('quickInstallmentToggle');
-  if (qInstToggle) {
-    qInstToggle.checked = false;
-    toggleQuickInstallmentFields(false);
-  }
-  document.getElementById('quickInstTotal').value = '3';
+
+  // Fecha por defecto: hoy
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('quickDate').value = today;
+
+  // Reintegro vacío
+  document.getElementById('quickReintegro').value = '';
+
+  // Cuotas: reset a 1 (pago único)
+  document.getElementById('quickInstTotal').value = '1';
   document.getElementById('quickInstCurrent').value = '1';
+  document.getElementById('quickInstCurrent').disabled = true;
+  document.getElementById('quickInstHint').style.display = 'none';
+
+  // Listener para que el hint se actualice cuando cambia "cuota actual"
+  const curEl = document.getElementById('quickInstCurrent');
+  if (curEl) curEl.oninput = onInstallmentsTotalChange;
 
   renderQuickCategoryChips();
   document.querySelectorAll('#quickPayerChips .quick-chip').forEach(c => {
@@ -2961,15 +3061,16 @@ function submitQuickAdd() {
     return;
   }
   const isCapital = document.getElementById('quickCapital').checked;
+  const date = document.getElementById('quickDate').value || new Date().toISOString().split('T')[0];
+  const reintegro = parseFloat(document.getElementById('quickReintegro').value) || 0;
 
-  // Detectar cuotas
+  // Cuotas
   let installments = null;
-  const instToggle = document.getElementById('quickInstallmentToggle');
-  if (instToggle && instToggle.checked) {
-    const total = parseInt(document.getElementById('quickInstTotal').value);
+  const total = parseInt(document.getElementById('quickInstTotal').value) || 1;
+  if (total >= 2) {
     const currentAt = parseInt(document.getElementById('quickInstCurrent').value);
-    if (!total || total < 2 || !currentAt || currentAt < 1 || currentAt > total) {
-      alert('Datos de cuotas inválidos. Total debe ser ≥ 2 y la cuota actual entre 1 y el total.');
+    if (!currentAt || currentAt < 1 || currentAt > total) {
+      alert('Datos de cuotas inválidos. La cuota actual debe estar entre 1 y el total.');
       return;
     }
     installments = { total, currentAt };
@@ -2981,10 +3082,11 @@ function submitQuickAdd() {
     category: quickState.category,
     payer: quickState.payer,
     split: quickState.split,
-    date: new Date().toISOString().split('T')[0],
+    date,
     comments: [],
     capital: isCapital,
-    installments
+    installments,
+    reintegro: reintegro > 0 ? reintegro : null
   });
   scheduleSave();
   closeQuickAdd();
@@ -3017,7 +3119,8 @@ function openTicket(id) {
   document.getElementById('ticketTitle').textContent = (isCapital ? '💰 APORTE: ' : '') + e.desc;
   document.getElementById('ticketSub').textContent = `${info.name} · ${dateStr}`;
   document.getElementById('ticketAmount').textContent = (isCapital ? '+ ' : '') + formatMoney(e.amount) + (isInstallment ? ' / cuota' : '');
-  document.getElementById('ticketSplit').textContent = `${splitLabel} · Pagó ${payerName}`;
+  document.getElementById('ticketSplit').textContent = `${splitLabel} · Pagó ${payerName}`
+    + (e.reintegro ? ` · Reintegro: ${formatMoney(e.reintegro)}` : '');
 
   // Sección de cuotas
   const instBlock = document.getElementById('ticketInstallmentBlock');
