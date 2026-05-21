@@ -1391,6 +1391,268 @@
     margin-right: 4px;
     vertical-align: middle;
   }
+
+  /* ============ TOOLBAR DE GASTOS (búsqueda + vista) ============ */
+  .expense-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .expense-toolbar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .search-input-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+  .search-input-wrap input {
+    width: 100%;
+    padding: 9px 14px 9px 36px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--card);
+    color: var(--text);
+  }
+  .search-input-wrap input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+  .search-input-wrap::before {
+    content: '🔍';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  .filter-chip {
+    background: var(--bg-soft);
+    color: var(--text-soft);
+    border: none;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+  }
+  .filter-chip:hover { background: var(--border); }
+  .filter-chip.active.p1 { background: var(--p1); color: white; }
+  .filter-chip.active.p2 { background: var(--p2); color: white; }
+  .filter-chip.active.all { background: var(--text); color: var(--card); }
+
+  .view-toggle {
+    display: flex;
+    background: var(--bg-soft);
+    padding: 3px;
+    border-radius: 8px;
+    gap: 2px;
+  }
+  .view-toggle button {
+    background: none;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-soft);
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .view-toggle button.active {
+    background: var(--card);
+    color: var(--text);
+    box-shadow: var(--shadow);
+  }
+
+  /* ============ LISTA COMPACTA ============ */
+  .expense-item.compact {
+    grid-template-columns: 28px 1fr auto auto 26px;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+  }
+  .expense-item.compact .expense-icon {
+    width: 28px; height: 28px;
+    font-size: 13px;
+  }
+  .expense-item.compact .expense-info .name { font-size: 13px; }
+  .expense-item.compact .expense-info .meta { font-size: 11px; }
+  .expense-item.compact .expense-amount { font-size: 13px; min-width: 75px; }
+  .expense-item.compact .expense-amount-sub { font-size: 9px; }
+  .expense-item.compact .expense-payer-mini {
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-soft);
+  }
+  .expense-item.compact .expense-payer-mini .avatar {
+    width: 18px; height: 18px; font-size: 9px;
+  }
+  .expense-item.compact .expense-split { font-size: 10px; padding: 2px 6px; }
+  .expense-item.compact .delete-btn { padding: 2px 4px; }
+
+  .expense-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .edit-btn {
+    background: none;
+    border: none;
+    color: var(--text-soft);
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .edit-btn:hover { background: var(--primary-soft); color: var(--primary); }
+
+  /* ============ VISTA AGRUPADA ============ */
+  .group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 4px 8px;
+    margin-top: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .group-header:first-child { margin-top: 0; }
+  .group-header .group-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .group-header .group-icon {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+  .group-header .group-total {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .group-header .group-count {
+    font-size: 11px;
+    color: var(--text-soft);
+    margin-left: 4px;
+    font-weight: 500;
+  }
+  .group-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 6px;
+  }
+
+  /* ============ STATS / KPIs ============ */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+  .kpi-card .kpi-label {
+    font-size: 11px;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .kpi-card .kpi-value {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .kpi-card .kpi-sub {
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+  .kpi-card .kpi-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    margin-top: 6px;
+  }
+  .kpi-card .kpi-trend.up { background: var(--danger-soft); color: var(--danger); }
+  .kpi-card .kpi-trend.down { background: var(--success-soft); color: var(--success); }
+  .kpi-card .kpi-trend.neutral { background: var(--bg-soft); color: var(--text-soft); }
+
+  .stats-chart-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+  }
+  .stats-chart-card h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+  .stats-chart-card .chart-container {
+    height: 260px;
+  }
+
+  .stats-empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-soft);
+    font-size: 13px;
+  }
+  .stats-empty .icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* Mensaje de info en edición */
+  .edit-mode-banner {
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
   .expense-item.installment {
     border-left: 3px solid var(--primary);
   }
@@ -1822,6 +2084,7 @@
     <button class="tab active" onclick="switchTab('gastos')">💸 Gastos</button>
     <button class="tab" onclick="switchTab('fijos')">📌 Gastos fijos</button>
     <button class="tab" onclick="switchTab('ahorro')">💵 Ahorro USD</button>
+    <button class="tab" onclick="switchTab('stats')">📊 Stats</button>
   </div>
 
   <!-- TAB: GASTOS -->
@@ -1854,20 +2117,68 @@
       Agregar gasto
     </button>
 
-    <div class="charts-grid">
-      <div class="card">
-        <h2>Distribución por categoría</h2>
-        <div class="chart-container"><canvas id="pieChart"></canvas></div>
+    <div class="card">
+      <div class="expense-toolbar">
+        <div class="expense-toolbar-row">
+          <div class="search-input-wrap">
+            <input type="text" id="searchInput" placeholder="Buscar gasto por descripción..." oninput="onSearchInput()">
+          </div>
+          <div class="view-toggle">
+            <button class="active" data-view="list" onclick="setViewMode('list')">📋 Lista</button>
+            <button data-view="cat" onclick="setViewMode('cat')">🏷️ Categoría</button>
+            <button data-view="person" onclick="setViewMode('person')">👥 Persona</button>
+          </div>
+        </div>
+        <div class="expense-toolbar-row">
+          <button class="filter-chip all active" data-filter="all" onclick="setFilterPayer('all')">Todos</button>
+          <button class="filter-chip p1" data-filter="p1" onclick="setFilterPayer('p1')">
+            <div class="avatar" style="width:16px; height:16px; font-size:9px;">F</div> Flucy
+          </button>
+          <button class="filter-chip p2" data-filter="p2" onclick="setFilterPayer('p2')">
+            <div class="avatar p2" style="width:16px; height:16px; font-size:9px;">N</div> Neitor
+          </button>
+          <div style="margin-left:auto; font-size:12px; color: var(--text-soft);">
+            <span id="expenseCount">0</span> gasto(s)
+          </div>
+        </div>
       </div>
-      <div class="card">
-        <h2>Pagado por cada uno</h2>
-        <div class="chart-container"><canvas id="barChart"></canvas></div>
+      <div class="expense-list" id="expenseList"></div>
+    </div>
+  </div>
+
+  <!-- TAB: STATS -->
+  <div class="tab-content" id="tab-stats">
+    <div class="stats-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">💰 Promedio mensual</div>
+        <div class="kpi-value" id="kpiAvgMonth">$0</div>
+        <div class="kpi-sub" id="kpiAvgMonthSub">Últimos 6 meses</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">📅 Cuotas pendientes</div>
+        <div class="kpi-value" id="kpiPendingInst">$0</div>
+        <div class="kpi-sub" id="kpiPendingInstSub">A pagar a futuro</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">📈 Categoría que más creció</div>
+        <div class="kpi-value" id="kpiGrowCat" style="font-size:18px;">-</div>
+        <div class="kpi-sub" id="kpiGrowCatSub">vs mes anterior</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">📉 Categoría que más bajó</div>
+        <div class="kpi-value" id="kpiDropCat" style="font-size:18px;">-</div>
+        <div class="kpi-sub" id="kpiDropCatSub">vs mes anterior</div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>Gastos del mes <span class="badge" id="expenseCount">0</span></h2>
-      <div class="expense-list" id="expenseList"></div>
+    <div class="stats-chart-card">
+      <h3>📊 Pagado por persona (histórico mensual)</h3>
+      <div class="chart-container"><canvas id="statsPersonChart"></canvas></div>
+    </div>
+
+    <div class="stats-chart-card">
+      <h3>📈 Tendencia del gasto total</h3>
+      <div class="chart-container"><canvas id="statsTrendChart"></canvas></div>
     </div>
   </div>
 
@@ -2123,9 +2434,15 @@
 // ============ ESTADO ============
 let currentUser = 'p1';
 let openTicketId = null;
-let unsubscribeListener = null; // para desuscribirse del listener al logout
-let savingTimer = null; // debounce para no spammear Firestore
-let isApplyingRemoteUpdate = false; // bandera para evitar loop de save→listen
+let unsubscribeListener = null;
+let savingTimer = null;
+let isApplyingRemoteUpdate = false;
+
+// Estado de UI (no se sincroniza con Firestore — es por sesión)
+let viewMode = 'list'; // 'list' | 'cat' | 'person'
+let searchQuery = '';
+let filterPayer = 'all'; // 'all' | 'p1' | 'p2'
+let editingExpenseId = null; // si está editando, contiene el ID
 
 let expenses = [];
 let recurring = [];
@@ -2221,10 +2538,11 @@ function toggleTheme() {
   const labelEl = document.getElementById('themeMenuLabel');
   if (iconEl) iconEl.textContent = darkMode ? '☀️' : '🌙';
   if (labelEl) labelEl.textContent = darkMode ? 'Modo día' : 'Modo nocturno';
-  renderCharts();
   renderSavingsCharts();
-  // Cerrar menu
-  document.getElementById('userMenuWrap')?.classList.remove('open');
+  // Si estamos en la tab stats, re-renderizar
+  if (document.getElementById('tab-stats').classList.contains('active')) {
+    renderStats();
+  }
   document.querySelector('.user-menu-wrap')?.classList.remove('open');
 }
 
@@ -2244,10 +2562,12 @@ document.addEventListener('click', (e) => {
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  document.querySelectorAll('.tab')[{gastos:0, fijos:1, ahorro:2}[name]].classList.add('active');
+  const tabIdx = { gastos: 0, fijos: 1, ahorro: 2, stats: 3 }[name];
+  if (tabIdx !== undefined) document.querySelectorAll('.tab')[tabIdx].classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
   if (name === 'ahorro') renderSavings();
   if (name === 'fijos') renderRecurring();
+  if (name === 'stats') renderStats();
   // FAB solo visible en gastos
   const fab = document.getElementById('fabAddExpense');
   if (fab) fab.style.display = (name === 'gastos') ? '' : 'none';
@@ -2395,83 +2715,218 @@ function renderCategories() {
   }).join('') || '<div class="empty">Sin gastos este mes</div>';
 }
 
+// ============ FILTROS + VISTA ============
+function onSearchInput() {
+  searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+  renderExpenseList();
+}
+
+function setFilterPayer(payer) {
+  filterPayer = payer;
+  document.querySelectorAll('.filter-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.filter === payer);
+  });
+  renderExpenseList();
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  document.querySelectorAll('.view-toggle button').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === mode);
+  });
+  renderExpenseList();
+}
+
+// Aplica filtros (búsqueda + persona) sobre la lista del mes ya expandida
+function applyFilters(items) {
+  return items.filter(e => {
+    if (filterPayer !== 'all' && e.payer !== filterPayer) return false;
+    if (searchQuery && !e.desc.toLowerCase().includes(searchQuery)) return false;
+    return true;
+  });
+}
+
+// ===== HTML de un item individual (extraído para reuso entre vistas) =====
+function renderExpenseItemHTML(e) {
+  const info = getCategoryInfo(e.category);
+  const payerAvatar = e.payer === 'p1' ? '<div class="avatar">F</div>' : '<div class="avatar p2">N</div>';
+  const splitLabel = { '5050': '50/50', '100p1': '100% Flucy', '100p2': '100% Neitor' }[e.split];
+  const dateStr = new Date(e.date + 'T00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+  const commentsCount = (e.comments || []).length;
+  const hasUnreadFromOther = commentsCount > 0 && e.comments.some(c => c.author !== currentUser);
+  const commentsBadge = commentsCount > 0
+    ? `<span class="expense-comments-badge ${hasUnreadFromOther ? 'has-new' : ''}">💬 ${commentsCount}</span>`
+    : '';
+
+  // === Caso reintegro ===
+  if (e._isReintegro) {
+    return `<div class="expense-item compact reintegro" onclick="openTicket(${e._realId})">
+      <div class="expense-icon cat-capital">💸</div>
+      <div class="expense-info">
+        <div class="name"><span class="reintegro-tag">REINTEGRO</span>${escapeHtml(e.desc)}</div>
+        <div class="meta"><span>${dateStr}</span><span class="dot"></span><span>Crédito a favor</span></div>
+      </div>
+      <div class="expense-payer-mini">${payerAvatar}</div>
+      <div class="expense-amount capital-amount">+ ${formatMoney(e.amount)}</div>
+      <div class="expense-actions">
+        <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${e._realId})">✕</button>
+      </div>
+    </div>`;
+  }
+
+  const isCapital = e.capital === true;
+  const isInstallment = e._isVirtual === true;
+  const itemClass = 'expense-item compact'
+    + (isCapital ? ' capital' : '')
+    + (isInstallment ? ' installment' : '');
+  const amountText = isCapital ? '+ ' + formatMoney(e.amount) : formatMoney(e.amount);
+  const iconDisplay = isCapital ? '💰' : info.icon;
+  const iconCls = isCapital ? 'cat-capital' : info.cls;
+  const installmentBadge = isInstallment
+    ? `<span class="installment-tag">CUOTA ${e._installmentNum}/${e.installments.total}</span>`
+    : '';
+  const nameDisplay = (isCapital ? `<span class="capital-tag">APORTE</span> ` : '')
+    + escapeHtml(e.desc)
+    + installmentBadge;
+  const totalDisplay = isInstallment
+    ? `<div class="expense-amount-sub">de ${formatMoney(e.amount * e.installments.total)}</div>`
+    : '';
+  const clickId = isInstallment ? e._realId : e.id;
+
+  return `<div class="${itemClass}" onclick="openTicket(${clickId})">
+    <div class="expense-icon ${iconCls}">${iconDisplay}</div>
+    <div class="expense-info">
+      <div class="name">${nameDisplay} ${commentsBadge}</div>
+      <div class="meta"><span>${dateStr}</span><span class="dot"></span><span>${info.name}</span><span class="dot"></span><span>${splitLabel}</span></div>
+    </div>
+    <div class="expense-payer-mini">${payerAvatar}</div>
+    <div class="expense-amount ${isCapital ? 'capital-amount' : ''}">
+      ${amountText}
+      ${totalDisplay}
+    </div>
+    <div class="expense-actions">
+      <button class="edit-btn" onclick="event.stopPropagation(); editExpense(${clickId})" title="Editar">✏️</button>
+      <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${clickId})" title="Eliminar">✕</button>
+    </div>
+  </div>`;
+}
+
 function renderExpenseList() {
   const list = document.getElementById('expenseList');
   const monthExpenses = getCurrentMonthExpenses();
-  document.getElementById('expenseCount').textContent = monthExpenses.length;
-  if (monthExpenses.length === 0) {
-    list.innerHTML = '<div class="empty">Todavía no hay gastos en este mes</div>';
+  const filtered = applyFilters(monthExpenses);
+
+  document.getElementById('expenseCount').textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    const msg = (searchQuery || filterPayer !== 'all')
+      ? 'No hay gastos que coincidan con la búsqueda'
+      : 'Todavía no hay gastos en este mes';
+    list.innerHTML = `<div class="empty">${msg}</div>`;
     return;
   }
-  const sorted = [...monthExpenses].sort((a, b) => {
-    // Reintegros siempre debajo de su gasto pareja en el mismo día
-    const da = new Date(a.date), db = new Date(b.date);
-    if (db - da !== 0) return db - da;
-    if (a._isReintegro && !b._isReintegro) return 1;
-    if (!a._isReintegro && b._isReintegro) return -1;
-    return 0;
-  });
-  list.innerHTML = sorted.map(e => {
-    const info = getCategoryInfo(e.category);
-    const payerAvatar = e.payer === 'p1' ? '<div class="avatar">F</div>' : '<div class="avatar p2">N</div>';
-    const payerName = e.payer === 'p1' ? 'Flucy' : 'Neitor';
-    const splitLabel = { '5050': '50/50', '100p1': '100% Flucy', '100p2': '100% Neitor' }[e.split];
-    const dateStr = new Date(e.date + 'T00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
-    const commentsCount = (e.comments || []).length;
-    const hasUnreadFromOther = commentsCount > 0 && e.comments.some(c => c.author !== currentUser);
-    const commentsBadge = commentsCount > 0
-      ? `<span class="expense-comments-badge ${hasUnreadFromOther ? 'has-new' : ''}">💬 ${commentsCount}</span>`
-      : '';
 
-    // === Caso 1: ítem de reintegro (crédito verde) ===
-    if (e._isReintegro) {
-      return `<div class="expense-item reintegro" onclick="openTicket(${e._realId})">
-        <div class="expense-icon cat-capital">💸</div>
-        <div class="expense-info">
-          <div class="name"><span class="reintegro-tag">REINTEGRO</span>${e.desc}</div>
-          <div class="meta"><span>${dateStr}</span><span class="dot"></span><span>Crédito a favor</span></div>
-        </div>
-        <div class="expense-payer">${payerAvatar} ${payerName}</div>
-        <span class="expense-split s${e.split}">${splitLabel}</span>
-        <div class="expense-amount capital-amount">+ ${formatMoney(e.amount)}</div>
-        <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${e._realId})">✕</button>
-      </div>`;
+  if (viewMode === 'list') {
+    // Vista plana: ordenado por fecha (desc), reintegros pegados a su gasto
+    const sorted = [...filtered].sort((a, b) => {
+      const da = new Date(a.date), db = new Date(b.date);
+      if (db - da !== 0) return db - da;
+      if (a._isReintegro && !b._isReintegro) return 1;
+      if (!a._isReintegro && b._isReintegro) return -1;
+      return 0;
+    });
+    list.innerHTML = sorted.map(renderExpenseItemHTML).join('');
+    return;
+  }
+
+  if (viewMode === 'cat') {
+    // Agrupado por categoría
+    const groups = {};
+    filtered.forEach(e => {
+      if (e._isReintegro) return; // los reintegros no agrupamos por categoría
+      const key = e.category;
+      if (!groups[key]) groups[key] = { items: [], total: 0 };
+      groups[key].items.push(e);
+      const isCapital = e.capital === true;
+      groups[key].total += isCapital ? -e.amount : e.amount;
+    });
+    // También agregar los reintegros como grupo separado
+    const reintegros = filtered.filter(e => e._isReintegro);
+    if (reintegros.length > 0) {
+      groups['_reintegros'] = {
+        items: reintegros,
+        total: -reintegros.reduce((s, r) => s + r.amount, 0),
+        special: 'reintegros'
+      };
     }
+    // Ordenar grupos por monto total absoluto descendente
+    const sortedGroups = Object.entries(groups).sort((a, b) => Math.abs(b[1].total) - Math.abs(a[1].total));
 
-    // === Caso 2 y 3: gasto normal / aporte / cuota ===
-    const isCapital = e.capital === true;
-    const isInstallment = e._isVirtual === true;
-    const itemClass = 'expense-item'
-      + (isCapital ? ' capital' : '')
-      + (isInstallment ? ' installment' : '');
-    const amountText = isCapital ? '+ ' + formatMoney(e.amount) : formatMoney(e.amount);
-    const iconDisplay = isCapital ? '💰' : info.icon;
-    const iconCls = isCapital ? 'cat-capital' : info.cls;
-    const installmentBadge = isInstallment
-      ? `<span class="installment-tag">📅 CUOTA ${e._installmentNum}/${e.installments.total}</span>`
-      : '';
-    const nameDisplay = (isCapital ? `<span class="capital-tag">APORTE</span> ` : '')
-      + e.desc
-      + installmentBadge;
-    const totalDisplay = isInstallment
-      ? `<div class="expense-amount-sub">de ${formatMoney(e.amount * e.installments.total)}</div>`
-      : '';
-    const clickId = isInstallment ? e._realId : e.id;
-    return `<div class="${itemClass}" onclick="openTicket(${clickId})">
-      <div class="expense-icon ${iconCls}">${iconDisplay}</div>
-      <div class="expense-info">
-        <div class="name">${nameDisplay} ${commentsBadge}</div>
-        <div class="meta"><span>${dateStr}</span><span class="dot"></span><span>${info.name}</span></div>
-      </div>
-      <div class="expense-payer">${payerAvatar} ${payerName}</div>
-      <span class="expense-split s${e.split}">${splitLabel}</span>
-      <div class="expense-amount ${isCapital ? 'capital-amount' : ''}">
-        ${amountText}
-        ${totalDisplay}
-      </div>
-      <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${clickId})">✕</button>
-    </div>`;
-  }).join('');
+    list.innerHTML = sortedGroups.map(([catKey, group]) => {
+      let icon, name, cls;
+      if (group.special === 'reintegros') {
+        icon = '💸'; name = 'Reintegros'; cls = 'cat-capital';
+      } else {
+        const info = getCategoryInfo(catKey);
+        icon = info.icon; name = info.name; cls = info.cls;
+      }
+      const totalLabel = group.total < 0 ? `+ ${formatMoney(-group.total)}` : formatMoney(group.total);
+      const totalClass = group.total < 0 ? 'capital-amount' : '';
+      return `
+        <div class="group-header">
+          <div class="group-title">
+            <div class="group-icon ${cls}">${icon}</div>
+            ${name}
+            <span class="group-count">(${group.items.length})</span>
+          </div>
+          <div class="group-total ${totalClass}">${totalLabel}</div>
+        </div>
+        <div class="group-content">
+          ${group.items
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .map(renderExpenseItemHTML).join('')}
+        </div>
+      `;
+    }).join('');
+    return;
+  }
+
+  if (viewMode === 'person') {
+    // Agrupado por persona
+    const groups = { p1: { items: [], total: 0 }, p2: { items: [], total: 0 } };
+    filtered.forEach(e => {
+      const target = e.payer === 'p1' ? groups.p1 : groups.p2;
+      target.items.push(e);
+      const isCapitalOrReintegro = e.capital === true || e._isReintegro === true;
+      target.total += isCapitalOrReintegro ? -e.amount : e.amount;
+    });
+
+    list.innerHTML = ['p1', 'p2'].map(p => {
+      const group = groups[p];
+      if (group.items.length === 0) return '';
+      const name = p === 'p1' ? 'Flucy' : 'Neitor';
+      const initial = p === 'p1' ? 'F' : 'N';
+      const avClass = p === 'p1' ? 'avatar' : 'avatar p2';
+      const totalLabel = group.total < 0 ? `+ ${formatMoney(-group.total)}` : formatMoney(group.total);
+      const totalClass = group.total < 0 ? 'capital-amount' : '';
+      return `
+        <div class="group-header">
+          <div class="group-title">
+            <div class="${avClass}">${initial}</div>
+            ${name} pagó
+            <span class="group-count">(${group.items.length})</span>
+          </div>
+          <div class="group-total ${totalClass}">${totalLabel}</div>
+        </div>
+        <div class="group-content">
+          ${group.items
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .map(renderExpenseItemHTML).join('')}
+        </div>
+      `;
+    }).join('');
+    return;
+  }
 }
 
 function deleteExpense(id) {
@@ -2705,47 +3160,11 @@ function renderSavingsCharts() {
   });
 }
 
-// ============ GRAFICOS GASTOS ============
+// ============ GRAFICOS GASTOS (legacy - safe noop) ============
 function renderCharts() {
-  const textColor = darkMode ? '#f3f4f6' : '#1a1d29';
-  const gridColor = darkMode ? '#2d3142' : '#f3f4f6';
-
-  const totals = {};
-  expenses.forEach(e => totals[e.category] = (totals[e.category] || 0) + e.amount);
-  const labels = Object.keys(totals).map(k => getCategoryInfo(k).name);
-  const data = Object.values(totals);
-  const colors = Object.keys(totals).map(k => getCategoryInfo(k).color);
-
-  if (pieChart) pieChart.destroy();
-  pieChart = new Chart(document.getElementById('pieChart'), {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '60%',
-      plugins: { legend: { position: 'right', labels: { color: textColor, boxWidth: 12, padding: 12, font: { size: 12 } } } }
-    }
-  });
-
-  const { p1Paid, p2Paid, p1Owes, p2Owes } = calculateBalance();
-  if (barChart) barChart.destroy();
-  barChart = new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: {
-      labels: ['Flucy', 'Neitor'],
-      datasets: [
-        { label: 'Pagado', data: [p1Paid, p2Paid], backgroundColor: '#6366f1', borderRadius: 6 },
-        { label: 'Le corresponde', data: [p1Owes, p2Owes], backgroundColor: '#ec4899', borderRadius: 6 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { color: textColor, boxWidth: 12, padding: 12 } } },
-      scales: {
-        y: { beginAtZero: true, ticks: { color: textColor, callback: v => '$' + (v/1000) + 'k' }, grid: { color: gridColor } },
-        x: { ticks: { color: textColor }, grid: { display: false } }
-      }
-    }
-  });
+  // Los charts viejos (pieChart, barChart) se movieron a la pestaña Stats.
+  // Si los canvas no existen, salir.
+  return;
 }
 
 // ============ RENDER GENERAL ============
@@ -2971,24 +3390,72 @@ function onInstallmentsTotalChange() {
   }
 }
 
-function openQuickAdd() {
-  quickState = { payer: 'p1', split: '5050', category: 'comida' };
-  document.getElementById('quickAmount').value = '';
-  document.getElementById('quickDesc').value = '';
-  document.getElementById('quickCapital').checked = false;
+function openQuickAdd(editId = null) {
+  editingExpenseId = editId;
+  const isEdit = editId !== null;
+  const editingExpense = isEdit ? expenses.find(x => x.id === editId) : null;
+  if (isEdit && !editingExpense) {
+    editingExpenseId = null;
+    return;
+  }
 
-  // Fecha por defecto: hoy
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('quickDate').value = today;
+  // Título y botón
+  document.getElementById('quickModalTitle').textContent = isEdit ? 'Editar gasto' : 'Nuevo gasto';
+  const submitBtn = document.querySelector('.quick-submit-btn');
+  if (submitBtn) submitBtn.textContent = isEdit ? 'Guardar cambios' : 'Guardar movimiento';
 
-  // Reintegro vacío
-  document.getElementById('quickReintegro').value = '';
+  // Banner de edición
+  let banner = document.getElementById('editModeBanner');
+  if (isEdit) {
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'editModeBanner';
+      banner.className = 'edit-mode-banner';
+      banner.innerHTML = '✏️ Editando: los cambios se registrarán en los comentarios';
+      document.querySelector('.quick-modal').insertBefore(banner, document.querySelector('.quick-amount-display'));
+    } else {
+      banner.style.display = '';
+    }
+  } else if (banner) {
+    banner.style.display = 'none';
+  }
 
-  // Cuotas: reset a 1 (pago único)
-  document.getElementById('quickInstTotal').value = '1';
-  document.getElementById('quickInstCurrent').value = '1';
-  document.getElementById('quickInstCurrent').disabled = true;
-  document.getElementById('quickInstHint').style.display = 'none';
+  // Cargar valores (edición) o defaults (nuevo)
+  if (isEdit) {
+    quickState = {
+      payer: editingExpense.payer,
+      split: editingExpense.split,
+      category: editingExpense.category
+    };
+    document.getElementById('quickAmount').value = editingExpense.amount;
+    document.getElementById('quickDesc').value = editingExpense.desc;
+    document.getElementById('quickDate').value = editingExpense.date;
+    document.getElementById('quickReintegro').value = editingExpense.reintegro || '';
+    document.getElementById('quickCapital').checked = editingExpense.capital === true;
+
+    if (editingExpense.installments) {
+      document.getElementById('quickInstTotal').value = editingExpense.installments.total;
+      document.getElementById('quickInstCurrent').value = editingExpense.installments.currentAt;
+      document.getElementById('quickInstCurrent').disabled = false;
+      onInstallmentsTotalChange();
+    } else {
+      document.getElementById('quickInstTotal').value = '1';
+      document.getElementById('quickInstCurrent').value = '1';
+      document.getElementById('quickInstCurrent').disabled = true;
+      document.getElementById('quickInstHint').style.display = 'none';
+    }
+  } else {
+    quickState = { payer: 'p1', split: '5050', category: 'comida' };
+    document.getElementById('quickAmount').value = '';
+    document.getElementById('quickDesc').value = '';
+    document.getElementById('quickCapital').checked = false;
+    document.getElementById('quickDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('quickReintegro').value = '';
+    document.getElementById('quickInstTotal').value = '1';
+    document.getElementById('quickInstCurrent').value = '1';
+    document.getElementById('quickInstCurrent').disabled = true;
+    document.getElementById('quickInstHint').style.display = 'none';
+  }
 
   // Listener para que el hint se actualice cuando cambia "cuota actual"
   const curEl = document.getElementById('quickInstCurrent');
@@ -2996,19 +3463,20 @@ function openQuickAdd() {
 
   renderQuickCategoryChips();
   document.querySelectorAll('#quickPayerChips .quick-chip').forEach(c => {
-    c.classList.toggle('active', c.dataset.payer === 'p1');
+    c.classList.toggle('active', c.dataset.payer === quickState.payer);
   });
   document.querySelectorAll('#quickSplitChips .quick-chip').forEach(c => {
-    c.classList.toggle('active', c.dataset.split === '5050');
+    c.classList.toggle('active', c.dataset.split === quickState.split);
   });
 
   document.getElementById('quickAddModal').classList.add('open');
   setTimeout(() => document.getElementById('quickAmount').focus(), 100);
 }
 
-function closeQuickAdd(event) {
-  if (event && event.target.id !== 'quickAddModal' && event.type === 'click') return;
-  document.getElementById('quickAddModal').classList.remove('open');
+function editExpense(id) {
+  // Cerrar el ticket modal si está abierto
+  if (openTicketId) closeTicket();
+  openQuickAdd(id);
 }
 
 function renderQuickCategoryChips() {
@@ -3076,6 +3544,65 @@ function submitQuickAdd() {
     installments = { total, currentAt };
   }
 
+  // === Modo edición ===
+  if (editingExpenseId !== null) {
+    const e = expenses.find(x => x.id === editingExpenseId);
+    if (!e) { editingExpenseId = null; return; }
+
+    // Detectar cambios para registrar en comentarios
+    const changes = [];
+    if (e.desc !== desc) changes.push(`descripción: "${e.desc}" → "${desc}"`);
+    if (e.amount !== amount) changes.push(`monto: ${formatMoney(e.amount)} → ${formatMoney(amount)}`);
+    if (e.category !== quickState.category) {
+      changes.push(`categoría: ${getCategoryInfo(e.category).name} → ${getCategoryInfo(quickState.category).name}`);
+    }
+    if (e.payer !== quickState.payer) {
+      changes.push(`pagó: ${e.payer === 'p1' ? 'Flucy' : 'Neitor'} → ${quickState.payer === 'p1' ? 'Flucy' : 'Neitor'}`);
+    }
+    if (e.split !== quickState.split) {
+      const labels = { '5050': '50/50', '100p1': '100% Flucy', '100p2': '100% Neitor' };
+      changes.push(`división: ${labels[e.split]} → ${labels[quickState.split]}`);
+    }
+    if (e.date !== date) changes.push(`fecha: ${e.date} → ${date}`);
+    if ((e.reintegro || 0) !== reintegro) changes.push(`reintegro: ${formatMoney(e.reintegro || 0)} → ${formatMoney(reintegro)}`);
+    if ((e.capital === true) !== isCapital) changes.push(`tipo: ${isCapital ? 'gasto → aporte' : 'aporte → gasto'}`);
+
+    const oldInstStr = e.installments ? `${e.installments.currentAt}/${e.installments.total}` : 'sin cuotas';
+    const newInstStr = installments ? `${installments.currentAt}/${installments.total}` : 'sin cuotas';
+    if (oldInstStr !== newInstStr) changes.push(`cuotas: ${oldInstStr} → ${newInstStr}`);
+
+    // Actualizar
+    e.desc = desc;
+    e.amount = amount;
+    e.category = quickState.category;
+    e.payer = quickState.payer;
+    e.split = quickState.split;
+    e.date = date;
+    e.reintegro = reintegro > 0 ? reintegro : null;
+    e.capital = isCapital;
+    e.installments = installments;
+
+    // Agregar comentario automático con los cambios
+    if (changes.length > 0) {
+      if (!e.comments) e.comments = [];
+      e.comments.push({
+        id: Date.now(),
+        author: currentUser,
+        text: `✏️ Editado: ${changes.join('; ')}.`,
+        date: new Date().toISOString(),
+        likes: [],
+        _isSystem: true
+      });
+    }
+
+    editingExpenseId = null;
+    scheduleSave();
+    closeQuickAdd();
+    render();
+    return;
+  }
+
+  // === Modo nuevo ===
   expenses.push({
     id: Date.now(),
     desc, amount,
@@ -3091,6 +3618,262 @@ function submitQuickAdd() {
   scheduleSave();
   closeQuickAdd();
   render();
+}
+
+function closeQuickAdd(event) {
+  if (event && event.target.id !== 'quickAddModal' && event.type === 'click') return;
+  document.getElementById('quickAddModal').classList.remove('open');
+  editingExpenseId = null;
+  const banner = document.getElementById('editModeBanner');
+  if (banner) banner.style.display = 'none';
+}
+
+// ============ STATS / KPIs ============
+let statsPersonChart = null;
+let statsTrendChart = null;
+
+// Expande todos los gastos a "instancias mensuales" para análisis histórico
+// (es como getCurrentMonthExpenses pero para TODOS los meses)
+function getAllExpenseInstances() {
+  const out = [];
+  expenses.forEach(e => {
+    if (e.installments && e.installments.total >= 2) {
+      // Generar una instancia por cada cuota
+      const startDate = new Date(e.date + 'T00:00');
+      const startedAt = e.installments.currentAt || 1;
+      for (let i = 0; i < e.installments.total; i++) {
+        const cuotaNum = startedAt + i - (startedAt - 1); // siempre 1..total
+        // Pero el mes correspondiente:
+        const cuotaDate = new Date(startDate.getFullYear(), startDate.getMonth() + i - (startedAt - 1), startDate.getDate());
+        // El cuotaNum real es i+1 si tomamos como base la primera del plan
+        out.push({
+          ...e,
+          _isVirtual: true,
+          _installmentNum: i + 1,
+          _instanceDate: cuotaDate.toISOString().split('T')[0],
+          _yearMonth: cuotaDate.getFullYear() + '-' + String(cuotaDate.getMonth() + 1).padStart(2, '0')
+        });
+      }
+      // Reintegro se asocia al mes de la cuota 1
+      if (e.reintegro && e.reintegro > 0) {
+        const firstDate = new Date(startDate.getFullYear(), startDate.getMonth() - (startedAt - 1), startDate.getDate());
+        out.push({
+          ...e,
+          _isReintegro: true,
+          _instanceDate: firstDate.toISOString().split('T')[0],
+          _yearMonth: firstDate.getFullYear() + '-' + String(firstDate.getMonth() + 1).padStart(2, '0'),
+          amount: e.reintegro
+        });
+      }
+    } else {
+      // Gasto normal
+      const d = new Date(e.date + 'T00:00');
+      out.push({
+        ...e,
+        _instanceDate: e.date,
+        _yearMonth: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+      });
+      // Reintegro
+      if (e.reintegro && e.reintegro > 0) {
+        out.push({
+          ...e,
+          _isReintegro: true,
+          _instanceDate: e.date,
+          _yearMonth: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'),
+          amount: e.reintegro
+        });
+      }
+    }
+  });
+  return out;
+}
+
+// Calcula el gasto neto de un mes (gastos - aportes - reintegros)
+function getMonthNetSpend(yearMonth, instances = null) {
+  const inst = instances || getAllExpenseInstances();
+  let total = 0;
+  inst.forEach(e => {
+    if (e._yearMonth !== yearMonth) return;
+    const sign = (e.capital === true || e._isReintegro === true) ? -1 : 1;
+    total += e.amount * sign;
+  });
+  return total;
+}
+
+function renderStats() {
+  const instances = getAllExpenseInstances();
+
+  if (instances.length === 0) {
+    document.getElementById('kpiAvgMonth').textContent = '$0';
+    document.getElementById('kpiPendingInst').textContent = '$0';
+    document.getElementById('kpiGrowCat').textContent = '-';
+    document.getElementById('kpiDropCat').textContent = '-';
+    return;
+  }
+
+  // Lista de meses únicos donde hubo movimientos, ordenados ascendente
+  const monthsSet = new Set(instances.map(e => e._yearMonth));
+  const months = [...monthsSet].sort();
+
+  // === KPI 1: Promedio mensual de los últimos 6 meses (gasto neto positivo) ===
+  const last6 = months.slice(-6);
+  if (last6.length > 0) {
+    let sum = 0, count = 0;
+    last6.forEach(m => {
+      const net = getMonthNetSpend(m, instances);
+      if (net > 0) { sum += net; count++; }
+    });
+    const avg = count > 0 ? sum / count : 0;
+    document.getElementById('kpiAvgMonth').textContent = formatMoney(avg);
+    document.getElementById('kpiAvgMonthSub').textContent = `Últimos ${last6.length} mes(es)`;
+  }
+
+  // === KPI 2: Cuotas pendientes (total que falta pagar) ===
+  let pendingTotal = 0;
+  const now = new Date();
+  const currentYearMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  expenses.forEach(e => {
+    if (!e.installments || e.installments.total < 2) return;
+    const startDate = new Date(e.date + 'T00:00');
+    const startedAt = e.installments.currentAt || 1;
+    for (let i = 0; i < e.installments.total; i++) {
+      const cuotaDate = new Date(startDate.getFullYear(), startDate.getMonth() + i - (startedAt - 1), 1);
+      const cuotaYM = cuotaDate.getFullYear() + '-' + String(cuotaDate.getMonth() + 1).padStart(2, '0');
+      if (cuotaYM > currentYearMonth) {
+        pendingTotal += e.amount;
+      }
+    }
+  });
+  document.getElementById('kpiPendingInst').textContent = formatMoney(pendingTotal);
+  document.getElementById('kpiPendingInstSub').textContent = pendingTotal > 0
+    ? 'A pagar en próximos meses'
+    : 'No hay cuotas pendientes';
+
+  // === KPI 3 y 4: Categoría que más creció / más bajó vs mes anterior ===
+  if (months.length >= 2) {
+    const lastMonth = months[months.length - 1];
+    const prevMonth = months[months.length - 2];
+
+    const totalsLast = {}, totalsPrev = {};
+    instances.forEach(e => {
+      if (e.capital === true || e._isReintegro === true) return;
+      if (e._yearMonth === lastMonth) totalsLast[e.category] = (totalsLast[e.category] || 0) + e.amount;
+      if (e._yearMonth === prevMonth) totalsPrev[e.category] = (totalsPrev[e.category] || 0) + e.amount;
+    });
+
+    const allCats = new Set([...Object.keys(totalsLast), ...Object.keys(totalsPrev)]);
+    let maxGrow = { cat: null, delta: 0 };
+    let maxDrop = { cat: null, delta: 0 };
+    allCats.forEach(cat => {
+      const delta = (totalsLast[cat] || 0) - (totalsPrev[cat] || 0);
+      if (delta > maxGrow.delta) maxGrow = { cat, delta };
+      if (delta < maxDrop.delta) maxDrop = { cat, delta };
+    });
+
+    if (maxGrow.cat) {
+      const info = getCategoryInfo(maxGrow.cat);
+      document.getElementById('kpiGrowCat').innerHTML = `${info.icon} ${info.name}`;
+      document.getElementById('kpiGrowCatSub').innerHTML = `<span style="color:var(--danger); font-weight:700;">+${formatMoney(maxGrow.delta)}</span> vs mes anterior`;
+    } else {
+      document.getElementById('kpiGrowCat').textContent = '-';
+      document.getElementById('kpiGrowCatSub').textContent = 'Sin cambios significativos';
+    }
+
+    if (maxDrop.cat) {
+      const info = getCategoryInfo(maxDrop.cat);
+      document.getElementById('kpiDropCat').innerHTML = `${info.icon} ${info.name}`;
+      document.getElementById('kpiDropCatSub').innerHTML = `<span style="color:var(--success); font-weight:700;">${formatMoney(maxDrop.delta)}</span> vs mes anterior`;
+    } else {
+      document.getElementById('kpiDropCat').textContent = '-';
+      document.getElementById('kpiDropCatSub').textContent = 'Sin cambios significativos';
+    }
+  } else {
+    document.getElementById('kpiGrowCat').textContent = '-';
+    document.getElementById('kpiGrowCatSub').textContent = 'Necesitás 2+ meses de datos';
+    document.getElementById('kpiDropCat').textContent = '-';
+    document.getElementById('kpiDropCatSub').textContent = 'Necesitás 2+ meses de datos';
+  }
+
+  // === Charts ===
+  const textColor = darkMode ? '#f3f4f6' : '#1a1d29';
+  const gridColor = darkMode ? '#2d3142' : '#f3f4f6';
+
+  // Tomar últimos 12 meses (o todos si hay menos)
+  const showMonths = months.slice(-12);
+  const monthLabels = showMonths.map(m => {
+    const [y, mo] = m.split('-');
+    return new Date(parseInt(y), parseInt(mo) - 1, 1).toLocaleDateString('es-AR', { month: 'short', year: '2-digit' });
+  });
+
+  // Pagado por persona (bar chart stacked)
+  const p1Data = showMonths.map(m => {
+    let sum = 0;
+    instances.forEach(e => {
+      if (e._yearMonth === m && e.payer === 'p1' && e.capital !== true && e._isReintegro !== true) {
+        sum += e.amount;
+      }
+    });
+    return Math.round(sum);
+  });
+  const p2Data = showMonths.map(m => {
+    let sum = 0;
+    instances.forEach(e => {
+      if (e._yearMonth === m && e.payer === 'p2' && e.capital !== true && e._isReintegro !== true) {
+        sum += e.amount;
+      }
+    });
+    return Math.round(sum);
+  });
+
+  if (statsPersonChart) statsPersonChart.destroy();
+  statsPersonChart = new Chart(document.getElementById('statsPersonChart'), {
+    type: 'bar',
+    data: {
+      labels: monthLabels,
+      datasets: [
+        { label: 'Flucy', data: p1Data, backgroundColor: '#6366f1', borderRadius: 6 },
+        { label: 'Neitor', data: p2Data, backgroundColor: '#ec4899', borderRadius: 6 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { color: textColor, boxWidth: 12, padding: 12 } } },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: textColor, callback: v => '$' + Math.round(v/1000) + 'k' }, grid: { color: gridColor } },
+        x: { ticks: { color: textColor }, grid: { display: false } }
+      }
+    }
+  });
+
+  // Tendencia mensual (line chart de gasto neto)
+  const trendData = showMonths.map(m => Math.round(getMonthNetSpend(m, instances)));
+
+  if (statsTrendChart) statsTrendChart.destroy();
+  statsTrendChart = new Chart(document.getElementById('statsTrendChart'), {
+    type: 'line',
+    data: {
+      labels: monthLabels,
+      datasets: [{
+        label: 'Gasto neto',
+        data: trendData,
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99,102,241,0.1)',
+        fill: true,
+        tension: 0.35,
+        borderWidth: 3,
+        pointBackgroundColor: '#6366f1',
+        pointRadius: 5
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: textColor, callback: v => '$' + Math.round(v/1000) + 'k' }, grid: { color: gridColor } },
+        x: { ticks: { color: textColor }, grid: { display: false } }
+      }
+    }
+  });
 }
 
 // ESC para cerrar el quickAdd
