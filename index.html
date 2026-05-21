@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gastos · Flucy & Neitor</title>
+<title>Cuchugastos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -91,10 +91,14 @@
     --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3);
   }
   body {
-    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.5;
+    line-height: 1.6;
+    letter-spacing: -0.005em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv11', 'ss01';
     padding: 24px;
     min-height: 100vh;
     transition: background 0.3s, color 0.3s;
@@ -1344,27 +1348,31 @@
 
   /* Botón "Agregar gasto" desktop (reemplaza al form inline) */
   .add-expense-btn-desktop {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    width: 100%;
     background: linear-gradient(135deg, var(--p1), var(--p2));
     color: white;
     border: none;
-    padding: 14px;
-    border-radius: 14px;
-    font-size: 15px;
+    padding: 11px 22px;
+    border-radius: 12px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    margin-bottom: 20px;
     font-family: inherit;
     box-shadow: 0 4px 12px rgba(99,102,241,0.2);
     transition: all 0.2s;
+    letter-spacing: 0.02em;
   }
   .add-expense-btn-desktop:hover {
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(99,102,241,0.35);
+  }
+  .add-expense-btn-wrap {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
   }
 
   /* Grid 2 columnas dentro del modal */
@@ -1564,8 +1572,202 @@
     gap: 4px;
     padding-top: 6px;
   }
+  .group-header {
+    cursor: pointer;
+    user-select: none;
+  }
+  .group-header .group-toggle {
+    margin-left: 8px;
+    color: var(--text-soft);
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+  .group-header.collapsed .group-toggle {
+    transform: rotate(-90deg);
+  }
+  .group-content.collapsed {
+    display: none;
+  }
+
+  /* ============ VISTA TARJETAS ============ */
+  .expense-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .expense-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .expense-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
+  .expense-card.reintegro {
+    border-left: 3px solid var(--success);
+  }
+  .expense-card.capital {
+    border-left: 3px solid var(--success);
+    background: linear-gradient(to right, rgba(16,185,129,0.05), transparent 60%);
+  }
+  .expense-card.installment {
+    border-left: 3px solid var(--primary);
+  }
+  .expense-card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .expense-card-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .expense-card-icon.cat-comida { background: #fef3c7; color: #d97706; }
+  .expense-card-icon.cat-alquiler { background: #dbeafe; color: #2563eb; }
+  .expense-card-icon.cat-servicios { background: #ede9fe; color: #7c3aed; }
+  .expense-card-icon.cat-ocio { background: #fce7f3; color: #db2777; }
+  .expense-card-icon.cat-transporte { background: #d1fae5; color: #059669; }
+  .expense-card-icon.cat-salud { background: #fee2e2; color: #dc2626; }
+  .expense-card-icon.cat-hogar { background: #cffafe; color: #0891b2; }
+  .expense-card-icon.cat-otros { background: #f3f4f6; color: #4b5563; }
+  .expense-card-icon.cat-capital { background: var(--success-soft); color: var(--success); }
+  body.dark .expense-card-icon.cat-comida { background: #422006; color: #fbbf24; }
+  body.dark .expense-card-icon.cat-alquiler { background: #1e293b; color: #60a5fa; }
+  body.dark .expense-card-icon.cat-servicios { background: #2e1065; color: #a78bfa; }
+  body.dark .expense-card-icon.cat-ocio { background: #500724; color: #f472b6; }
+  body.dark .expense-card-icon.cat-transporte { background: #064e3b; color: #34d399; }
+  body.dark .expense-card-icon.cat-salud { background: #450a0a; color: #f87171; }
+  body.dark .expense-card-icon.cat-hogar { background: #083344; color: #22d3ee; }
+  body.dark .expense-card-icon.cat-otros { background: #2d3142; color: #9ca3af; }
+  body.dark .expense-card-icon.cat-capital { background: #064e3b; color: #6ee7b7; }
+
+  .expense-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 3px;
+    line-height: 1.3;
+  }
+  .expense-card-meta {
+    font-size: 11px;
+    color: var(--text-soft);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .expense-card-amount {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+  .expense-card-amount.capital-amount { color: var(--success); }
+  .expense-card-amount-sub {
+    font-size: 10px;
+    color: var(--text-soft);
+    font-weight: 500;
+    margin-top: 3px;
+  }
+  .expense-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+  }
+  .expense-card-tags {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .expense-card-tag {
+    font-size: 10px;
+    background: var(--bg-soft);
+    color: var(--text-soft);
+    padding: 3px 7px;
+    border-radius: 5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .expense-card-tag.p1 { background: var(--primary-soft); color: var(--primary); }
+  .expense-card-tag.p2 { background: #fce7f3; color: var(--p2); }
+  body.dark .expense-card-tag.p2 { background: #500724; color: #f9a8d4; }
+  .expense-card-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .expense-card-actions button {
+    background: none;
+    border: none;
+    color: var(--text-soft);
+    padding: 4px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .expense-card-actions button:hover { background: var(--bg-soft); }
+  .expense-card-actions .delete-btn:hover { background: var(--danger-soft); color: var(--danger); }
+  .expense-card-actions .edit-btn:hover { background: var(--primary-soft); color: var(--primary); }
 
   /* ============ STATS / KPIs ============ */
+  .stats-filter-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    background: var(--primary-soft);
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  .stats-filter-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .stats-filter-chip {
+    background: white;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  body.dark .stats-filter-chip { background: var(--card); }
+  .stats-filter-chip:hover { background: var(--primary); color: white; }
+  .stats-filter-chip.clear-all {
+    background: transparent;
+    color: var(--text-soft);
+    border-color: var(--border);
+    margin-left: auto;
+  }
+  .stats-filter-chip.clear-all:hover { background: var(--danger-soft); color: var(--danger); border-color: var(--danger); }
+
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1652,6 +1854,119 @@
     display: flex;
     align-items: center;
     gap: 6px;
+  }
+
+  /* ============ BALANCE CARD: estado saldado ============ */
+  .balance-card.settled {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  }
+  .settle-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .settle-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 11px 16px;
+    background: rgba(255,255,255,0.18);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    letter-spacing: 0.02em;
+  }
+  .settle-btn:hover {
+    background: rgba(255,255,255,0.28);
+    transform: translateY(-1px);
+  }
+  .settle-btn.unsettle {
+    background: rgba(0,0,0,0.18);
+    border-color: rgba(255,255,255,0.2);
+  }
+  .settled-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .settled-info {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: white;
+  }
+
+  /* Confetti / celebración */
+  @keyframes confettiFall {
+    0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+  .confetti-piece {
+    position: fixed;
+    top: 0;
+    width: 10px;
+    height: 14px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: confettiFall linear forwards;
+  }
+
+  /* Modal saldar (uso quick-modal con un id distinto) */
+  .settle-platform-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .settle-platform-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: var(--bg-soft);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    user-select: none;
+    transition: all 0.15s;
+  }
+  .settle-platform-chip:hover { border-color: var(--border); }
+  .settle-platform-chip.active {
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+  .settle-platform-icon {
+    font-size: 18px;
+  }
+
+  /* Mes saldado: estilo de los items */
+  body.month-settled .expense-item {
+    opacity: 0.92;
   }
   .expense-item.installment {
     border-left: 3px solid var(--primary);
@@ -2020,7 +2335,7 @@
 <!-- ============ LOGIN SCREEN ============ -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
-    <div class="login-logo">F&N</div>
+    <div class="login-logo">$</div>
     <div class="login-title">Cuchugastos</div>
     <div class="login-subtitle">Iniciá sesión para continuar</div>
 
@@ -2047,7 +2362,7 @@
 
   <!-- Header -->
   <div class="header">
-    <h1><span class="icon">F&N</span> Flucy & Neitor</h1>
+    <h1><span class="icon">$</span> Cuchugastos</h1>
     <div class="header-actions">
       <div class="month-selector">
         <button onclick="changeMonth(-1)">‹</button>
@@ -2090,7 +2405,7 @@
   <!-- TAB: GASTOS -->
   <div class="tab-content active" id="tab-gastos">
     <div class="main-grid">
-      <div class="balance-card">
+      <div class="balance-card" id="balanceCard">
         <div class="balance-label">Balance del mes</div>
         <div class="balance-message" id="balanceMessage">Calculando...</div>
         <div class="balance-amount" id="balanceAmount">$0</div>
@@ -2103,7 +2418,13 @@
             <div class="label">💗 Neitor pagó</div>
             <div class="value" id="totalP2">$0</div>
           </div>
+          <div class="total">
+            <div class="label">💸 Total del mes</div>
+            <div class="value" id="totalMonth">$0</div>
+          </div>
         </div>
+        <div id="settleActions"></div>
+        <div id="settledInfo" style="display:none;" class="settled-info"></div>
       </div>
 
       <div class="card">
@@ -2112,10 +2433,12 @@
       </div>
     </div>
 
-    <button class="add-expense-btn-desktop" onclick="openQuickAdd()">
-      <span style="font-size:18px;">+</span>
-      Agregar gasto
-    </button>
+    <div class="add-expense-btn-wrap">
+      <button class="add-expense-btn-desktop" onclick="openQuickAdd()">
+        <span style="font-size:16px;">+</span>
+        Agregar gasto
+      </button>
+    </div>
 
     <div class="card">
       <div class="expense-toolbar">
@@ -2124,7 +2447,8 @@
             <input type="text" id="searchInput" placeholder="Buscar gasto por descripción..." oninput="onSearchInput()">
           </div>
           <div class="view-toggle">
-            <button class="active" data-view="list" onclick="setViewMode('list')">📋 Lista</button>
+            <button class="active" data-view="cards" onclick="setViewMode('cards')">🎴 Tarjetas</button>
+            <button data-view="list" onclick="setViewMode('list')">📋 Lista</button>
             <button data-view="cat" onclick="setViewMode('cat')">🏷️ Categoría</button>
             <button data-view="person" onclick="setViewMode('person')">👥 Persona</button>
           </div>
@@ -2148,6 +2472,8 @@
 
   <!-- TAB: STATS -->
   <div class="tab-content" id="tab-stats">
+    <div class="stats-filter-chips" id="statsFilterChips" style="display:none;"></div>
+
     <div class="stats-grid">
       <div class="kpi-card">
         <div class="kpi-label">💰 Promedio mensual</div>
@@ -2172,12 +2498,17 @@
     </div>
 
     <div class="stats-chart-card">
-      <h3>📊 Pagado por persona (histórico mensual)</h3>
+      <h3>📈 Gasto acumulado mes a mes <span style="font-size:11px; font-weight:500; color:var(--text-soft);">(click en un punto para filtrar)</span></h3>
+      <div class="chart-container"><canvas id="statsAccumChart"></canvas></div>
+    </div>
+
+    <div class="stats-chart-card">
+      <h3>📊 Pagado por persona <span style="font-size:11px; font-weight:500; color:var(--text-soft);">(click en barras o leyenda)</span></h3>
       <div class="chart-container"><canvas id="statsPersonChart"></canvas></div>
     </div>
 
     <div class="stats-chart-card">
-      <h3>📈 Tendencia del gasto total</h3>
+      <h3>📉 Tendencia del gasto total mensual</h3>
       <div class="chart-container"><canvas id="statsTrendChart"></canvas></div>
     </div>
   </div>
@@ -2354,6 +2685,48 @@
 
 <button class="fab" id="fabAddExpense" onclick="openQuickAdd()" title="Agregar gasto">+</button>
 
+<!-- Modal saldar mes -->
+<div class="quick-modal-overlay" id="settleModal" onclick="closeSettleModal(event)">
+  <div class="quick-modal" onclick="event.stopPropagation()">
+    <div class="quick-modal-header">
+      <div class="quick-modal-title">💸 Saldar el mes</div>
+      <button class="modal-close" onclick="closeSettleModal()">✕</button>
+    </div>
+
+    <div id="settleSummary" style="background: var(--bg-soft); padding: 14px; border-radius: 12px; margin-bottom: 16px; font-size: 13px; line-height: 1.6;"></div>
+
+    <div class="quick-field">
+      <label>¿Cómo se hizo la transferencia?</label>
+      <div class="settle-platform-options" id="settlePlatformOptions">
+        <div class="settle-platform-chip active" data-platform="Mercado Pago" onclick="selectSettlePlatform('Mercado Pago')">
+          <span class="settle-platform-icon">💙</span> Mercado Pago
+        </div>
+        <div class="settle-platform-chip" data-platform="Transferencia CBU" onclick="selectSettlePlatform('Transferencia CBU')">
+          <span class="settle-platform-icon">🏦</span> Transferencia CBU
+        </div>
+        <div class="settle-platform-chip" data-platform="Efectivo" onclick="selectSettlePlatform('Efectivo')">
+          <span class="settle-platform-icon">💵</span> Efectivo
+        </div>
+        <div class="settle-platform-chip" data-platform="Otro" onclick="selectSettlePlatform('Otro')">
+          <span class="settle-platform-icon">📝</span> Otro
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-field" id="settleOtherWrap" style="display:none;">
+      <label>Especificá la plataforma</label>
+      <input type="text" id="settleOtherInput" placeholder="Ej: Western Union">
+    </div>
+
+    <div class="quick-field">
+      <label>Comentario (opcional)</label>
+      <input type="text" id="settleComment" placeholder="Ej: Listo, ya te pasé">
+    </div>
+
+    <button class="quick-submit-btn" onclick="confirmSettle()">✓ Confirmar saldo</button>
+  </div>
+</div>
+
 <div class="quick-modal-overlay" id="quickAddModal" onclick="closeQuickAdd(event)">
   <div class="quick-modal" onclick="event.stopPropagation()">
     <div class="quick-modal-header">
@@ -2439,14 +2812,17 @@ let savingTimer = null;
 let isApplyingRemoteUpdate = false;
 
 // Estado de UI (no se sincroniza con Firestore — es por sesión)
-let viewMode = 'list'; // 'list' | 'cat' | 'person'
+let viewMode = 'cards'; // 'cards' | 'list' | 'cat' | 'person'
 let searchQuery = '';
-let filterPayer = 'all'; // 'all' | 'p1' | 'p2'
-let editingExpenseId = null; // si está editando, contiene el ID
+let filterPayer = 'all';
+let editingExpenseId = null;
+let collapsedGroups = new Set(); // grupos colapsados (vista cat/person)
 
 let expenses = [];
 let recurring = [];
 let savings = [];
+// Diccionario { "2026-05": { date, by, platform, comment, amount } } - meses saldados
+let settledMonths = {};
 
 // Categorías predeterminadas (no se pueden borrar)
 const defaultCategoryInfo = {
@@ -2518,7 +2894,9 @@ function addCustomCategory() {
   return key;
 }
 
-let currentDate = new Date(2026, 4, 1);
+// currentDate arranca en el mes actual, pero al loguearse se ajusta al primer mes NO saldado
+let currentDate = new Date();
+currentDate.setDate(1);
 let pieChart, barChart, savingsChart, savingsPieChart;
 let darkMode = false;
 
@@ -2579,7 +2957,32 @@ function changeMonth(delta) {
 }
 
 // ============ GASTOS ============
-// ============ FILTRO POR MES ============
+// ============ MESES SALDADOS ============
+function getMonthKey(d = currentDate) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+function isMonthSettled(d = currentDate) {
+  return !!settledMonths[getMonthKey(d)];
+}
+// Encuentra el primer mes no saldado. Si todos los recientes están saldados, va al próximo mes.
+function findFirstUnsettledMonth() {
+  // Empezamos desde hoy y vamos para atrás buscando uno saldado; si lo encontramos, vamos al siguiente
+  const today = new Date();
+  today.setDate(1);
+  const k = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+  // Si el mes actual no está saldado, ese
+  if (!settledMonths[k]) return today;
+  // Si está saldado, ir al siguiente
+  const next = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+  // Y si ese también está saldado, seguir
+  let probe = next;
+  for (let i = 0; i < 12; i++) {
+    const pk = probe.getFullYear() + '-' + String(probe.getMonth() + 1).padStart(2, '0');
+    if (!settledMonths[pk]) return probe;
+    probe = new Date(probe.getFullYear(), probe.getMonth() + 1, 1);
+  }
+  return today; // fallback
+}
 function isCurrentMonth(dateStr) {
   if (!dateStr) return false;
   const d = new Date(dateStr + 'T00:00');
@@ -2684,11 +3087,60 @@ function renderBalance() {
   const { p1Paid, p2Paid, p1Balance } = calculateBalance();
   document.getElementById('totalP1').textContent = formatMoney(p1Paid);
   document.getElementById('totalP2').textContent = formatMoney(p2Paid);
+  const totalMonth = Math.max(0, p1Paid) + Math.max(0, p2Paid);
+  document.getElementById('totalMonth').textContent = formatMoney(totalMonth);
+
   const msg = document.getElementById('balanceMessage');
   const amt = document.getElementById('balanceAmount');
-  if (Math.abs(p1Balance) < 1) { msg.textContent = '🎉 Están a mano'; amt.textContent = '$0'; }
-  else if (p1Balance > 0) { msg.textContent = 'Neitor le debe a Flucy'; amt.textContent = formatMoney(p1Balance); }
-  else { msg.textContent = 'Flucy le debe a Neitor'; amt.textContent = formatMoney(-p1Balance); }
+  const card = document.getElementById('balanceCard');
+  const monthKey = getMonthKey();
+  const settled = settledMonths[monthKey];
+
+  if (settled) {
+    card.classList.add('settled');
+    msg.innerHTML = `<span class="settled-badge">✓ Mes saldado</span>`;
+    amt.textContent = formatMoney(settled.amount || 0);
+    // Mostrar info
+    const info = document.getElementById('settledInfo');
+    info.style.display = '';
+    const settledByName = settled.by === 'p1' ? 'Flucy' : 'Neitor';
+    const dateStr = new Date(settled.date).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+    info.innerHTML = `
+      💸 <b>${settledByName}</b> transfirió <b>${formatMoney(settled.amount || 0)}</b><br>
+      📍 Vía <b>${settled.platform}</b> · ${dateStr}
+      ${settled.comment ? `<br>💬 ${escapeHtml(settled.comment)}` : ''}
+    `;
+    document.getElementById('settleActions').innerHTML = `
+      <div class="settle-actions">
+        <button class="settle-btn unsettle" onclick="openUnsettleConfirm()">↩️ Des-saldar</button>
+      </div>
+    `;
+  } else {
+    card.classList.remove('settled');
+    if (Math.abs(p1Balance) < 1) {
+      msg.textContent = '🎉 Están a mano';
+      amt.textContent = '$0';
+    } else if (p1Balance > 0) {
+      msg.textContent = 'Neitor le debe a Flucy';
+      amt.textContent = formatMoney(p1Balance);
+    } else {
+      msg.textContent = 'Flucy le debe a Neitor';
+      amt.textContent = formatMoney(-p1Balance);
+    }
+    document.getElementById('settledInfo').style.display = 'none';
+    // Botón saldar solo si hay deuda
+    if (Math.abs(p1Balance) >= 1) {
+      document.getElementById('settleActions').innerHTML = `
+        <div class="settle-actions">
+          <button class="settle-btn" onclick="openSettleModal()">💸 Saldar mes</button>
+        </div>
+      `;
+    } else {
+      document.getElementById('settleActions').innerHTML = '';
+    }
+  }
+
+  document.body.classList.toggle('month-settled', !!settled);
 }
 
 function renderCategories() {
@@ -2811,6 +3263,90 @@ function renderExpenseItemHTML(e) {
   </div>`;
 }
 
+// Render de un gasto como tarjeta (vista cards)
+function renderExpenseCardHTML(e) {
+  const info = getCategoryInfo(e.category);
+  const payerName = e.payer === 'p1' ? 'Flucy' : 'Neitor';
+  const splitLabel = { '5050': '50/50', '100p1': '100% Flucy', '100p2': '100% Neitor' }[e.split];
+  const dateStr = new Date(e.date + 'T00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+  const commentsCount = (e.comments || []).length;
+
+  // === Caso reintegro ===
+  if (e._isReintegro) {
+    return `<div class="expense-card reintegro" onclick="openTicket(${e._realId})">
+      <div class="expense-card-head">
+        <div class="expense-card-icon cat-capital">💸</div>
+        <div style="flex:1; min-width:0;">
+          <div class="expense-card-title"><span class="reintegro-tag">REINTEGRO</span>${escapeHtml(e.desc)}</div>
+          <div class="expense-card-meta">${dateStr} · Crédito a favor</div>
+        </div>
+        <div class="expense-card-actions">
+          <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${e._realId})">✕</button>
+        </div>
+      </div>
+      <div class="expense-card-amount capital-amount">+ ${formatMoney(e.amount)}</div>
+      <div class="expense-card-footer">
+        <div class="expense-card-tags">
+          <span class="expense-card-tag ${e.payer}">${e.payer === 'p1' ? '💜 Flucy' : '💗 Neitor'}</span>
+          <span class="expense-card-tag">${splitLabel}</span>
+        </div>
+        ${commentsCount > 0 ? `<span class="expense-card-tag">💬 ${commentsCount}</span>` : ''}
+      </div>
+    </div>`;
+  }
+
+  const isCapital = e.capital === true;
+  const isInstallment = e._isVirtual === true;
+  const cardClass = 'expense-card'
+    + (isCapital ? ' capital' : '')
+    + (isInstallment ? ' installment' : '');
+  const amountText = isCapital ? '+ ' + formatMoney(e.amount) : formatMoney(e.amount);
+  const iconDisplay = isCapital ? '💰' : info.icon;
+  const iconCls = isCapital ? 'cat-capital' : info.cls;
+  const installmentBadge = isInstallment
+    ? `<span class="installment-tag">CUOTA ${e._installmentNum}/${e.installments.total}</span>`
+    : '';
+  const titleDisplay = (isCapital ? `<span class="capital-tag">APORTE</span> ` : '')
+    + escapeHtml(e.desc)
+    + ' '
+    + installmentBadge;
+  const subAmount = isInstallment
+    ? `<div class="expense-card-amount-sub">de ${formatMoney(e.amount * e.installments.total)} total</div>`
+    : '';
+  const clickId = isInstallment ? e._realId : e.id;
+
+  return `<div class="${cardClass}" onclick="openTicket(${clickId})">
+    <div class="expense-card-head">
+      <div class="expense-card-icon ${iconCls}">${iconDisplay}</div>
+      <div style="flex:1; min-width:0;">
+        <div class="expense-card-title">${titleDisplay}</div>
+        <div class="expense-card-meta">${dateStr} · ${info.name}</div>
+      </div>
+      <div class="expense-card-actions">
+        <button class="edit-btn" onclick="event.stopPropagation(); editExpense(${clickId})" title="Editar">✏️</button>
+        <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${clickId})" title="Eliminar">✕</button>
+      </div>
+    </div>
+    <div>
+      <div class="expense-card-amount ${isCapital ? 'capital-amount' : ''}">${amountText}</div>
+      ${subAmount}
+    </div>
+    <div class="expense-card-footer">
+      <div class="expense-card-tags">
+        <span class="expense-card-tag ${e.payer}">${e.payer === 'p1' ? '💜 Flucy' : '💗 Neitor'}</span>
+        <span class="expense-card-tag">${splitLabel}</span>
+      </div>
+      ${commentsCount > 0 ? `<span class="expense-card-tag">💬 ${commentsCount}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+function toggleGroup(groupKey) {
+  if (collapsedGroups.has(groupKey)) collapsedGroups.delete(groupKey);
+  else collapsedGroups.add(groupKey);
+  renderExpenseList();
+}
+
 function renderExpenseList() {
   const list = document.getElementById('expenseList');
   const monthExpenses = getCurrentMonthExpenses();
@@ -2826,8 +3362,20 @@ function renderExpenseList() {
     return;
   }
 
+  if (viewMode === 'cards') {
+    // Vista tarjetas: grid
+    const sorted = [...filtered].sort((a, b) => {
+      const da = new Date(a.date), db = new Date(b.date);
+      if (db - da !== 0) return db - da;
+      if (a._isReintegro && !b._isReintegro) return 1;
+      if (!a._isReintegro && b._isReintegro) return -1;
+      return 0;
+    });
+    list.innerHTML = `<div class="expense-cards">${sorted.map(renderExpenseCardHTML).join('')}</div>`;
+    return;
+  }
+
   if (viewMode === 'list') {
-    // Vista plana: ordenado por fecha (desc), reintegros pegados a su gasto
     const sorted = [...filtered].sort((a, b) => {
       const da = new Date(a.date), db = new Date(b.date);
       if (db - da !== 0) return db - da;
@@ -2840,17 +3388,15 @@ function renderExpenseList() {
   }
 
   if (viewMode === 'cat') {
-    // Agrupado por categoría
     const groups = {};
     filtered.forEach(e => {
-      if (e._isReintegro) return; // los reintegros no agrupamos por categoría
+      if (e._isReintegro) return;
       const key = e.category;
       if (!groups[key]) groups[key] = { items: [], total: 0 };
       groups[key].items.push(e);
       const isCapital = e.capital === true;
       groups[key].total += isCapital ? -e.amount : e.amount;
     });
-    // También agregar los reintegros como grupo separado
     const reintegros = filtered.filter(e => e._isReintegro);
     if (reintegros.length > 0) {
       groups['_reintegros'] = {
@@ -2859,7 +3405,6 @@ function renderExpenseList() {
         special: 'reintegros'
       };
     }
-    // Ordenar grupos por monto total absoluto descendente
     const sortedGroups = Object.entries(groups).sort((a, b) => Math.abs(b[1].total) - Math.abs(a[1].total));
 
     list.innerHTML = sortedGroups.map(([catKey, group]) => {
@@ -2872,16 +3417,21 @@ function renderExpenseList() {
       }
       const totalLabel = group.total < 0 ? `+ ${formatMoney(-group.total)}` : formatMoney(group.total);
       const totalClass = group.total < 0 ? 'capital-amount' : '';
+      const groupKey = 'cat:' + catKey;
+      const isCollapsed = collapsedGroups.has(groupKey);
       return `
-        <div class="group-header">
+        <div class="group-header ${isCollapsed ? 'collapsed' : ''}" onclick="toggleGroup('${groupKey}')">
           <div class="group-title">
             <div class="group-icon ${cls}">${icon}</div>
             ${name}
             <span class="group-count">(${group.items.length})</span>
           </div>
-          <div class="group-total ${totalClass}">${totalLabel}</div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <div class="group-total ${totalClass}">${totalLabel}</div>
+            <span class="group-toggle">▾</span>
+          </div>
         </div>
-        <div class="group-content">
+        <div class="group-content ${isCollapsed ? 'collapsed' : ''}">
           ${group.items
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .map(renderExpenseItemHTML).join('')}
@@ -2892,7 +3442,6 @@ function renderExpenseList() {
   }
 
   if (viewMode === 'person') {
-    // Agrupado por persona
     const groups = { p1: { items: [], total: 0 }, p2: { items: [], total: 0 } };
     filtered.forEach(e => {
       const target = e.payer === 'p1' ? groups.p1 : groups.p2;
@@ -2909,16 +3458,21 @@ function renderExpenseList() {
       const avClass = p === 'p1' ? 'avatar' : 'avatar p2';
       const totalLabel = group.total < 0 ? `+ ${formatMoney(-group.total)}` : formatMoney(group.total);
       const totalClass = group.total < 0 ? 'capital-amount' : '';
+      const groupKey = 'person:' + p;
+      const isCollapsed = collapsedGroups.has(groupKey);
       return `
-        <div class="group-header">
+        <div class="group-header ${isCollapsed ? 'collapsed' : ''}" onclick="toggleGroup('${groupKey}')">
           <div class="group-title">
             <div class="${avClass}">${initial}</div>
             ${name} pagó
             <span class="group-count">(${group.items.length})</span>
           </div>
-          <div class="group-total ${totalClass}">${totalLabel}</div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <div class="group-total ${totalClass}">${totalLabel}</div>
+            <span class="group-toggle">▾</span>
+          </div>
         </div>
-        <div class="group-content">
+        <div class="group-content ${isCollapsed ? 'collapsed' : ''}">
           ${group.items
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .map(renderExpenseItemHTML).join('')}
@@ -3233,6 +3787,9 @@ async function initFirestoreSync() {
       applyRemoteData(data);
     }
 
+    // Ajustar al primer mes no saldado (si hay meses saldados conocidos)
+    currentDate = findFirstUnsettledMonth();
+
     // Suscribirse a cambios en tiempo real
     unsubscribeListener = window.firebaseDB.listen((data) => {
       isApplyingRemoteUpdate = true;
@@ -3256,6 +3813,7 @@ function applyRemoteData(data) {
   recurring = data.recurring || [];
   savings = data.savings || [];
   customCategories = data.customCategories || {};
+  settledMonths = data.settledMonths || {};
 }
 
 function loadDemoData() {
@@ -3283,7 +3841,7 @@ function scheduleSave() {
 async function saveToFirestore() {
   try {
     await window.firebaseDB.save({
-      expenses, recurring, savings, customCategories,
+      expenses, recurring, savings, customCategories, settledMonths,
       lastUpdated: new Date().toISOString(),
       lastUpdatedBy: currentUser
     });
@@ -3628,24 +4186,137 @@ function closeQuickAdd(event) {
   if (banner) banner.style.display = 'none';
 }
 
+// ============ SALDAR MES ============
+let selectedSettlePlatform = 'Mercado Pago';
+
+function openSettleModal() {
+  const { p1Balance } = calculateBalance();
+  if (Math.abs(p1Balance) < 1) return;
+
+  const amount = Math.abs(p1Balance);
+  const fromWho = p1Balance > 0 ? 'Neitor' : 'Flucy';
+  const toWho = p1Balance > 0 ? 'Flucy' : 'Neitor';
+
+  document.getElementById('settleSummary').innerHTML = `
+    <b>${fromWho}</b> le tiene que transferir <b style="color: var(--primary); font-size: 16px;">${formatMoney(amount)}</b> a <b>${toWho}</b>.
+  `;
+
+  selectedSettlePlatform = 'Mercado Pago';
+  document.querySelectorAll('.settle-platform-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.platform === 'Mercado Pago');
+  });
+  document.getElementById('settleOtherWrap').style.display = 'none';
+  document.getElementById('settleOtherInput').value = '';
+  document.getElementById('settleComment').value = '';
+
+  document.getElementById('settleModal').classList.add('open');
+}
+
+function closeSettleModal(event) {
+  if (event && event.target.id !== 'settleModal' && event.type === 'click') return;
+  document.getElementById('settleModal').classList.remove('open');
+}
+
+function selectSettlePlatform(p) {
+  selectedSettlePlatform = p;
+  document.querySelectorAll('.settle-platform-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.platform === p);
+  });
+  document.getElementById('settleOtherWrap').style.display = (p === 'Otro') ? '' : 'none';
+}
+
+function confirmSettle() {
+  const { p1Balance } = calculateBalance();
+  if (Math.abs(p1Balance) < 1) return;
+
+  let platform = selectedSettlePlatform;
+  if (platform === 'Otro') {
+    const otherInput = document.getElementById('settleOtherInput').value.trim();
+    if (!otherInput) { alert('Especificá la plataforma'); return; }
+    platform = otherInput;
+  }
+
+  const amount = Math.abs(p1Balance);
+  const fromWho = p1Balance > 0 ? 'p2' : 'p1';
+  const comment = document.getElementById('settleComment').value.trim();
+  const monthKey = getMonthKey();
+
+  settledMonths[monthKey] = {
+    date: new Date().toISOString(),
+    by: fromWho,
+    platform,
+    comment: comment || null,
+    amount,
+    settledBy: currentUser
+  };
+
+  scheduleSave();
+  closeSettleModal();
+  celebrate();
+  render();
+}
+
+function openUnsettleConfirm() {
+  if (!confirm('¿Querés des-saldar este mes? Esto vuelve a mostrar el balance pendiente.')) return;
+  delete settledMonths[getMonthKey()];
+  scheduleSave();
+  render();
+}
+
+// ============ CELEBRACIÓN (confetti + sonido) ============
+function celebrate() {
+  // Sonido tipo "ding" celebrativo usando Web Audio API
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const playNote = (freq, delay, duration = 0.18, volume = 0.18) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + duration);
+    };
+    // Arpegio C-E-G-C (Do mayor) ascendente
+    playNote(523.25, 0);      // C5
+    playNote(659.25, 0.08);   // E5
+    playNote(783.99, 0.16);   // G5
+    playNote(1046.50, 0.24, 0.3); // C6 (más largo)
+  } catch (e) { /* sin sonido si el browser no lo soporta */ }
+
+  // Confetti
+  const colors = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#ef4444'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+    piece.style.animationDelay = (Math.random() * 0.3) + 's';
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 5000);
+  }
+}
+
 // ============ STATS / KPIs ============
 let statsPersonChart = null;
 let statsTrendChart = null;
+let statsAccumChart = null;
 
-// Expande todos los gastos a "instancias mensuales" para análisis histórico
-// (es como getCurrentMonthExpenses pero para TODOS los meses)
+let statsFilter = { month: null, category: null, person: null };
+
 function getAllExpenseInstances() {
   const out = [];
   expenses.forEach(e => {
     if (e.installments && e.installments.total >= 2) {
-      // Generar una instancia por cada cuota
       const startDate = new Date(e.date + 'T00:00');
       const startedAt = e.installments.currentAt || 1;
       for (let i = 0; i < e.installments.total; i++) {
-        const cuotaNum = startedAt + i - (startedAt - 1); // siempre 1..total
-        // Pero el mes correspondiente:
         const cuotaDate = new Date(startDate.getFullYear(), startDate.getMonth() + i - (startedAt - 1), startDate.getDate());
-        // El cuotaNum real es i+1 si tomamos como base la primera del plan
         out.push({
           ...e,
           _isVirtual: true,
@@ -3654,7 +4325,6 @@ function getAllExpenseInstances() {
           _yearMonth: cuotaDate.getFullYear() + '-' + String(cuotaDate.getMonth() + 1).padStart(2, '0')
         });
       }
-      // Reintegro se asocia al mes de la cuota 1
       if (e.reintegro && e.reintegro > 0) {
         const firstDate = new Date(startDate.getFullYear(), startDate.getMonth() - (startedAt - 1), startDate.getDate());
         out.push({
@@ -3666,14 +4336,12 @@ function getAllExpenseInstances() {
         });
       }
     } else {
-      // Gasto normal
       const d = new Date(e.date + 'T00:00');
       out.push({
         ...e,
         _instanceDate: e.date,
         _yearMonth: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
       });
-      // Reintegro
       if (e.reintegro && e.reintegro > 0) {
         out.push({
           ...e,
@@ -3688,22 +4356,63 @@ function getAllExpenseInstances() {
   return out;
 }
 
-// Calcula el gasto neto de un mes (gastos - aportes - reintegros)
-function getMonthNetSpend(yearMonth, instances = null) {
-  const inst = instances || getAllExpenseInstances();
-  let total = 0;
-  inst.forEach(e => {
-    if (e._yearMonth !== yearMonth) return;
-    const sign = (e.capital === true || e._isReintegro === true) ? -1 : 1;
-    total += e.amount * sign;
+function getFilteredInstances() {
+  const all = getAllExpenseInstances();
+  return all.filter(e => {
+    if (statsFilter.month && e._yearMonth !== statsFilter.month) return false;
+    if (statsFilter.category && e.category !== statsFilter.category) return false;
+    if (statsFilter.person && e.payer !== statsFilter.person) return false;
+    return true;
   });
-  return total;
+}
+
+function setStatsFilter(type, value) {
+  if (statsFilter[type] === value) statsFilter[type] = null;
+  else statsFilter[type] = value;
+  renderStats();
+}
+
+function clearStatsFilters() {
+  statsFilter = { month: null, category: null, person: null };
+  renderStats();
+}
+
+function hasAnyFilter() {
+  return statsFilter.month || statsFilter.category || statsFilter.person;
+}
+
+function renderStatsFilterChips() {
+  const wrap = document.getElementById('statsFilterChips');
+  if (!wrap) return;
+  const chips = [];
+  if (statsFilter.month) {
+    const [y, mo] = statsFilter.month.split('-');
+    const label = new Date(parseInt(y), parseInt(mo) - 1, 1).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+    chips.push(`<button class="stats-filter-chip" onclick="setStatsFilter('month', '${statsFilter.month}')">📅 ${label} ✕</button>`);
+  }
+  if (statsFilter.category) {
+    const info = getCategoryInfo(statsFilter.category);
+    chips.push(`<button class="stats-filter-chip" onclick="setStatsFilter('category', '${statsFilter.category}')">${info.icon} ${info.name} ✕</button>`);
+  }
+  if (statsFilter.person) {
+    const name = statsFilter.person === 'p1' ? 'Flucy' : 'Neitor';
+    chips.push(`<button class="stats-filter-chip" onclick="setStatsFilter('person', '${statsFilter.person}')">👤 ${name} ✕</button>`);
+  }
+  if (chips.length > 0) {
+    wrap.innerHTML = `<div class="stats-filter-label">Filtros activos:</div>${chips.join('')}<button class="stats-filter-chip clear-all" onclick="clearStatsFilters()">Limpiar todos</button>`;
+    wrap.style.display = 'flex';
+  } else {
+    wrap.style.display = 'none';
+  }
 }
 
 function renderStats() {
-  const instances = getAllExpenseInstances();
+  const allInstances = getAllExpenseInstances();
+  const filteredInstances = getFilteredInstances();
 
-  if (instances.length === 0) {
+  renderStatsFilterChips();
+
+  if (allInstances.length === 0) {
     document.getElementById('kpiAvgMonth').textContent = '$0';
     document.getElementById('kpiPendingInst').textContent = '$0';
     document.getElementById('kpiGrowCat').textContent = '-';
@@ -3711,27 +4420,31 @@ function renderStats() {
     return;
   }
 
-  // Lista de meses únicos donde hubo movimientos, ordenados ascendente
-  const monthsSet = new Set(instances.map(e => e._yearMonth));
-  const months = [...monthsSet].sort();
-
-  // === KPI 1: Promedio mensual de los últimos 6 meses (gasto neto positivo) ===
-  const last6 = months.slice(-6);
-  if (last6.length > 0) {
-    let sum = 0, count = 0;
-    last6.forEach(m => {
-      const net = getMonthNetSpend(m, instances);
-      if (net > 0) { sum += net; count++; }
-    });
-    const avg = count > 0 ? sum / count : 0;
-    document.getElementById('kpiAvgMonth').textContent = formatMoney(avg);
-    document.getElementById('kpiAvgMonthSub').textContent = `Últimos ${last6.length} mes(es)`;
-  }
-
-  // === KPI 2: Cuotas pendientes (total que falta pagar) ===
-  let pendingTotal = 0;
+  // Solo meses pasados o el actual (NO futuros)
   const now = new Date();
   const currentYearMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  const allMonths = [...new Set(allInstances.map(e => e._yearMonth))].sort().filter(m => m <= currentYearMonth);
+
+  // KPI 1: Promedio mensual (filtros aplicados, últimos 6 meses)
+  const last6 = allMonths.slice(-6);
+  let sum = 0, count = 0;
+  last6.forEach(m => {
+    let monthSum = 0;
+    filteredInstances.forEach(e => {
+      if (e._yearMonth === m && e.capital !== true && e._isReintegro !== true) {
+        monthSum += e.amount;
+      }
+    });
+    if (monthSum > 0) { sum += monthSum; count++; }
+  });
+  const avg = count > 0 ? sum / count : 0;
+  document.getElementById('kpiAvgMonth').textContent = formatMoney(avg);
+  document.getElementById('kpiAvgMonthSub').textContent = count > 0
+    ? `Últimos ${count} mes(es)` + (hasAnyFilter() ? ' · filtrado' : '')
+    : 'Sin datos suficientes';
+
+  // KPI 2: Cuotas pendientes (global)
+  let pendingTotal = 0;
   expenses.forEach(e => {
     if (!e.installments || e.installments.total < 2) return;
     const startDate = new Date(e.date + 'T00:00');
@@ -3749,18 +4462,16 @@ function renderStats() {
     ? 'A pagar en próximos meses'
     : 'No hay cuotas pendientes';
 
-  // === KPI 3 y 4: Categoría que más creció / más bajó vs mes anterior ===
-  if (months.length >= 2) {
-    const lastMonth = months[months.length - 1];
-    const prevMonth = months[months.length - 2];
-
+  // KPI 3 y 4
+  if (allMonths.length >= 2) {
+    const lastMonth = allMonths[allMonths.length - 1];
+    const prevMonth = allMonths[allMonths.length - 2];
     const totalsLast = {}, totalsPrev = {};
-    instances.forEach(e => {
+    filteredInstances.forEach(e => {
       if (e.capital === true || e._isReintegro === true) return;
       if (e._yearMonth === lastMonth) totalsLast[e.category] = (totalsLast[e.category] || 0) + e.amount;
       if (e._yearMonth === prevMonth) totalsPrev[e.category] = (totalsPrev[e.category] || 0) + e.amount;
     });
-
     const allCats = new Set([...Object.keys(totalsLast), ...Object.keys(totalsPrev)]);
     let maxGrow = { cat: null, delta: 0 };
     let maxDrop = { cat: null, delta: 0 };
@@ -3769,7 +4480,6 @@ function renderStats() {
       if (delta > maxGrow.delta) maxGrow = { cat, delta };
       if (delta < maxDrop.delta) maxDrop = { cat, delta };
     });
-
     if (maxGrow.cat) {
       const info = getCategoryInfo(maxGrow.cat);
       document.getElementById('kpiGrowCat').innerHTML = `${info.icon} ${info.name}`;
@@ -3778,7 +4488,6 @@ function renderStats() {
       document.getElementById('kpiGrowCat').textContent = '-';
       document.getElementById('kpiGrowCatSub').textContent = 'Sin cambios significativos';
     }
-
     if (maxDrop.cat) {
       const info = getCategoryInfo(maxDrop.cat);
       document.getElementById('kpiDropCat').innerHTML = `${info.icon} ${info.name}`;
@@ -3789,40 +4498,41 @@ function renderStats() {
     }
   } else {
     document.getElementById('kpiGrowCat').textContent = '-';
-    document.getElementById('kpiGrowCatSub').textContent = 'Necesitás 2+ meses de datos';
+    document.getElementById('kpiGrowCatSub').textContent = 'Necesitás 2+ meses';
     document.getElementById('kpiDropCat').textContent = '-';
-    document.getElementById('kpiDropCatSub').textContent = 'Necesitás 2+ meses de datos';
+    document.getElementById('kpiDropCatSub').textContent = 'Necesitás 2+ meses';
   }
 
-  // === Charts ===
+  // Charts
   const textColor = darkMode ? '#f3f4f6' : '#1a1d29';
   const gridColor = darkMode ? '#2d3142' : '#f3f4f6';
 
-  // Tomar últimos 12 meses (o todos si hay menos)
-  const showMonths = months.slice(-12);
+  const showMonths = allMonths.slice(-12);
   const monthLabels = showMonths.map(m => {
     const [y, mo] = m.split('-');
     return new Date(parseInt(y), parseInt(mo) - 1, 1).toLocaleDateString('es-AR', { month: 'short', year: '2-digit' });
   });
 
-  // Pagado por persona (bar chart stacked)
+  // Bar chart: pagado por persona (aplica filtros menos persona)
   const p1Data = showMonths.map(m => {
-    let sum = 0;
-    instances.forEach(e => {
-      if (e._yearMonth === m && e.payer === 'p1' && e.capital !== true && e._isReintegro !== true) {
-        sum += e.amount;
-      }
+    let s = 0;
+    allInstances.forEach(e => {
+      if (e._yearMonth !== m || e.payer !== 'p1' || e.capital === true || e._isReintegro === true) return;
+      if (statsFilter.month && e._yearMonth !== statsFilter.month) return;
+      if (statsFilter.category && e.category !== statsFilter.category) return;
+      s += e.amount;
     });
-    return Math.round(sum);
+    return Math.round(s);
   });
   const p2Data = showMonths.map(m => {
-    let sum = 0;
-    instances.forEach(e => {
-      if (e._yearMonth === m && e.payer === 'p2' && e.capital !== true && e._isReintegro !== true) {
-        sum += e.amount;
-      }
+    let s = 0;
+    allInstances.forEach(e => {
+      if (e._yearMonth !== m || e.payer !== 'p2' || e.capital === true || e._isReintegro === true) return;
+      if (statsFilter.month && e._yearMonth !== statsFilter.month) return;
+      if (statsFilter.category && e.category !== statsFilter.category) return;
+      s += e.amount;
     });
-    return Math.round(sum);
+    return Math.round(s);
   });
 
   if (statsPersonChart) statsPersonChart.destroy();
@@ -3837,7 +4547,16 @@ function renderStats() {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { color: textColor, boxWidth: 12, padding: 12 } } },
+      onClick: (evt, items) => {
+        if (items.length > 0) setStatsFilter('month', showMonths[items[0].index]);
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: textColor, boxWidth: 12, padding: 12 },
+          onClick: (e, item) => setStatsFilter('person', item.datasetIndex === 0 ? 'p1' : 'p2')
+        }
+      },
       scales: {
         y: { beginAtZero: true, ticks: { color: textColor, callback: v => '$' + Math.round(v/1000) + 'k' }, grid: { color: gridColor } },
         x: { ticks: { color: textColor }, grid: { display: false } }
@@ -3845,8 +4564,17 @@ function renderStats() {
     }
   });
 
-  // Tendencia mensual (line chart de gasto neto)
-  const trendData = showMonths.map(m => Math.round(getMonthNetSpend(m, instances)));
+  // Line chart: tendencia mensual
+  const trendData = showMonths.map(m => {
+    let s = 0;
+    filteredInstances.forEach(e => {
+      if (e._yearMonth === m) {
+        const sign = (e.capital === true || e._isReintegro === true) ? -1 : 1;
+        s += e.amount * sign;
+      }
+    });
+    return Math.round(s);
+  });
 
   if (statsTrendChart) statsTrendChart.destroy();
   statsTrendChart = new Chart(document.getElementById('statsTrendChart'), {
@@ -3862,11 +4590,60 @@ function renderStats() {
         tension: 0.35,
         borderWidth: 3,
         pointBackgroundColor: '#6366f1',
-        pointRadius: 5
+        pointRadius: 5,
+        pointHoverRadius: 8
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      onClick: (evt, items) => {
+        if (items.length > 0) setStatsFilter('month', showMonths[items[0].index]);
+      },
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: textColor, callback: v => '$' + Math.round(v/1000) + 'k' }, grid: { color: gridColor } },
+        x: { ticks: { color: textColor }, grid: { display: false } }
+      }
+    }
+  });
+
+  // Line chart: acumulado
+  let acc = 0;
+  const accumData = showMonths.map(m => {
+    let monthSum = 0;
+    filteredInstances.forEach(e => {
+      if (e._yearMonth === m) {
+        const sign = (e.capital === true || e._isReintegro === true) ? -1 : 1;
+        monthSum += e.amount * sign;
+      }
+    });
+    acc += monthSum;
+    return Math.round(acc);
+  });
+
+  if (statsAccumChart) statsAccumChart.destroy();
+  statsAccumChart = new Chart(document.getElementById('statsAccumChart'), {
+    type: 'line',
+    data: {
+      labels: monthLabels,
+      datasets: [{
+        label: 'Acumulado',
+        data: accumData,
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16,185,129,0.15)',
+        fill: true,
+        tension: 0.3,
+        borderWidth: 3,
+        pointBackgroundColor: '#10b981',
+        pointRadius: 5,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      onClick: (evt, items) => {
+        if (items.length > 0) setStatsFilter('month', showMonths[items[0].index]);
+      },
       plugins: { legend: { display: false } },
       scales: {
         y: { beginAtZero: true, ticks: { color: textColor, callback: v => '$' + Math.round(v/1000) + 'k' }, grid: { color: gridColor } },
