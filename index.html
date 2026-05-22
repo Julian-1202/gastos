@@ -1281,6 +1281,135 @@
   .user-menu-wrap {
     position: relative;
   }
+
+  /* ============ NOTIFICATIONS ============ */
+  .notif-wrap {
+    position: relative;
+  }
+  .notif-bell {
+    background: var(--card);
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 17px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .notif-bell:hover { transform: translateY(-1px); }
+  .notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--danger);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 10px;
+    padding: 1px 6px;
+    min-width: 18px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  }
+  .notif-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: 360px;
+    max-width: calc(100vw - 30px);
+    max-height: 500px;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    animation: fadeIn 0.15s;
+  }
+  .notif-panel.open { display: flex; }
+  .notif-panel-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .notif-mark-read {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-family: inherit;
+  }
+  .notif-mark-read:hover { background: var(--primary-soft); }
+  .notif-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 4px;
+  }
+  .notif-empty {
+    text-align: center;
+    color: var(--text-soft);
+    padding: 30px 20px;
+    font-size: 13px;
+  }
+  .notif-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+  }
+  .notif-item:hover { background: var(--bg-soft); }
+  .notif-item.unread { background: var(--primary-soft); }
+  .notif-item.unread:hover { background: var(--primary-soft); opacity: 0.85; }
+  .notif-avatar {
+    width: 28px; height: 28px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .notif-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .notif-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+  .notif-icon { font-size: 12px; }
+  .notif-author { font-weight: 700; color: var(--text); }
+  .notif-time { color: var(--text-soft); }
+  .notif-text {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text);
+    word-wrap: break-word;
+  }
+  .notif-unread-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    align-self: center;
+    flex-shrink: 0;
+  }
   .current-user-badge {
     display: flex;
     align-items: center;
@@ -1819,6 +1948,14 @@
     padding: 20px;
     box-shadow: var(--shadow);
     margin-bottom: 14px;
+  }
+  .stats-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 900px) {
+    .stats-2col { grid-template-columns: 1fr; }
   }
   .stats-chart-card h3 {
     font-size: 14px;
@@ -2373,6 +2510,19 @@
         <span class="sync-dot"></span>
         <span id="syncText">Guardado</span>
       </div>
+      <div class="notif-wrap">
+        <button class="notif-bell" onclick="toggleNotifPanel(event)" title="Notificaciones">
+          🔔
+          <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+        </button>
+        <div class="notif-panel" id="notifPanel">
+          <div class="notif-panel-header">
+            <span>🔔 Notificaciones</span>
+            <button class="notif-mark-read" onclick="markAllNotificationsRead()">Marcar leídas</button>
+          </div>
+          <div class="notif-list" id="notifList"></div>
+        </div>
+      </div>
       <div class="user-menu-wrap">
         <button class="current-user-badge" id="currentUserBadge" onclick="toggleUserMenu(event)">
           <div class="avatar" id="currentUserAvatar">F</div>
@@ -2476,9 +2626,19 @@
 
     <div class="stats-grid">
       <div class="kpi-card">
-        <div class="kpi-label">💰 Promedio mensual</div>
-        <div class="kpi-value" id="kpiAvgMonth">$0</div>
-        <div class="kpi-sub" id="kpiAvgMonthSub">Últimos 6 meses</div>
+        <div class="kpi-label">💜 Total Flucy</div>
+        <div class="kpi-value" id="kpiTotalP1">$0</div>
+        <div class="kpi-sub" id="kpiTotalP1Sub">En el rango visible</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">💗 Total Neitor</div>
+        <div class="kpi-value" id="kpiTotalP2">$0</div>
+        <div class="kpi-sub" id="kpiTotalP2Sub">En el rango visible</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">📊 Total acumulado</div>
+        <div class="kpi-value" id="kpiTotalAcc">$0</div>
+        <div class="kpi-sub" id="kpiTotalAccSub">Flucy + Neitor</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">📅 Cuotas pendientes</div>
@@ -2486,30 +2646,36 @@
         <div class="kpi-sub" id="kpiPendingInstSub">A pagar a futuro</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">📈 Categoría que más creció</div>
-        <div class="kpi-value" id="kpiGrowCat" style="font-size:18px;">-</div>
+        <div class="kpi-label">💰 Promedio mensual</div>
+        <div class="kpi-value" id="kpiAvgMonth" style="font-size:22px;">$0</div>
+        <div class="kpi-sub" id="kpiAvgMonthSub">En el rango visible</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">📈 Más creció</div>
+        <div class="kpi-value" id="kpiGrowCat" style="font-size:16px;">-</div>
         <div class="kpi-sub" id="kpiGrowCatSub">vs mes anterior</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">📉 Categoría que más bajó</div>
-        <div class="kpi-value" id="kpiDropCat" style="font-size:18px;">-</div>
+        <div class="kpi-label">📉 Más bajó</div>
+        <div class="kpi-value" id="kpiDropCat" style="font-size:16px;">-</div>
         <div class="kpi-sub" id="kpiDropCatSub">vs mes anterior</div>
       </div>
     </div>
 
     <div class="stats-chart-card">
-      <h3>📈 Gasto acumulado mes a mes <span style="font-size:11px; font-weight:500; color:var(--text-soft);">(click en un punto para filtrar)</span></h3>
+      <h3>📈 Gasto acumulado <span style="font-size:11px; font-weight:500; color:var(--text-soft);">(click en un punto para filtrar)</span></h3>
       <div class="chart-container"><canvas id="statsAccumChart"></canvas></div>
     </div>
 
-    <div class="stats-chart-card">
-      <h3>📊 Pagado por persona <span style="font-size:11px; font-weight:500; color:var(--text-soft);">(click en barras o leyenda)</span></h3>
-      <div class="chart-container"><canvas id="statsPersonChart"></canvas></div>
-    </div>
-
-    <div class="stats-chart-card">
-      <h3>📉 Tendencia del gasto total mensual</h3>
-      <div class="chart-container"><canvas id="statsTrendChart"></canvas></div>
+    <div class="stats-2col">
+      <div class="stats-chart-card">
+        <h3>📊 Pagado por persona <span style="font-size:11px; font-weight:500; color:var(--text-soft);">(click en barras o leyenda)</span></h3>
+        <div class="chart-container"><canvas id="statsPersonChart"></canvas></div>
+      </div>
+      <div class="stats-chart-card">
+        <h3>🥧 Distribución por categoría</h3>
+        <div class="chart-container"><canvas id="statsCategoryChart"></canvas></div>
+      </div>
     </div>
   </div>
 
@@ -2821,8 +2987,9 @@ let collapsedGroups = new Set(); // grupos colapsados (vista cat/person)
 let expenses = [];
 let recurring = [];
 let savings = [];
-// Diccionario { "2026-05": { date, by, platform, comment, amount } } - meses saldados
 let settledMonths = {};
+let notifications = [];
+let lastReadNotif = {};
 
 // Categorías predeterminadas (no se pueden borrar)
 const defaultCategoryInfo = {
@@ -2934,6 +3101,10 @@ function toggleUserMenu(event) {
 document.addEventListener('click', (e) => {
   const wrap = document.querySelector('.user-menu-wrap');
   if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
+  const notifWrap = document.querySelector('.notif-wrap');
+  if (notifWrap && !notifWrap.contains(e.target)) {
+    document.getElementById('notifPanel')?.classList.remove('open');
+  }
 });
 
 // ============ TABS ============
@@ -3492,6 +3663,7 @@ function deleteExpense(id) {
     extraMsg = `\n\n⚠️ Este gasto está en ${e.installments.total} cuotas. Se eliminarán TODAS las cuotas (no solo la actual).`;
   }
   if (!confirm(`¿Eliminar el ${label} "${e.desc}" de ${formatMoney(e.amount)}?${extraMsg}\n\nEsta acción no se puede deshacer.`)) return;
+  pushNotification('delete', `eliminó "${e.desc}" · ${formatMoney(e.amount)}`);
   expenses = expenses.filter(x => x.id !== id);
   scheduleSave();
   render();
@@ -3729,6 +3901,7 @@ function render() {
   renderCategories();
   renderExpenseList();
   renderCharts();
+  renderNotifBell();
 }
 
 // ============ AUTH (Firebase) ============
@@ -3795,6 +3968,7 @@ async function initFirestoreSync() {
       isApplyingRemoteUpdate = true;
       applyRemoteData(data);
       render();
+      renderNotifBell();
       if (openTicketId) renderTicketComments();
       isApplyingRemoteUpdate = false;
     });
@@ -3814,6 +3988,8 @@ function applyRemoteData(data) {
   savings = data.savings || [];
   customCategories = data.customCategories || {};
   settledMonths = data.settledMonths || {};
+  notifications = data.notifications || [];
+  lastReadNotif = data.lastReadNotif || {};
 }
 
 function loadDemoData() {
@@ -3841,7 +4017,7 @@ function scheduleSave() {
 async function saveToFirestore() {
   try {
     await window.firebaseDB.save({
-      expenses, recurring, savings, customCategories, settledMonths,
+      expenses, recurring, savings, customCategories, settledMonths, notifications, lastReadNotif,
       lastUpdated: new Date().toISOString(),
       lastUpdatedBy: currentUser
     });
@@ -3949,17 +4125,26 @@ function onInstallmentsTotalChange() {
 }
 
 function openQuickAdd(editId = null) {
+  // Asegurarse que editId sea número (puede venir como string del onclick)
+  if (editId !== null && editId !== undefined) editId = parseInt(editId);
+
   editingExpenseId = editId;
-  const isEdit = editId !== null;
+  const isEdit = editId !== null && editId !== undefined && !isNaN(editId);
   const editingExpense = isEdit ? expenses.find(x => x.id === editId) : null;
   if (isEdit && !editingExpense) {
+    console.warn('No se encontró el gasto con id', editId);
     editingExpenseId = null;
+    alert('No se pudo encontrar el gasto para editar. Probá recargar.');
     return;
   }
 
+  // Selectores específicos del modal de carga (no del de saldar)
+  const modal = document.getElementById('quickAddModal');
+  const modalCard = modal.querySelector('.quick-modal');
+  const submitBtn = modalCard.querySelector('.quick-submit-btn');
+
   // Título y botón
   document.getElementById('quickModalTitle').textContent = isEdit ? 'Editar gasto' : 'Nuevo gasto';
-  const submitBtn = document.querySelector('.quick-submit-btn');
   if (submitBtn) submitBtn.textContent = isEdit ? 'Guardar cambios' : 'Guardar movimiento';
 
   // Banner de edición
@@ -3970,7 +4155,8 @@ function openQuickAdd(editId = null) {
       banner.id = 'editModeBanner';
       banner.className = 'edit-mode-banner';
       banner.innerHTML = '✏️ Editando: los cambios se registrarán en los comentarios';
-      document.querySelector('.quick-modal').insertBefore(banner, document.querySelector('.quick-amount-display'));
+      const amountDisplay = modalCard.querySelector('.quick-amount-display');
+      modalCard.insertBefore(banner, amountDisplay);
     } else {
       banner.style.display = '';
     }
@@ -4151,6 +4337,8 @@ function submitQuickAdd() {
         likes: [],
         _isSystem: true
       });
+      // Notificación
+      pushNotification('edit', `editó "${e.desc}": ${changes.slice(0, 2).join('; ')}${changes.length > 2 ? '...' : ''}`, e.id);
     }
 
     editingExpenseId = null;
@@ -4161,8 +4349,9 @@ function submitQuickAdd() {
   }
 
   // === Modo nuevo ===
+  const newId = Date.now();
   expenses.push({
-    id: Date.now(),
+    id: newId,
     desc, amount,
     category: quickState.category,
     payer: quickState.payer,
@@ -4173,6 +4362,11 @@ function submitQuickAdd() {
     installments,
     reintegro: reintegro > 0 ? reintegro : null
   });
+
+  // Notificación
+  const verb = isCapital ? 'cargó un aporte' : 'agregó un gasto';
+  pushNotification('add', `${verb}: "${desc}" · ${formatMoney(amount)}`, newId);
+
   scheduleSave();
   closeQuickAdd();
   render();
@@ -4250,6 +4444,10 @@ function confirmSettle() {
     settledBy: currentUser
   };
 
+  const fromName = fromWho === 'p1' ? 'Flucy' : 'Neitor';
+  const monthName = new Date(currentDate).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+  pushNotification('settle', `saldó ${monthName} (${formatMoney(amount)} via ${platform})`);
+
   scheduleSave();
   closeSettleModal();
   celebrate();
@@ -4300,6 +4498,99 @@ function celebrate() {
     document.body.appendChild(piece);
     setTimeout(() => piece.remove(), 5000);
   }
+}
+
+// ============ NOTIFICACIONES (in-app) ============
+// Las notificaciones son un array compartido. Cada usuario marca como leídas las que vio.
+// notifications: [{ id, type, by, message, date, expenseId? }]
+// lastReadNotif: { p1: timestamp, p2: timestamp }
+
+function pushNotification(type, message, expenseId = null) {
+  if (!Array.isArray(notifications)) notifications = [];
+  notifications.unshift({
+    id: Date.now() + Math.random(),
+    type, // 'add' | 'edit' | 'delete' | 'comment' | 'settle'
+    by: currentUser,
+    message,
+    date: new Date().toISOString(),
+    expenseId
+  });
+  // Limitar a 100 para no inflar Firestore
+  if (notifications.length > 100) notifications = notifications.slice(0, 100);
+}
+
+function getUnreadCount() {
+  if (!Array.isArray(notifications)) return 0;
+  const lastRead = (lastReadNotif && lastReadNotif[currentUser]) || 0;
+  return notifications.filter(n => n.by !== currentUser && new Date(n.date).getTime() > lastRead).length;
+}
+
+function markAllNotificationsRead() {
+  if (!lastReadNotif) lastReadNotif = {};
+  lastReadNotif[currentUser] = Date.now();
+  scheduleSave();
+  renderNotifBell();
+}
+
+function renderNotifBell() {
+  const badge = document.getElementById('notifBadge');
+  if (!badge) return;
+  const count = getUnreadCount();
+  if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : count;
+    badge.style.display = '';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function toggleNotifPanel(event) {
+  if (event) event.stopPropagation();
+  const panel = document.getElementById('notifPanel');
+  if (!panel) return;
+  const isOpen = panel.classList.toggle('open');
+  if (isOpen) {
+    renderNotifList();
+    // Marcar como leídas después de abrir
+    setTimeout(() => markAllNotificationsRead(), 200);
+  }
+}
+
+function renderNotifList() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  if (!Array.isArray(notifications) || notifications.length === 0) {
+    list.innerHTML = '<div class="notif-empty">No hay notificaciones todavía</div>';
+    return;
+  }
+  const lastRead = (lastReadNotif && lastReadNotif[currentUser]) || 0;
+  list.innerHTML = notifications.slice(0, 30).map(n => {
+    const isMine = n.by === currentUser;
+    const isUnread = !isMine && new Date(n.date).getTime() > lastRead;
+    const authorName = n.by === 'p1' ? 'Flucy' : 'Neitor';
+    const initial = n.by === 'p1' ? 'F' : 'N';
+    const avClass = n.by === 'p1' ? 'avatar' : 'avatar p2';
+    const iconMap = { add: '➕', edit: '✏️', delete: '🗑️', comment: '💬', settle: '💸', reaction: '❤️' };
+    return `<div class="notif-item ${isUnread ? 'unread' : ''}" ${n.expenseId ? `onclick="openTicketFromNotif(${n.expenseId})"` : ''}>
+      <div class="${avClass} notif-avatar">${initial}</div>
+      <div class="notif-body">
+        <div class="notif-meta">
+          <span class="notif-icon">${iconMap[n.type] || '📌'}</span>
+          <span class="notif-author">${authorName}</span>
+          <span class="notif-time">${formatCommentTime(n.date)}</span>
+        </div>
+        <div class="notif-text">${n.message}</div>
+      </div>
+      ${isUnread ? '<span class="notif-unread-dot"></span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function openTicketFromNotif(id) {
+  // Cerrar el panel
+  document.getElementById('notifPanel')?.classList.remove('open');
+  const e = expenses.find(x => x.id === id);
+  if (e) openTicket(id);
 }
 
 // ============ STATS / KPIs ============
@@ -4413,37 +4704,64 @@ function renderStats() {
   renderStatsFilterChips();
 
   if (allInstances.length === 0) {
-    document.getElementById('kpiAvgMonth').textContent = '$0';
+    document.getElementById('kpiTotalP1').textContent = '$0';
+    document.getElementById('kpiTotalP2').textContent = '$0';
+    document.getElementById('kpiTotalAcc').textContent = '$0';
     document.getElementById('kpiPendingInst').textContent = '$0';
+    document.getElementById('kpiAvgMonth').textContent = '$0';
     document.getElementById('kpiGrowCat').textContent = '-';
     document.getElementById('kpiDropCat').textContent = '-';
     return;
   }
 
-  // Solo meses pasados o el actual (NO futuros)
+  // === Rango visible: 3 meses antes y 3 después del actual (mes calendario actual) ===
   const now = new Date();
   const currentYearMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-  const allMonths = [...new Set(allInstances.map(e => e._yearMonth))].sort().filter(m => m <= currentYearMonth);
+  // Generar lista de 7 meses (de -3 a +3) si no hay filtro de mes
+  const rangeMonths = [];
+  for (let offset = -3; offset <= 3; offset++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+    rangeMonths.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
+  }
+  // Si hay filtro de mes, mostrar solo ese; si no, mostrar el rango -3/+3
+  const showMonths = statsFilter.month ? [statsFilter.month] : rangeMonths;
 
-  // KPI 1: Promedio mensual (filtros aplicados, últimos 6 meses)
-  const last6 = allMonths.slice(-6);
-  let sum = 0, count = 0;
-  last6.forEach(m => {
+  // === KPIs basados en filtros y rango visible ===
+  let totalP1 = 0, totalP2 = 0;
+  filteredInstances.forEach(e => {
+    if (!showMonths.includes(e._yearMonth)) return;
+    const sign = (e.capital === true || e._isReintegro === true) ? -1 : 1;
+    if (e.payer === 'p1') totalP1 += e.amount * sign;
+    else totalP2 += e.amount * sign;
+  });
+
+  document.getElementById('kpiTotalP1').textContent = formatMoney(Math.max(0, totalP1));
+  document.getElementById('kpiTotalP2').textContent = formatMoney(Math.max(0, totalP2));
+  document.getElementById('kpiTotalAcc').textContent = formatMoney(Math.max(0, totalP1 + totalP2));
+
+  const rangeLabel = statsFilter.month ? 'En el mes filtrado' : 'Últimos 7 meses';
+  document.getElementById('kpiTotalP1Sub').textContent = rangeLabel + (hasAnyFilter() ? ' · filtrado' : '');
+  document.getElementById('kpiTotalP2Sub').textContent = rangeLabel + (hasAnyFilter() ? ' · filtrado' : '');
+  document.getElementById('kpiTotalAccSub').textContent = 'Flucy + Neitor';
+
+  // KPI: Promedio mensual (sobre meses en el rango con gastos)
+  let sumAvg = 0, countAvg = 0;
+  showMonths.forEach(m => {
     let monthSum = 0;
     filteredInstances.forEach(e => {
       if (e._yearMonth === m && e.capital !== true && e._isReintegro !== true) {
         monthSum += e.amount;
       }
     });
-    if (monthSum > 0) { sum += monthSum; count++; }
+    if (monthSum > 0) { sumAvg += monthSum; countAvg++; }
   });
-  const avg = count > 0 ? sum / count : 0;
+  const avg = countAvg > 0 ? sumAvg / countAvg : 0;
   document.getElementById('kpiAvgMonth').textContent = formatMoney(avg);
-  document.getElementById('kpiAvgMonthSub').textContent = count > 0
-    ? `Últimos ${count} mes(es)` + (hasAnyFilter() ? ' · filtrado' : '')
+  document.getElementById('kpiAvgMonthSub').textContent = countAvg > 0
+    ? `Sobre ${countAvg} mes(es) con gastos`
     : 'Sin datos suficientes';
 
-  // KPI 2: Cuotas pendientes (global)
+  // KPI: Cuotas pendientes (global, no se filtra por rango)
   let pendingTotal = 0;
   expenses.forEach(e => {
     if (!e.installments || e.installments.total < 2) return;
@@ -4462,10 +4780,11 @@ function renderStats() {
     ? 'A pagar en próximos meses'
     : 'No hay cuotas pendientes';
 
-  // KPI 3 y 4
-  if (allMonths.length >= 2) {
-    const lastMonth = allMonths[allMonths.length - 1];
-    const prevMonth = allMonths[allMonths.length - 2];
+  // KPI: Categoría que más creció / bajó (% como principal, $ como sub)
+  const pastMonths = rangeMonths.filter(m => m <= currentYearMonth);
+  if (pastMonths.length >= 2) {
+    const lastMonth = pastMonths[pastMonths.length - 1];
+    const prevMonth = pastMonths[pastMonths.length - 2];
     const totalsLast = {}, totalsPrev = {};
     filteredInstances.forEach(e => {
       if (e.capital === true || e._isReintegro === true) return;
@@ -4473,28 +4792,40 @@ function renderStats() {
       if (e._yearMonth === prevMonth) totalsPrev[e.category] = (totalsPrev[e.category] || 0) + e.amount;
     });
     const allCats = new Set([...Object.keys(totalsLast), ...Object.keys(totalsPrev)]);
-    let maxGrow = { cat: null, delta: 0 };
-    let maxDrop = { cat: null, delta: 0 };
+    let maxGrow = { cat: null, delta: 0, pct: 0 };
+    let maxDrop = { cat: null, delta: 0, pct: 0 };
     allCats.forEach(cat => {
-      const delta = (totalsLast[cat] || 0) - (totalsPrev[cat] || 0);
-      if (delta > maxGrow.delta) maxGrow = { cat, delta };
-      if (delta < maxDrop.delta) maxDrop = { cat, delta };
+      const prev = totalsPrev[cat] || 0;
+      const last = totalsLast[cat] || 0;
+      const delta = last - prev;
+      // % de variación: si previo = 0, mostramos como nuevo (100% o "Nuevo")
+      const pct = prev > 0 ? (delta / prev) * 100 : (last > 0 ? Infinity : 0);
+      if (delta > 0 && pct > maxGrow.pct) maxGrow = { cat, delta, pct };
+      if (delta < 0 && pct < maxDrop.pct) maxDrop = { cat, delta, pct };
     });
+
+    const fmtPct = (pct) => {
+      if (!isFinite(pct)) return 'Nuevo';
+      const sign = pct > 0 ? '+' : '';
+      return sign + Math.round(pct) + '%';
+    };
+
     if (maxGrow.cat) {
       const info = getCategoryInfo(maxGrow.cat);
-      document.getElementById('kpiGrowCat').innerHTML = `${info.icon} ${info.name}`;
+      document.getElementById('kpiGrowCat').innerHTML = `<div style="display:flex; align-items:center; gap:6px;"><span>${info.icon}</span><span style="font-size:13px;">${info.name}</span><span style="color:var(--danger); font-weight:800; margin-left:4px;">${fmtPct(maxGrow.pct)}</span></div>`;
       document.getElementById('kpiGrowCatSub').innerHTML = `<span style="color:var(--danger); font-weight:700;">+${formatMoney(maxGrow.delta)}</span> vs mes anterior`;
     } else {
-      document.getElementById('kpiGrowCat').textContent = '-';
-      document.getElementById('kpiGrowCatSub').textContent = 'Sin cambios significativos';
+      document.getElementById('kpiGrowCat').innerHTML = '<span style="font-size:13px; color:var(--text-soft);">Sin cambios</span>';
+      document.getElementById('kpiGrowCatSub').textContent = 'No hay aumentos';
     }
+
     if (maxDrop.cat) {
       const info = getCategoryInfo(maxDrop.cat);
-      document.getElementById('kpiDropCat').innerHTML = `${info.icon} ${info.name}`;
+      document.getElementById('kpiDropCat').innerHTML = `<div style="display:flex; align-items:center; gap:6px;"><span>${info.icon}</span><span style="font-size:13px;">${info.name}</span><span style="color:var(--success); font-weight:800; margin-left:4px;">${fmtPct(maxDrop.pct)}</span></div>`;
       document.getElementById('kpiDropCatSub').innerHTML = `<span style="color:var(--success); font-weight:700;">${formatMoney(maxDrop.delta)}</span> vs mes anterior`;
     } else {
-      document.getElementById('kpiDropCat').textContent = '-';
-      document.getElementById('kpiDropCatSub').textContent = 'Sin cambios significativos';
+      document.getElementById('kpiDropCat').innerHTML = '<span style="font-size:13px; color:var(--text-soft);">Sin cambios</span>';
+      document.getElementById('kpiDropCatSub').textContent = 'No hay reducciones';
     }
   } else {
     document.getElementById('kpiGrowCat').textContent = '-';
@@ -4503,11 +4834,10 @@ function renderStats() {
     document.getElementById('kpiDropCatSub').textContent = 'Necesitás 2+ meses';
   }
 
-  // Charts
+  // === Charts ===
   const textColor = darkMode ? '#f3f4f6' : '#1a1d29';
   const gridColor = darkMode ? '#2d3142' : '#f3f4f6';
 
-  const showMonths = allMonths.slice(-12);
   const monthLabels = showMonths.map(m => {
     const [y, mo] = m.split('-');
     return new Date(parseInt(y), parseInt(mo) - 1, 1).toLocaleDateString('es-AR', { month: 'short', year: '2-digit' });
@@ -4518,7 +4848,6 @@ function renderStats() {
     let s = 0;
     allInstances.forEach(e => {
       if (e._yearMonth !== m || e.payer !== 'p1' || e.capital === true || e._isReintegro === true) return;
-      if (statsFilter.month && e._yearMonth !== statsFilter.month) return;
       if (statsFilter.category && e.category !== statsFilter.category) return;
       s += e.amount;
     });
@@ -4528,7 +4857,6 @@ function renderStats() {
     let s = 0;
     allInstances.forEach(e => {
       if (e._yearMonth !== m || e.payer !== 'p2' || e.capital === true || e._isReintegro === true) return;
-      if (statsFilter.month && e._yearMonth !== statsFilter.month) return;
       if (statsFilter.category && e.category !== statsFilter.category) return;
       s += e.amount;
     });
@@ -4564,50 +4892,7 @@ function renderStats() {
     }
   });
 
-  // Line chart: tendencia mensual
-  const trendData = showMonths.map(m => {
-    let s = 0;
-    filteredInstances.forEach(e => {
-      if (e._yearMonth === m) {
-        const sign = (e.capital === true || e._isReintegro === true) ? -1 : 1;
-        s += e.amount * sign;
-      }
-    });
-    return Math.round(s);
-  });
-
-  if (statsTrendChart) statsTrendChart.destroy();
-  statsTrendChart = new Chart(document.getElementById('statsTrendChart'), {
-    type: 'line',
-    data: {
-      labels: monthLabels,
-      datasets: [{
-        label: 'Gasto neto',
-        data: trendData,
-        borderColor: '#6366f1',
-        backgroundColor: 'rgba(99,102,241,0.1)',
-        fill: true,
-        tension: 0.35,
-        borderWidth: 3,
-        pointBackgroundColor: '#6366f1',
-        pointRadius: 5,
-        pointHoverRadius: 8
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      onClick: (evt, items) => {
-        if (items.length > 0) setStatsFilter('month', showMonths[items[0].index]);
-      },
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { beginAtZero: true, ticks: { color: textColor, callback: v => '$' + Math.round(v/1000) + 'k' }, grid: { color: gridColor } },
-        x: { ticks: { color: textColor }, grid: { display: false } }
-      }
-    }
-  });
-
-  // Line chart: acumulado
+  // Line chart: acumulado mes a mes (con filtros)
   let acc = 0;
   const accumData = showMonths.map(m => {
     let monthSum = 0;
@@ -4648,6 +4933,50 @@ function renderStats() {
       scales: {
         y: { beginAtZero: true, ticks: { color: textColor, callback: v => '$' + Math.round(v/1000) + 'k' }, grid: { color: gridColor } },
         x: { ticks: { color: textColor }, grid: { display: false } }
+      }
+    }
+  });
+
+  // Pie chart: distribución por categoría (con filtros, sobre el rango visible)
+  const catTotals = {};
+  filteredInstances.forEach(e => {
+    if (e.capital === true || e._isReintegro === true) return;
+    if (!showMonths.includes(e._yearMonth)) return;
+    catTotals[e.category] = (catTotals[e.category] || 0) + e.amount;
+  });
+  const catSorted = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+  const catLabels = catSorted.map(([k]) => getCategoryInfo(k).name);
+  const catData = catSorted.map(([_, v]) => Math.round(v));
+  const catColors = catSorted.map(([k]) => getCategoryInfo(k).color);
+  const catKeys = catSorted.map(([k]) => k);
+  const totalCat = catData.reduce((a, b) => a + b, 0);
+
+  if (window.statsCategoryChart && typeof window.statsCategoryChart.destroy === 'function') window.statsCategoryChart.destroy();
+  window.statsCategoryChart = new Chart(document.getElementById('statsCategoryChart'), {
+    type: 'doughnut',
+    data: {
+      labels: catLabels,
+      datasets: [{ data: catData, backgroundColor: catColors, borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '55%',
+      onClick: (evt, items) => {
+        if (items.length > 0) setStatsFilter('category', catKeys[items[0].index]);
+      },
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: textColor, boxWidth: 12, padding: 10, font: { size: 11 } }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const value = ctx.parsed;
+              const pct = totalCat > 0 ? ((value / totalCat) * 100).toFixed(1) : 0;
+              return `${ctx.label}: ${formatMoney(value)} (${pct}%)`;
+            }
+          }
+        }
       }
     }
   });
@@ -4785,6 +5114,7 @@ function addComment() {
     date: new Date().toISOString(),
     likes: []
   });
+  pushNotification('comment', `comentó en "${e.desc}": ${text.length > 60 ? text.slice(0, 60) + '...' : text}`, e.id);
   input.value = '';
   scheduleSave();
   renderTicketComments();
