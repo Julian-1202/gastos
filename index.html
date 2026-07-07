@@ -2054,6 +2054,82 @@
     color: white;
   }
 
+  /* ============ PAGOS PARCIALES ============ */
+  .partial-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .payment-progress-label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .payment-progress-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .payment-progress-bar .fill {
+    height: 100%;
+    background: white;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .payments-history {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .payment-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: rgba(255,255,255,0.12);
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .payment-desc { flex: 1; min-width: 0; }
+  .payment-delete {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    font-family: inherit;
+  }
+  .payment-delete:hover {
+    background: rgba(0,0,0,0.2);
+    color: white;
+  }
+  .settle-amount-hint {
+    margin-top: 6px;
+    font-size: 12px;
+    min-height: 16px;
+  }
+  .settle-amount-hint .hint-full {
+    color: var(--success);
+    font-weight: 600;
+  }
+  .settle-amount-hint .hint-partial {
+    color: var(--warning);
+    font-weight: 600;
+  }
+
   /* Confetti / celebración */
   @keyframes confettiFall {
     0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
@@ -2855,11 +2931,17 @@
 <div class="quick-modal-overlay" id="settleModal" onclick="closeSettleModal(event)">
   <div class="quick-modal" onclick="event.stopPropagation()">
     <div class="quick-modal-header">
-      <div class="quick-modal-title">💸 Saldar el mes</div>
+      <div class="quick-modal-title">💸 Registrar pago</div>
       <button class="modal-close" onclick="closeSettleModal()">✕</button>
     </div>
 
     <div id="settleSummary" style="background: var(--bg-soft); padding: 14px; border-radius: 12px; margin-bottom: 16px; font-size: 13px; line-height: 1.6;"></div>
+
+    <div class="quick-field">
+      <label>Monto a pagar ahora</label>
+      <input type="number" id="settleAmount" placeholder="0" step="0.01" min="1" inputmode="decimal">
+      <div class="settle-amount-hint" id="settleAmountHint"></div>
+    </div>
 
     <div class="quick-field">
       <label>¿Cómo se hizo la transferencia?</label>
@@ -3132,24 +3214,75 @@ function changeMonth(delta) {
 function getMonthKey(d = currentDate) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
 }
+
+// Normaliza el formato: los meses saldados viejos tenían { date, by, platform, amount... }
+// El formato nuevo es { payments: [...], settledAt: iso|null }
+function normalizeSettleEntry(entry) {
+  if (!entry) return null;
+  if (Array.isArray(entry.payments)) return entry; // ya es formato nuevo
+  // Formato legacy → convertir a 1 pago + mes saldado
+  return {
+    payments: [{
+      id: 1,
+      date: entry.date,
+      by: entry.by,
+      platform: entry.platform,
+      comment: entry.comment || null,
+      amount: entry.amount || 0,
+      recordedBy: entry.settledBy || entry.by
+    }],
+    settledAt: entry.date
+  };
+}
+
+// Estado completo del saldo del mes actual:
+// - rawBalance: deuda según gastos (p1Balance > 0 = Neitor debe a Flucy)
+// - paid: total ya pagado por el deudor
+// - remaining: lo que falta pagar (con signo, igual que rawBalance)
+// - isSettled: si el mes está marcado como saldado
+function getSettleState() {
+  const { p1Balance } = calculateBalance();
+  const entry = normalizeSettleEntry(settledMonths[getMonthKey()]);
+  const payments = entry ? entry.payments : [];
+
+  // Los pagos de p1 reducen la deuda de p1; los de p2 la de p2
+  let paidByP1 = 0, paidByP2 = 0;
+  payments.forEach(p => {
+    if (p.by === 'p1') paidByP1 += p.amount;
+    else paidByP2 += p.amount;
+  });
+
+  // adjusted > 0 → Neitor (p2) todavía debe; adjusted < 0 → Flucy (p1) todavía debe
+  const adjusted = p1Balance + paidByP1 - paidByP2;
+
+  return {
+    entry,
+    payments,
+    rawBalance: p1Balance,
+    paid: paidByP1 + paidByP2,
+    remaining: adjusted,
+    isSettled: !!(entry && entry.settledAt)
+  };
+}
+
 function isMonthSettled(d = currentDate) {
-  return !!settledMonths[getMonthKey(d)];
+  const entry = normalizeSettleEntry(settledMonths[getMonthKey(d)]);
+  return !!(entry && entry.settledAt);
 }
 // Encuentra el primer mes no saldado. Si todos los recientes están saldados, va al próximo mes.
 function findFirstUnsettledMonth() {
-  // Empezamos desde hoy y vamos para atrás buscando uno saldado; si lo encontramos, vamos al siguiente
   const today = new Date();
   today.setDate(1);
+  const isSettledKey = (k) => {
+    const entry = normalizeSettleEntry(settledMonths[k]);
+    return !!(entry && entry.settledAt);
+  };
   const k = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
-  // Si el mes actual no está saldado, ese
-  if (!settledMonths[k]) return today;
-  // Si está saldado, ir al siguiente
-  const next = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-  // Y si ese también está saldado, seguir
-  let probe = next;
+  if (!isSettledKey(k)) return today;
+  let probe = new Date(today.getFullYear(), today.getMonth() + 1, 1);
   for (let i = 0; i < 12; i++) {
     const pk = probe.getFullYear() + '-' + String(probe.getMonth() + 1).padStart(2, '0');
-    if (!settledMonths[pk]) return probe;
+    if (!isSettledKey(pk)) return probe;
     probe = new Date(probe.getFullYear(), probe.getMonth() + 1, 1);
   }
   return today; // fallback
@@ -3255,7 +3388,7 @@ function calculateBalance() {
 }
 
 function renderBalance() {
-  const { p1Paid, p2Paid, p1Balance } = calculateBalance();
+  const { p1Paid, p2Paid } = calculateBalance();
   document.getElementById('totalP1').textContent = formatMoney(p1Paid);
   document.getElementById('totalP2').textContent = formatMoney(p2Paid);
   const totalMonth = Math.max(0, p1Paid) + Math.max(0, p2Paid);
@@ -3264,54 +3397,98 @@ function renderBalance() {
   const msg = document.getElementById('balanceMessage');
   const amt = document.getElementById('balanceAmount');
   const card = document.getElementById('balanceCard');
-  const monthKey = getMonthKey();
-  const settled = settledMonths[monthKey];
+  const info = document.getElementById('settledInfo');
+  const actions = document.getElementById('settleActions');
 
-  if (settled) {
+  const state = getSettleState();
+  const { payments, paid, remaining, isSettled } = state;
+
+  // HTML del historial de pagos (compartido entre estados)
+  const paymentsHTML = payments.length > 0 ? `
+    <div class="payments-history">
+      ${payments.map(p => {
+        const byName = p.by === 'p1' ? 'Flucy' : 'Neitor';
+        const dateStr = new Date(p.date).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+        return `<div class="payment-row">
+          <span class="payment-desc">💸 <b>${byName}</b> pagó <b>${formatMoney(p.amount)}</b> · ${p.platform} · ${dateStr}${p.comment ? ` · "${escapeHtml(p.comment)}"` : ''}</span>
+          <button class="payment-delete" onclick="deletePayment(${p.id})" title="Eliminar pago">✕</button>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+  if (isSettled) {
+    // === ESTADO: SALDADO ===
     card.classList.add('settled');
     msg.innerHTML = `<span class="settled-badge">✓ Mes saldado</span>`;
-    amt.textContent = formatMoney(settled.amount || 0);
-    // Mostrar info
-    const info = document.getElementById('settledInfo');
+    amt.textContent = formatMoney(paid);
     info.style.display = '';
-    const settledByName = settled.by === 'p1' ? 'Flucy' : 'Neitor';
-    const dateStr = new Date(settled.date).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
-    info.innerHTML = `
-      💸 <b>${settledByName}</b> transfirió <b>${formatMoney(settled.amount || 0)}</b><br>
-      📍 Vía <b>${settled.platform}</b> · ${dateStr}
-      ${settled.comment ? `<br>💬 ${escapeHtml(settled.comment)}` : ''}
-    `;
-    document.getElementById('settleActions').innerHTML = `
+    info.innerHTML = paymentsHTML || '💸 Mes marcado como saldado';
+    actions.innerHTML = `
       <div class="settle-actions">
         <button class="settle-btn unsettle" onclick="openUnsettleConfirm()">↩️ Des-saldar</button>
       </div>
     `;
-  } else {
+  } else if (payments.length > 0 && Math.abs(remaining) >= 1) {
+    // === ESTADO: PAGO PARCIAL ===
     card.classList.remove('settled');
-    if (Math.abs(p1Balance) < 1) {
-      msg.textContent = '🎉 Están a mano';
-      amt.textContent = '$0';
-    } else if (p1Balance > 0) {
+    const debtorName = remaining > 0 ? 'Neitor' : 'Flucy';
+    const creditorName = remaining > 0 ? 'Flucy' : 'Neitor';
+    msg.innerHTML = `${debtorName} le debe a ${creditorName} <span class="partial-badge">Pago parcial</span>`;
+    amt.textContent = formatMoney(Math.abs(remaining));
+
+    // Barra de progreso: pagado / deuda total original
+    const totalDebt = paid + Math.abs(remaining);
+    const pct = totalDebt > 0 ? Math.min(100, (paid / totalDebt) * 100) : 0;
+    info.style.display = '';
+    info.innerHTML = `
+      <div class="payment-progress-label">Pagado <b>${formatMoney(paid)}</b> de <b>${formatMoney(totalDebt)}</b> (${Math.round(pct)}%)</div>
+      <div class="payment-progress-bar"><div class="fill" style="width:${pct}%"></div></div>
+      ${paymentsHTML}
+    `;
+    actions.innerHTML = `
+      <div class="settle-actions">
+        <button class="settle-btn" onclick="openSettleModal()">💸 Registrar otro pago</button>
+      </div>
+    `;
+  } else {
+    // === ESTADO: SIN PAGOS (o pagos que ya cubren todo sin marcar) ===
+    card.classList.remove('settled');
+    if (Math.abs(remaining) < 1) {
+      if (payments.length > 0) {
+        // Pagó todo pero no está marcado: marcarlo automáticamente
+        // (pasa si el último pago cubrió justo la deuda)
+        msg.textContent = '🎉 Están a mano';
+        amt.textContent = '$0';
+        info.style.display = '';
+        info.innerHTML = paymentsHTML;
+      } else {
+        msg.textContent = '🎉 Están a mano';
+        amt.textContent = '$0';
+        info.style.display = 'none';
+      }
+      actions.innerHTML = '';
+    } else if (remaining > 0) {
       msg.textContent = 'Neitor le debe a Flucy';
-      amt.textContent = formatMoney(p1Balance);
-    } else {
-      msg.textContent = 'Flucy le debe a Neitor';
-      amt.textContent = formatMoney(-p1Balance);
-    }
-    document.getElementById('settledInfo').style.display = 'none';
-    // Botón saldar solo si hay deuda
-    if (Math.abs(p1Balance) >= 1) {
-      document.getElementById('settleActions').innerHTML = `
+      amt.textContent = formatMoney(remaining);
+      info.style.display = 'none';
+      actions.innerHTML = `
         <div class="settle-actions">
-          <button class="settle-btn" onclick="openSettleModal()">💸 Saldar mes</button>
+          <button class="settle-btn" onclick="openSettleModal()">💸 Registrar pago</button>
         </div>
       `;
     } else {
-      document.getElementById('settleActions').innerHTML = '';
+      msg.textContent = 'Flucy le debe a Neitor';
+      amt.textContent = formatMoney(-remaining);
+      info.style.display = 'none';
+      actions.innerHTML = `
+        <div class="settle-actions">
+          <button class="settle-btn" onclick="openSettleModal()">💸 Registrar pago</button>
+        </div>
+      `;
     }
   }
 
-  document.body.classList.toggle('month-settled', !!settled);
+  document.body.classList.toggle('month-settled', isSettled);
 }
 
 function renderCategories() {
@@ -4384,16 +4561,27 @@ function closeQuickAdd(event) {
 let selectedSettlePlatform = 'Mercado Pago';
 
 function openSettleModal() {
-  const { p1Balance } = calculateBalance();
-  if (Math.abs(p1Balance) < 1) return;
+  const state = getSettleState();
+  const { remaining, paid } = state;
+  if (Math.abs(remaining) < 1) return;
 
-  const amount = Math.abs(p1Balance);
-  const fromWho = p1Balance > 0 ? 'Neitor' : 'Flucy';
-  const toWho = p1Balance > 0 ? 'Flucy' : 'Neitor';
+  const amount = Math.abs(remaining);
+  const fromWho = remaining > 0 ? 'Neitor' : 'Flucy';
+  const toWho = remaining > 0 ? 'Flucy' : 'Neitor';
 
+  const paidNote = paid > 0
+    ? `<br><span style="color: var(--success); font-size: 12px;">Ya pagado: ${formatMoney(paid)}</span>`
+    : '';
   document.getElementById('settleSummary').innerHTML = `
-    <b>${fromWho}</b> le tiene que transferir <b style="color: var(--primary); font-size: 16px;">${formatMoney(amount)}</b> a <b>${toWho}</b>.
+    <b>${fromWho}</b> le debe <b style="color: var(--primary); font-size: 16px;">${formatMoney(amount)}</b> a <b>${toWho}</b>.${paidNote}
   `;
+
+  // Monto prellenado con el total restante (se puede achicar para pago parcial)
+  const amountInput = document.getElementById('settleAmount');
+  amountInput.value = Math.round(amount);
+  amountInput.max = Math.ceil(amount);
+  updateSettleAmountHint();
+  amountInput.oninput = updateSettleAmountHint;
 
   selectedSettlePlatform = 'Mercado Pago';
   document.querySelectorAll('.settle-platform-chip').forEach(c => {
@@ -4419,9 +4607,27 @@ function selectSettlePlatform(p) {
   document.getElementById('settleOtherWrap').style.display = (p === 'Otro') ? '' : 'none';
 }
 
+// Hint dinámico: aclara si es pago total o parcial
+function updateSettleAmountHint() {
+  const state = getSettleState();
+  const totalRemaining = Math.abs(state.remaining);
+  const val = parseFloat(document.getElementById('settleAmount').value) || 0;
+  const hint = document.getElementById('settleAmountHint');
+  if (!hint) return;
+  if (val <= 0) {
+    hint.innerHTML = '';
+  } else if (val >= totalRemaining - 0.5) {
+    hint.innerHTML = '<span class="hint-full">✓ Pago total: el mes quedará saldado 🎉</span>';
+  } else {
+    const rest = totalRemaining - val;
+    hint.innerHTML = `<span class="hint-partial">Pago parcial: quedarán ${formatMoney(rest)} pendientes</span>`;
+  }
+}
+
 function confirmSettle() {
-  const { p1Balance } = calculateBalance();
-  if (Math.abs(p1Balance) < 1) return;
+  const state = getSettleState();
+  const { remaining } = state;
+  if (Math.abs(remaining) < 1) return;
 
   let platform = selectedSettlePlatform;
   if (platform === 'Otro') {
@@ -4430,33 +4636,82 @@ function confirmSettle() {
     platform = otherInput;
   }
 
-  const amount = Math.abs(p1Balance);
-  const fromWho = p1Balance > 0 ? 'p2' : 'p1';
+  const totalRemaining = Math.abs(remaining);
+  const payAmount = parseFloat(document.getElementById('settleAmount').value) || 0;
+  if (payAmount <= 0) { alert('Ingresá un monto mayor a 0'); return; }
+  if (payAmount > totalRemaining + 1) {
+    alert(`El monto supera lo adeudado (${formatMoney(totalRemaining)}). Ajustalo.`);
+    return;
+  }
+
+  const fromWho = remaining > 0 ? 'p2' : 'p1';
   const comment = document.getElementById('settleComment').value.trim();
   const monthKey = getMonthKey();
 
-  settledMonths[monthKey] = {
+  // Asegurar estructura nueva (normaliza si es legacy)
+  let entry = normalizeSettleEntry(settledMonths[monthKey]) || { payments: [], settledAt: null };
+
+  entry.payments.push({
+    id: Date.now(),
     date: new Date().toISOString(),
     by: fromWho,
     platform,
     comment: comment || null,
-    amount,
-    settledBy: currentUser
-  };
+    amount: payAmount,
+    recordedBy: currentUser
+  });
+
+  // ¿Con este pago se cubre todo?
+  const isFullPayment = payAmount >= totalRemaining - 0.5;
+  if (isFullPayment) entry.settledAt = new Date().toISOString();
+
+  settledMonths[monthKey] = entry;
 
   const fromName = fromWho === 'p1' ? 'Flucy' : 'Neitor';
   const monthName = new Date(currentDate).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
-  pushNotification('settle', `saldó ${monthName} (${formatMoney(amount)} via ${platform})`);
+  if (isFullPayment) {
+    pushNotification('settle', `saldó ${monthName} (pagó ${formatMoney(payAmount)} vía ${platform})`);
+  } else {
+    pushNotification('settle', `hizo un pago parcial de ${monthName}: ${formatMoney(payAmount)} vía ${platform}`);
+  }
 
   scheduleSave();
   closeSettleModal();
-  celebrate();
+  if (isFullPayment) celebrate(); // 🎊 solo cuando queda saldado
+  render();
+}
+
+// Elimina un pago individual (por error de carga)
+function deletePayment(paymentId) {
+  const monthKey = getMonthKey();
+  let entry = normalizeSettleEntry(settledMonths[monthKey]);
+  if (!entry) return;
+  const p = entry.payments.find(x => x.id === paymentId);
+  if (!p) return;
+  const byName = p.by === 'p1' ? 'Flucy' : 'Neitor';
+  if (!confirm(`¿Eliminar el pago de ${formatMoney(p.amount)} de ${byName}?`)) return;
+
+  entry.payments = entry.payments.filter(x => x.id !== paymentId);
+  // Al eliminar un pago, el mes deja de estar saldado (la deuda reaparece)
+  entry.settledAt = null;
+  if (entry.payments.length === 0) {
+    delete settledMonths[monthKey];
+  } else {
+    settledMonths[monthKey] = entry;
+  }
+  pushNotification('settle', `eliminó un pago de ${formatMoney(p.amount)}`);
+  scheduleSave();
   render();
 }
 
 function openUnsettleConfirm() {
-  if (!confirm('¿Querés des-saldar este mes? Esto vuelve a mostrar el balance pendiente.')) return;
-  delete settledMonths[getMonthKey()];
+  if (!confirm('¿Querés des-saldar este mes?\n\nLos pagos registrados NO se borran: solo se quita la marca de "saldado". Podés eliminar pagos individuales con la ✕ de cada uno.')) return;
+  const monthKey = getMonthKey();
+  let entry = normalizeSettleEntry(settledMonths[monthKey]);
+  if (!entry) return;
+  entry.settledAt = null;
+  if (entry.payments.length === 0) delete settledMonths[monthKey];
+  else settledMonths[monthKey] = entry;
   scheduleSave();
   render();
 }
