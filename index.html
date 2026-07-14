@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cuchugastos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💸</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1334,6 +1335,184 @@
     animation: fadeIn 0.15s;
   }
   .notif-panel.open { display: flex; }
+
+  /* ============ IMPORTADOR DE RESUMEN ============ */
+  .import-cards-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+  .import-nav-btn {
+    background: var(--bg-soft);
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text);
+    font-family: inherit;
+  }
+  .import-nav-btn:hover { background: var(--border); }
+  .import-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .import-progress {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-soft);
+  }
+
+  .import-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .import-card.accepted { border-color: var(--success); background: linear-gradient(to right, rgba(16,185,129,0.05), transparent 60%); }
+  .import-card.rejected { border-color: var(--danger); opacity: 0.6; background: linear-gradient(to right, rgba(239,68,68,0.05), transparent 60%); }
+  .import-card.duplicate { border-color: var(--warning); background: linear-gradient(to right, rgba(245,158,11,0.05), transparent 60%); }
+
+  .import-card-status {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .import-card-status.accepted { background: var(--success); color: white; }
+  .import-card-status.rejected { background: var(--danger); color: white; }
+  .import-card-status.duplicate { background: var(--warning); color: white; }
+  .import-card-status.pending { background: var(--primary-soft); color: var(--primary); }
+
+  .import-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .import-card-grid > .full { grid-column: 1 / -1; }
+  .import-card-grid label {
+    font-size: 10px;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .import-card-grid input,
+  .import-card-grid select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--card);
+    color: var(--text);
+  }
+  .import-card-grid input:focus,
+  .import-card-grid select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  .import-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .import-card-actions button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .import-btn-accept { background: var(--success); color: white; }
+  .import-btn-accept:hover { opacity: 0.9; }
+  .import-btn-reject { background: var(--bg-soft); color: var(--danger); }
+  .import-btn-reject:hover { background: var(--danger-soft); }
+
+  .import-cuota-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding: 3px 8px;
+    border-radius: 5px;
+    margin-left: 6px;
+  }
+  .import-duplicate-warning {
+    background: var(--warning-soft);
+    color: var(--warning);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  .recurring-alert {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #92400e;
+    border-left: 4px solid #f59e0b;
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  body.dark .recurring-alert {
+    background: linear-gradient(135deg, #451a03 0%, #78350f 100%);
+    color: #fde68a;
+    border-left-color: #f59e0b;
+  }
+  .recurring-alert-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .recurring-alert-content {
+    flex: 1;
+    min-width: 180px;
+  }
+  .recurring-alert-title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 3px;
+  }
+  .recurring-alert-detail {
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+  .recurring-alert-action {
+    background: #92400e;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  body.dark .recurring-alert-action { background: #f59e0b; color: #451a03; }
+  .recurring-alert-action:hover { opacity: 0.9; }
   .notif-panel-header {
     padding: 14px 16px;
     border-bottom: 1px solid var(--border);
@@ -2130,7 +2309,78 @@
     font-weight: 600;
   }
 
-  /* Confetti / celebración */
+  /* ============ HISTORIAL DE SALDOS ============ */
+  .settlement-month {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .settlement-month:last-child { border-bottom: none; }
+  .settlement-month-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .settlement-month-name {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: capitalize;
+  }
+  .settlement-status {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .settlement-status.done { background: var(--success-soft); color: var(--success); }
+  .settlement-status.partial { background: var(--warning-soft); color: var(--warning); }
+  .settlement-payments {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+  .settlement-payment {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 8px;
+    background: var(--bg-soft);
+    border-radius: 6px;
+  }
+  .settlement-history-empty {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-soft);
+    font-size: 13px;
+  }
+  .settlement-totals {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    background: var(--bg-soft);
+    border-radius: 10px;
+    flex-wrap: wrap;
+  }
+  .settlement-total-item {
+    flex: 1;
+    min-width: 120px;
+  }
+  .settlement-total-label {
+    font-size: 10px;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .settlement-total-value {
+    font-size: 16px;
+    font-weight: 800;
+  }
   @keyframes confettiFall {
     0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
     100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
@@ -2606,6 +2856,11 @@
           <span class="user-menu-chevron">▾</span>
         </button>
         <div class="user-menu" id="userMenu">
+          <button class="user-menu-item" onclick="openImportModal()">
+            <span>📄</span>
+            <span>Importar resumen de tarjeta</span>
+          </button>
+          <div class="user-menu-divider"></div>
           <button class="user-menu-item" onclick="toggleTheme()">
             <span id="themeMenuIcon">🌙</span>
             <span id="themeMenuLabel">Modo nocturno</span>
@@ -2658,6 +2913,8 @@
         <div class="categories-list" id="categoriesList"></div>
       </div>
     </div>
+
+    <div id="recurringAlert" class="recurring-alert" style="display:none;"></div>
 
     <div class="add-expense-btn-wrap">
       <button class="add-expense-btn-desktop" onclick="openQuickAdd()">
@@ -2752,6 +3009,16 @@
         <h3>🥧 Distribución por categoría</h3>
         <div class="chart-container"><canvas id="statsCategoryChart"></canvas></div>
       </div>
+    </div>
+
+    <div class="stats-chart-card">
+      <h3>📉 Evolución por categoría <span style="font-size:11px; font-weight:500; color:var(--text-soft);">(últimos 6 meses)</span></h3>
+      <div class="chart-container"><canvas id="statsCategoryEvolutionChart"></canvas></div>
+    </div>
+
+    <div class="stats-chart-card" id="settlementHistoryCard">
+      <h3>💸 Historial de saldos <span style="font-size:11px; font-weight:500; color:var(--text-soft);">(pagos entre Flucy y Neitor)</span></h3>
+      <div id="settlementHistoryList"></div>
     </div>
   </div>
 
@@ -2927,6 +3194,66 @@
 
 <button class="fab" id="fabAddExpense" onclick="openQuickAdd()" title="Agregar gasto">+</button>
 
+<!-- Modal Importador de Resumen -->
+<div class="quick-modal-overlay" id="importModal" onclick="closeImportModal(event)">
+  <div class="quick-modal" onclick="event.stopPropagation()" style="max-width: 640px;">
+    <div class="quick-modal-header">
+      <div class="quick-modal-title">📄 Importar resumen de tarjeta</div>
+      <button class="modal-close" onclick="closeImportModal()">✕</button>
+    </div>
+
+    <!-- Paso 1: Pegar texto -->
+    <div id="importStep1">
+      <div class="quick-field">
+        <label>¿Quién es titular de la tarjeta?</label>
+        <div class="quick-chips" id="importPayerChips">
+          <div class="quick-chip active" data-payer="p1" onclick="selectImportPayer('p1')">💜 Flucy</div>
+          <div class="quick-chip" data-payer="p2" onclick="selectImportPayer('p2')">💗 Neitor</div>
+        </div>
+      </div>
+
+      <div class="quick-field">
+        <label>División por defecto (después la ajustás en cada gasto)</label>
+        <div class="quick-chips" id="importSplitChips">
+          <div class="quick-chip split active s5050" data-split="5050" onclick="selectImportSplit('5050')">50/50</div>
+          <div class="quick-chip split s100p1" data-split="100p1" onclick="selectImportSplit('100p1')">100% Flucy</div>
+          <div class="quick-chip split s100p2" data-split="100p2" onclick="selectImportSplit('100p2')">100% Neitor</div>
+        </div>
+      </div>
+
+      <div class="quick-field">
+        <label>Pegá el texto del resumen</label>
+        <textarea id="importText" rows="10" placeholder="Copiá y pegá acá el resumen de tu tarjeta. Ejemplo:&#10;&#10;15/06/25  COTO CICSA               12.450,00&#10;16/06/25  UBER *TRIP                3.200,50&#10;17/06/25  NETFLIX ARGENTINA         5.999,00  C.03/12" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; font-family: monospace; font-size:12px; background: var(--card); color: var(--text); resize: vertical;"></textarea>
+        <div style="font-size:11px; color: var(--text-soft); margin-top:6px;">
+          💡 Copiá directamente del PDF/HTML del resumen. Ignora todo lo que no sean movimientos (pagos, intereses).
+        </div>
+      </div>
+
+      <button class="quick-submit-btn" onclick="parseImportText()">🔍 Analizar resumen</button>
+    </div>
+
+    <!-- Paso 2: Preview + resultados -->
+    <div id="importStep2" style="display:none;">
+      <div id="importSummary" style="background: var(--primary-soft); padding: 14px; border-radius: 12px; margin-bottom: 14px; font-size: 13px; line-height: 1.6;"></div>
+
+      <div class="import-cards-nav">
+        <button class="import-nav-btn" onclick="importPrev()">‹ Anterior</button>
+        <div class="import-progress">
+          <span id="importProgress">1 de 0</span>
+        </div>
+        <button class="import-nav-btn" onclick="importNext()">Siguiente ›</button>
+      </div>
+
+      <div id="importCard"></div>
+
+      <div style="display:flex; gap:8px; margin-top:16px;">
+        <button class="quick-submit-btn" style="flex:1; background: var(--bg-soft); color: var(--text);" onclick="importBackToStep1()">← Volver</button>
+        <button class="quick-submit-btn" style="flex:2;" onclick="confirmImport()" id="importConfirmBtn">✓ Cargar aceptados</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal saldar mes -->
 <div class="quick-modal-overlay" id="settleModal" onclick="closeSettleModal(event)">
   <div class="quick-modal" onclick="event.stopPropagation()">
@@ -3072,6 +3399,8 @@ let savings = [];
 let settledMonths = {};
 let notifications = [];
 let lastReadNotif = {};
+// Diccionario aprendido de comercios: { "COTO": "comida", "UBER": "transporte", ... }
+let learnedMerchants = {};
 
 // Categorías predeterminadas (no se pueden borrar)
 const defaultCategoryInfo = {
@@ -3151,10 +3480,17 @@ let darkMode = false;
 
 // ============ UTILS ============
 function formatMoney(n) {
-  return '$' + Math.round(n).toLocaleString('es-AR');
+  return '$' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function formatUSD(n) {
-  return 'USD ' + Math.round(n).toLocaleString('es-AR');
+  return 'USD ' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+// Formato corto para ejes de gráficos: $1,2k / $250 / $1,5M
+function formatMoneyShort(n) {
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000) return '$' + (n / 1_000_000).toLocaleString('es-AR', { maximumFractionDigits: 1 }) + 'M';
+  if (abs >= 1_000) return '$' + (n / 1_000).toLocaleString('es-AR', { maximumFractionDigits: 1 }) + 'k';
+  return '$' + Math.round(n);
 }
 
 // ============ TEMA ============
@@ -3848,10 +4184,40 @@ function deleteExpense(id) {
 
 // (addExpense viejo eliminado: ahora todo el alta se hace por submitQuickAdd)
 
+// Muestra el aviso de gastos fijos pendientes del mes visualizado
+function renderRecurringAlert() {
+  const alert = document.getElementById('recurringAlert');
+  if (!alert) return;
+  const monthKey = getMonthKey();
+  const pending = recurring.filter(r => !isRecurringPaid(r, monthKey) && r.split !== 'none');
+
+  if (pending.length === 0) {
+    alert.style.display = 'none';
+    return;
+  }
+
+  const totalPending = pending.reduce((s, r) => s + (r.amount || 0), 0);
+  const names = pending.slice(0, 3).map(r => r.name).join(', ');
+  const moreCount = pending.length - 3;
+  const detail = names + (moreCount > 0 ? ` y ${moreCount} más` : '');
+
+  alert.style.display = 'flex';
+  alert.innerHTML = `
+    <div class="recurring-alert-icon">📌</div>
+    <div class="recurring-alert-content">
+      <div class="recurring-alert-title">${pending.length} gasto${pending.length !== 1 ? 's' : ''} fijo${pending.length !== 1 ? 's' : ''} sin pagar este mes · ${formatMoney(totalPending)}</div>
+      <div class="recurring-alert-detail">${detail}</div>
+    </div>
+    <button class="recurring-alert-action" onclick="switchTab('fijos')">Ver gastos fijos</button>
+  `;
+}
+
 // ============ RECURRENTES ============
 function renderRecurring() {
   const today = new Date();
   const currentDay = today.getDate();
+  const monthKey = getMonthKey();
+  const isCurrentCalendarMonth = (monthKey === today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0'));
   const tbody = document.getElementById('recurringBody');
 
   let total = 0;
@@ -3862,10 +4228,13 @@ function renderRecurring() {
       return `<option value="${v}" ${r.split === v ? 'selected' : ''}>${label}</option>`;
     }).join('');
 
+    const paid = isRecurringPaid(r, monthKey);
     let statusClass = 'status-pending';
     let statusText = 'Pendiente';
-    if (r.paid) { statusClass = 'status-paid'; statusText = '✓ Pagado'; }
-    else if (r.dueDay - currentDay <= 3 && r.dueDay >= currentDay) { statusClass = 'status-soon'; statusText = 'Próximo'; }
+    if (paid) { statusClass = 'status-paid'; statusText = '✓ Pagado'; }
+    else if (isCurrentCalendarMonth && r.dueDay - currentDay <= 3 && r.dueDay >= currentDay) {
+      statusClass = 'status-soon'; statusText = 'Próximo';
+    }
 
     return `<tr>
       <td><input type="text" value="${r.name}" onchange="updateRecurring(${r.id}, 'name', this.value)"></td>
@@ -3884,6 +4253,16 @@ function renderRecurring() {
   document.getElementById('recurringTotal').textContent = formatMoney(total);
 }
 
+// Helper: los gastos fijos ahora tienen paidMonths: { "YYYY-MM": true }
+// Devuelve si el gasto fijo está pagado para el mes visualizado
+function isRecurringPaid(r, monthKey = getMonthKey()) {
+  if (!r) return false;
+  if (r.paidMonths && typeof r.paidMonths === 'object') return !!r.paidMonths[monthKey];
+  // Compatibilidad: si tiene el viejo r.paid, lo tratamos como pagado en el mes que se cargó
+  // Migración: si tiene r.paid === true sin paidMonths, migrar al mes actual
+  return !!r.paid;
+}
+
 function updateRecurring(id, field, value) {
   const r = recurring.find(x => x.id === id);
   if (r) { r[field] = value; scheduleSave(); renderRecurring(); }
@@ -3891,7 +4270,19 @@ function updateRecurring(id, field, value) {
 
 function togglePaid(id) {
   const r = recurring.find(x => x.id === id);
-  if (r) { r.paid = !r.paid; scheduleSave(); renderRecurring(); }
+  if (!r) return;
+  if (!r.paidMonths) r.paidMonths = {};
+  const monthKey = getMonthKey();
+  // Migración soft: si tenía r.paid=true, respetarlo como pagado en el mes actual la primera vez
+  if (r.paid === true && Object.keys(r.paidMonths).length === 0) {
+    r.paidMonths[monthKey] = true;
+  }
+  r.paidMonths[monthKey] = !r.paidMonths[monthKey];
+  if (!r.paidMonths[monthKey]) delete r.paidMonths[monthKey];
+  delete r.paid; // limpiar campo legacy
+  scheduleSave();
+  renderRecurring();
+  renderBalance(); // por si el aviso "vencen" cambió
 }
 
 function deleteRecurring(id) {
@@ -3906,15 +4297,17 @@ function addRecurring() {
   if (!name) return;
   recurring.push({
     id: Date.now(),
-    name, dueDay: 1, amount: 0, split: '5050', payer: 'p1', paid: false, category: 'servicios'
+    name, dueDay: 1, amount: 0, split: '5050', payer: 'p1',
+    paidMonths: {}, category: 'servicios'
   });
   scheduleSave();
   renderRecurring();
 }
 
 function importRecurringToExpenses() {
-  const paidRecs = recurring.filter(r => r.paid && r.split !== 'none');
-  if (paidRecs.length === 0) { alert('No hay gastos fijos marcados como pagados.'); return; }
+  const monthKey = getMonthKey();
+  const paidRecs = recurring.filter(r => isRecurringPaid(r, monthKey) && r.split !== 'none');
+  if (paidRecs.length === 0) { alert('No hay gastos fijos marcados como pagados en el mes que estás viendo.'); return; }
   if (!confirm(`Cargar ${paidRecs.length} gasto(s) fijo(s) pagado(s) a los gastos del mes?`)) return;
   paidRecs.forEach(r => {
     expenses.push({
@@ -3946,7 +4339,7 @@ function renderSavings() {
   });
 
   document.getElementById('savingsTotalUSD').textContent = formatUSD(totalUSD);
-  document.getElementById('savingsTotalARS').textContent = '≈ AR$ ' + Math.round(totalARS).toLocaleString('es-AR') + ' acumulado';
+  document.getElementById('savingsTotalARS').textContent = '≈ AR$ ' + Number(totalARS).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' acumulado';
   document.getElementById('savingsP1').textContent = formatUSD(p1USD);
   document.getElementById('savingsP2').textContent = formatUSD(p2USD);
 
@@ -3966,8 +4359,8 @@ function renderSavings() {
       <td class="month">${monthName} ${typeBadge}</td>
       <td><div style="display:flex; align-items:center; gap:6px;">${whoLabel}</div></td>
       <td class="${usdClass}">${sign} ${formatUSD(s.usd)}</td>
-      <td>${s.rate ? '$' + s.rate.toLocaleString('es-AR') : '-'}</td>
-      <td>${s.rate ? sign + ' $' + Math.round(s.usd * s.rate).toLocaleString('es-AR') : '-'}</td>
+      <td>${s.rate ? '$' + Number(s.rate).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</td>
+      <td>${s.rate ? sign + ' $' + Number(s.usd * s.rate).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</td>
       <td><button class="delete-btn" onclick="deleteSavings(${s.id})">✕</button></td>
     </tr>`;
   }).join('') || '<tr><td colspan="6" class="empty">Todavía no registraste movimientos</td></tr>';
@@ -4077,6 +4470,7 @@ function render() {
   renderBalance();
   renderCategories();
   renderExpenseList();
+  renderRecurringAlert();
   renderCharts();
   renderNotifBell();
 }
@@ -4167,6 +4561,7 @@ function applyRemoteData(data) {
   settledMonths = data.settledMonths || {};
   notifications = data.notifications || [];
   lastReadNotif = data.lastReadNotif || {};
+  learnedMerchants = data.learnedMerchants || {};
 }
 
 function loadDemoData() {
@@ -4194,7 +4589,7 @@ function scheduleSave() {
 async function saveToFirestore() {
   try {
     await window.firebaseDB.save({
-      expenses, recurring, savings, customCategories, settledMonths, notifications, lastReadNotif,
+      expenses, recurring, savings, customCategories, settledMonths, notifications, lastReadNotif, learnedMerchants,
       lastUpdated: new Date().toISOString(),
       lastUpdatedBy: currentUser
     });
@@ -4755,7 +5150,457 @@ function celebrate() {
   }
 }
 
-// ============ NOTIFICACIONES (in-app) ============
+// ============ IMPORTADOR DE RESUMEN DE TARJETA ============
+let importState = {
+  payer: 'p1',
+  split: '5050',
+  items: [],
+  currentIdx: 0
+};
+
+// Palabras clave que indican que la línea NO es un gasto sino un cargo bancario/pago
+const IMPORT_IGNORE_KEYWORDS = [
+  'pago efectuado', 'pago recibido', 'pago mercadopago', 'su pago', 'saldo anterior', 'saldo actual',
+  'iva', 'impuesto', 'sellos', 'iibb', 'ingresos brutos', 'percepcion',
+  'intereses', 'interes financiero', 'punitorios', 'mora', 'financiacion',
+  'seguro de vida', 'seguro proteccion', 'cargo por seguro',
+  'renovacion', 'comision', 'cargo administrativo', 'mantenimiento',
+  'total a pagar', 'pago minimo', 'vencimiento', 'proximo vencimiento',
+  'total consumos', 'db.rg', 'db iva', 'db rg'
+];
+
+// Detecta si una línea corresponde a un cargo del banco (para ignorar)
+function isBankCharge(desc) {
+  const lower = desc.toLowerCase();
+  return IMPORT_IGNORE_KEYWORDS.some(kw => lower.includes(kw));
+}
+
+// Extrae el "mercader" de una descripción — la primera palabra significativa
+// Ej: "COTO CICSA 001 SUCURSAL 15" → "COTO"
+// Ej: "UBER *TRIP HELP.UBER" → "UBER"
+function extractMerchant(desc) {
+  const clean = desc.toUpperCase()
+    .replace(/[^A-ZÁÉÍÓÚÑ0-9\s\*]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  // Tomar primeras 1-2 palabras significativas
+  const words = clean.split(' ').filter(w => w.length >= 3 && !/^\d+$/.test(w));
+  if (words.length === 0) return clean.split(' ')[0] || 'DESCONOCIDO';
+  // Si la primera palabra es muy corta o común, tomar 2
+  if (words[0].length <= 4 && words[1]) return words[0] + ' ' + words[1];
+  return words[0];
+}
+
+// Detecta cuotas en texto libre: "C.03/12", "CUOTA 3 DE 12", "03/12 CUOTAS", etc.
+// (para bancos que embeben la cuota en la descripción, en vez de tener columna separada)
+function detectInstallmentsInText(text) {
+  const patterns = [
+    /C\.?\s?(\d{1,2})\s?[\/\-DE]+\s?(\d{1,2})/i,
+    /CUOTA\s?(\d{1,2})\s?[\/\-DE]+\s?(\d{1,2})/i,
+    /(\d{1,2})\s?\/\s?(\d{1,2})\s?CUOTAS?/i
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m) {
+      const current = parseInt(m[1]);
+      const total = parseInt(m[2]);
+      if (current >= 1 && total >= 2 && current <= total) {
+        return { currentAt: current, total, matchStr: m[0] };
+      }
+    }
+  }
+  return null;
+}
+
+// Parsea una línea del resumen a un item o null si no aplica.
+// Soporta el formato de columnas de Visa Galicia (y similares):
+//   FECHA  [*|K]  REFERENCIA  [CUOTA NN/NN]  COMPROBANTE  MONTO
+// Ejemplos reales:
+//   "27-02-26 * WWW.DEXTER.COM.AR 04/09 001908 8.544,22"
+//   "28-05-26 K MERPAGO*CANTARTICA 849514 76.999,00"
+//   "05-06-26 SU PAGO EN PESOS -314.825,73"  → pago (se ignora, monto negativo)
+function parseImportLine(line) {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed.length < 8) return null;
+
+  // 1. Fecha: preferimos que esté al INICIO de la línea (formato típico de resumen).
+  //    Si no está al inicio, probamos en cualquier posición (compatibilidad con otros formatos).
+  let dateMatch = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+  let dateAtStart = true;
+  if (!dateMatch) {
+    dateMatch = trimmed.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})|(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+    dateAtStart = false;
+  }
+  if (!dateMatch) return null;
+
+  let day, month, year;
+  if (dateMatch[1] && !dateMatch[4]) {
+    day = parseInt(dateMatch[1]);
+    month = parseInt(dateMatch[2]);
+    year = parseInt(dateMatch[3]);
+    if (year < 100) year += 2000;
+  } else if (dateMatch[4]) {
+    year = parseInt(dateMatch[4]);
+    month = parseInt(dateMatch[5]);
+    day = parseInt(dateMatch[6]);
+  } else {
+    day = parseInt(dateMatch[1]);
+    month = parseInt(dateMatch[2]);
+    year = parseInt(dateMatch[3]);
+    if (year < 100) year += 2000;
+  }
+  if (day < 1 || day > 31 || month < 1 || month > 12 || year < 2000 || year > 2100) return null;
+  const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+  // 2. Resto de la línea después de la fecha
+  let rest = dateAtStart
+    ? trimmed.slice(dateMatch[0].length).trim()
+    : trimmed.slice(dateMatch.index + dateMatch[0].length).trim();
+
+  // 3. Sacar marcador de tipo de operación al inicio ("*" o una letra sola seguida de espacio, ej. "K ")
+  rest = rest.replace(/^[A-Z\*]\s+/, '');
+
+  // 4. Buscar monto: el ÚLTIMO número con coma decimal de 2 dígitos en la línea
+  //    (soporta con o sin separador de miles: "8.544,22" y "27903,86")
+  const amountMatches = [...rest.matchAll(/(-?\d+(?:\.\d{3})*,\d{2})/g)];
+  if (amountMatches.length === 0) return null;
+  const lastAmountMatch = amountMatches[amountMatches.length - 1];
+  const amountStr = lastAmountMatch[0];
+  const amount = parseFloat(amountStr.replace(/\./g, '').replace(',', '.'));
+  if (isNaN(amount)) return null;
+  // Los pagos vienen con signo negativo → no son gastos, se ignoran acá
+  if (amount <= 0) return null;
+
+  // 5. Texto antes del monto (contiene: descripción + cuota + comprobante)
+  let beforeAmount = rest.slice(0, lastAmountMatch.index).trim();
+  if (!beforeAmount) return null;
+
+  // 6. Detectar cuota como columna separada "NN/NN" (formato Galicia), o en texto libre
+  let installments = null;
+  const plainCuotaMatch = beforeAmount.match(/\b(\d{1,2})\/(\d{1,2})\b/);
+  if (plainCuotaMatch) {
+    const cur = parseInt(plainCuotaMatch[1]);
+    const tot = parseInt(plainCuotaMatch[2]);
+    if (cur >= 1 && tot >= 2 && cur <= tot) {
+      installments = { currentAt: cur, total: tot };
+      beforeAmount = beforeAmount.replace(plainCuotaMatch[0], ' ');
+    }
+  }
+  if (!installments) {
+    const textCuota = detectInstallmentsInText(beforeAmount);
+    if (textCuota) {
+      installments = { currentAt: textCuota.currentAt, total: textCuota.total };
+      beforeAmount = beforeAmount.replace(textCuota.matchStr, ' ');
+    }
+  }
+
+  // 7. Sacar el número de comprobante: token numérico puro (4 a 10 dígitos) al final del texto restante
+  beforeAmount = beforeAmount.replace(/\s+\d{4,10}\s*$/, '');
+
+  // 8. Limpiar descripción final
+  const desc = beforeAmount.replace(/\s+/g, ' ').trim();
+  if (!desc || desc.length < 2) return null;
+
+  // Filtrar cargos bancarios (intereses, IVA, comisiones, etc.)
+  if (isBankCharge(desc)) return null;
+
+  return {
+    date,
+    desc,
+    amount,
+    installments,
+    merchant: extractMerchant(desc)
+  };
+}
+
+// Detecta si un item importado ya existe en la lista de gastos
+function findDuplicate(item) {
+  return expenses.find(e => {
+    if (e.date !== item.date) return false;
+    if (Math.abs(e.amount - item.amount) > 0.5) return false;
+    // Comparación laxa de descripción: comparten al menos una palabra significativa
+    const w1 = new Set(item.desc.toUpperCase().split(/\s+/).filter(w => w.length > 3));
+    const w2 = new Set((e.desc || '').toUpperCase().split(/\s+/).filter(w => w.length > 3));
+    for (const w of w1) if (w2.has(w)) return true;
+    return false;
+  });
+}
+
+// Sugerencia de categoría: primero mira learnedMerchants (matching por merchant o palabra), después heurísticas
+function suggestCategory(item) {
+  const desc = item.desc.toUpperCase();
+  const merchant = item.merchant;
+
+  // 1. Match exacto en aprendidos
+  if (learnedMerchants[merchant]) return learnedMerchants[merchant];
+
+  // 2. Match parcial en aprendidos (por si el merchant tiene variaciones)
+  for (const [learned, cat] of Object.entries(learnedMerchants)) {
+    if (desc.includes(learned) || learned.includes(merchant)) return cat;
+  }
+
+  // 3. Heurísticas por palabras clave
+  const heuristics = {
+    comida: ['COTO', 'CARREFOUR', 'JUMBO', 'DISCO', 'DIA', 'CHINO', 'ALMACEN', 'PANADERIA', 'MCDONALD', 'BURGER', 'MOSTAZA', 'STARBUCKS', 'RESTAURANT', 'PARRILLA', 'PIZZERIA', 'CAFE', 'HELADERIA', 'PEDIDOSYA', 'RAPPI', 'UBER EATS', 'UBEREATS'],
+    transporte: ['UBER', 'CABIFY', 'DIDI', 'YPF', 'SHELL', 'AXION', 'PUMA', 'ESTACIONAMIENTO', 'PEAJE', 'SUBE', 'AUTOPISTAS', 'MOOV', 'CVSA ACCESOS', 'AUSA'],
+    servicios: ['NETFLIX', 'SPOTIFY', 'DISNEY', 'HBO', 'AMAZON PRIME', 'YOUTUBE', 'GOOGLE', 'MICROSOFT', 'APPLE', 'ICLOUD', 'ADOBE', 'PERSONAL', 'CLARO', 'MOVISTAR', 'TIENDA MOVIL', 'EDENOR', 'EDESUR', 'METROGAS', 'AYSA', 'CABLEVISION', 'FIBERTEL', 'TELECENTRO', 'DIRECTV'],
+    salud: ['FARMACIA', 'FARMACITY', 'FARMAPLUS', 'OSDE', 'SWISS', 'GALENO', 'MEDICUS', 'MEDICO', 'HOSPITAL', 'CLINICA', 'LABORATORIO', 'DENTISTA', 'PSICOLOGO'],
+    ocio: ['CINE', 'HOYTS', 'CINEMARK', 'SHOWCASE', 'TEATRO', 'CONCIERTO', 'STEAM', 'PLAYSTATION', 'XBOX', 'NINTENDO', 'HBOMAX', 'PARIS', 'BAILE', 'BAR', 'PUB', 'BOLICHE'],
+    hogar: ['SODIMAC', 'EASY', 'IKEA', 'FRAVEGA', 'MUSIMUNDO', 'GARBARINO', 'MERCADO LIBRE', 'FALABELLA', 'JUMBO HOGAR', 'FERRETERIA', 'LIMPIEZA'],
+    alquiler: ['ALQUILER', 'INMOBILIARIA', 'EXPENSAS', 'ADMINISTRACION']
+  };
+
+  for (const [cat, keywords] of Object.entries(heuristics)) {
+    if (keywords.some(kw => desc.includes(kw) || merchant.includes(kw))) return cat;
+  }
+
+  return 'otros';
+}
+
+function openImportModal() {
+  document.querySelector('.user-menu-wrap')?.classList.remove('open');
+  importState = { payer: currentUser || 'p1', split: '5050', items: [], currentIdx: 0 };
+  document.getElementById('importStep1').style.display = '';
+  document.getElementById('importStep2').style.display = 'none';
+  document.getElementById('importText').value = '';
+  document.querySelectorAll('#importPayerChips .quick-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.payer === importState.payer);
+  });
+  document.querySelectorAll('#importSplitChips .quick-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.split === '5050');
+  });
+  document.getElementById('importModal').classList.add('open');
+}
+
+function closeImportModal(event) {
+  if (event && event.target.id !== 'importModal' && event.type === 'click') return;
+  document.getElementById('importModal').classList.remove('open');
+}
+
+function selectImportPayer(p) {
+  importState.payer = p;
+  document.querySelectorAll('#importPayerChips .quick-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.payer === p);
+  });
+}
+
+function selectImportSplit(s) {
+  importState.split = s;
+  document.querySelectorAll('#importSplitChips .quick-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.split === s);
+  });
+}
+
+function parseImportText() {
+  const text = document.getElementById('importText').value.trim();
+  if (!text) { alert('Pegá el texto del resumen primero'); return; }
+
+  const lines = text.split(/\r?\n/);
+  const items = [];
+  const totalLines = lines.length;
+  let parsedCount = 0;
+
+  lines.forEach(line => {
+    const parsed = parseImportLine(line);
+    if (parsed) {
+      parsedCount++;
+      const dup = findDuplicate(parsed);
+      items.push({
+        ...parsed,
+        category: suggestCategory(parsed),
+        payer: importState.payer,
+        split: importState.split,
+        status: dup ? 'duplicate' : 'pending', // 'pending' | 'accepted' | 'rejected' | 'duplicate'
+        duplicateOfId: dup ? dup.id : null
+      });
+    }
+  });
+
+  if (items.length === 0) {
+    alert('No se detectaron gastos en el texto. Verificá el formato o pegá más líneas.');
+    return;
+  }
+
+  importState.items = items;
+  importState.currentIdx = 0;
+
+  const totalAmount = items.reduce((s, i) => s + i.amount, 0);
+  const dupCount = items.filter(i => i.status === 'duplicate').length;
+  document.getElementById('importSummary').innerHTML = `
+    ✅ Detectamos <b>${items.length}</b> gasto(s) por <b>${formatMoney(totalAmount)}</b>${dupCount > 0 ? `<br>⚠️ <b>${dupCount}</b> parecerían ya estar cargados (marcados en amarillo)` : ''}
+  `;
+
+  document.getElementById('importStep1').style.display = 'none';
+  document.getElementById('importStep2').style.display = '';
+  renderImportCard();
+}
+
+function importBackToStep1() {
+  document.getElementById('importStep1').style.display = '';
+  document.getElementById('importStep2').style.display = 'none';
+}
+
+function renderImportCard() {
+  const item = importState.items[importState.currentIdx];
+  if (!item) return;
+
+  const statusMap = {
+    pending: { label: 'Pendiente', cls: 'pending' },
+    accepted: { label: '✓ Aceptado', cls: 'accepted' },
+    rejected: { label: '✗ Descartado', cls: 'rejected' },
+    duplicate: { label: '⚠️ Duplicado', cls: 'duplicate' }
+  };
+  const status = statusMap[item.status];
+
+  const catOptions = Object.entries(getAllCategories())
+    .map(([k, info]) => `<option value="${k}" ${item.category === k ? 'selected' : ''}>${info.icon} ${info.name}</option>`)
+    .join('');
+
+  const dupWarning = item.status === 'duplicate' && item.duplicateOfId
+    ? `<div class="import-duplicate-warning">⚠️ Ya existe un gasto similar. Podés descartarlo si es duplicado.</div>`
+    : '';
+
+  const installmentsBadge = item.installments
+    ? `<span class="import-cuota-badge">CUOTA ${item.installments.currentAt}/${item.installments.total}</span>`
+    : '';
+
+  document.getElementById('importCard').innerHTML = `
+    <div class="import-card ${item.status}">
+      <div class="import-card-status ${status.cls}">${status.label}</div>
+      <div style="font-size:11px; color: var(--text-soft); font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">
+        Detectado como
+      </div>
+      <div style="font-size:16px; font-weight:800; margin-top:4px;">
+        ${escapeHtml(item.desc)} ${installmentsBadge}
+      </div>
+      <div style="font-size:22px; font-weight:800; color: var(--primary); margin-top:6px;">
+        ${formatMoney(item.amount)}
+      </div>
+
+      ${dupWarning}
+
+      <div class="import-card-grid">
+        <div class="full">
+          <label>Descripción</label>
+          <input type="text" value="${escapeHtml(item.desc).replace(/"/g, '&quot;')}" onchange="updateImportItem('desc', this.value)">
+        </div>
+        <div>
+          <label>Monto</label>
+          <input type="number" step="0.01" value="${item.amount}" onchange="updateImportItem('amount', parseFloat(this.value))">
+        </div>
+        <div>
+          <label>Fecha</label>
+          <input type="date" value="${item.date}" onchange="updateImportItem('date', this.value)">
+        </div>
+        <div>
+          <label>Categoría</label>
+          <select onchange="updateImportItem('category', this.value)">${catOptions}</select>
+        </div>
+        <div>
+          <label>Pagó</label>
+          <select onchange="updateImportItem('payer', this.value)">
+            <option value="p1" ${item.payer === 'p1' ? 'selected' : ''}>💜 Flucy</option>
+            <option value="p2" ${item.payer === 'p2' ? 'selected' : ''}>💗 Neitor</option>
+          </select>
+        </div>
+        <div class="full">
+          <label>División</label>
+          <select onchange="updateImportItem('split', this.value)">
+            <option value="5050" ${item.split === '5050' ? 'selected' : ''}>50/50 compartido</option>
+            <option value="100p1" ${item.split === '100p1' ? 'selected' : ''}>100% Flucy</option>
+            <option value="100p2" ${item.split === '100p2' ? 'selected' : ''}>100% Neitor</option>
+          </select>
+        </div>
+        ${item.installments ? `
+          <div>
+            <label>Total cuotas</label>
+            <input type="number" min="2" max="60" value="${item.installments.total}" onchange="updateImportInstallment('total', parseInt(this.value))">
+          </div>
+          <div>
+            <label>Cuota actual</label>
+            <input type="number" min="1" value="${item.installments.currentAt}" onchange="updateImportInstallment('currentAt', parseInt(this.value))">
+          </div>
+        ` : ''}
+      </div>
+
+      <div class="import-card-actions">
+        <button class="import-btn-reject" onclick="setImportStatus('rejected')">✗ Descartar</button>
+        <button class="import-btn-accept" onclick="setImportStatus('accepted'); importNext();">✓ Aceptar</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('importProgress').textContent = `${importState.currentIdx + 1} de ${importState.items.length}`;
+
+  // Actualizar contador del botón final
+  const acceptedCount = importState.items.filter(i => i.status === 'accepted').length;
+  document.getElementById('importConfirmBtn').textContent = `✓ Cargar ${acceptedCount} gasto(s)`;
+  document.getElementById('importConfirmBtn').disabled = acceptedCount === 0;
+}
+
+function updateImportItem(field, value) {
+  const item = importState.items[importState.currentIdx];
+  if (item) item[field] = value;
+}
+
+function updateImportInstallment(field, value) {
+  const item = importState.items[importState.currentIdx];
+  if (item && item.installments) item.installments[field] = value;
+}
+
+function setImportStatus(status) {
+  const item = importState.items[importState.currentIdx];
+  if (item) item.status = status;
+  renderImportCard();
+}
+
+function importNext() {
+  if (importState.currentIdx < importState.items.length - 1) {
+    importState.currentIdx++;
+    renderImportCard();
+  }
+}
+
+function importPrev() {
+  if (importState.currentIdx > 0) {
+    importState.currentIdx--;
+    renderImportCard();
+  }
+}
+
+function confirmImport() {
+  const accepted = importState.items.filter(i => i.status === 'accepted');
+  if (accepted.length === 0) { alert('No hay gastos aceptados para cargar.'); return; }
+
+  const total = accepted.reduce((s, i) => s + i.amount, 0);
+  if (!confirm(`Vas a cargar ${accepted.length} gasto(s) por ${formatMoney(total)}. ¿Confirmar?`)) return;
+
+  accepted.forEach(item => {
+    expenses.push({
+      id: Date.now() + Math.random(),
+      desc: item.desc,
+      amount: item.amount,
+      category: item.category,
+      payer: item.payer,
+      split: item.split,
+      date: item.date,
+      comments: [],
+      capital: false,
+      installments: item.installments || null,
+      reintegro: null
+    });
+    // Aprender la asociación merchant → categoría
+    if (item.merchant && item.category !== 'otros') {
+      learnedMerchants[item.merchant] = item.category;
+    }
+  });
+
+  pushNotification('add', `importó ${accepted.length} gasto(s) del resumen de tarjeta por ${formatMoney(total)}`);
+  scheduleSave();
+  closeImportModal();
+  render();
+  alert(`✓ ${accepted.length} gasto(s) cargados exitosamente.`);
+}
 // Las notificaciones son un array compartido. Cada usuario marca como leídas las que vio.
 // notifications: [{ id, type, by, message, date, expenseId? }]
 // lastReadNotif: { p1: timestamp, p2: timestamp }
@@ -4846,6 +5691,81 @@ function openTicketFromNotif(id) {
   document.getElementById('notifPanel')?.classList.remove('open');
   const e = expenses.find(x => x.id === id);
   if (e) openTicket(id);
+}
+
+function renderSettlementHistory() {
+  const container = document.getElementById('settlementHistoryList');
+  if (!container) return;
+
+  const entries = Object.entries(settledMonths || {})
+    .map(([month, raw]) => ({ month, entry: normalizeSettleEntry(raw) }))
+    .filter(x => x.entry && Array.isArray(x.entry.payments) && x.entry.payments.length > 0)
+    .sort((a, b) => b.month.localeCompare(a.month));
+
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="settlement-history-empty">📭 Todavía no hay pagos entre Flucy y Neitor</div>';
+    return;
+  }
+
+  // Totales globales (todos los pagos históricos)
+  let totalP1Paid = 0, totalP2Paid = 0;
+  const platformCount = {};
+  entries.forEach(({ entry }) => {
+    entry.payments.forEach(p => {
+      if (p.by === 'p1') totalP1Paid += p.amount;
+      else totalP2Paid += p.amount;
+      platformCount[p.platform] = (platformCount[p.platform] || 0) + 1;
+    });
+  });
+  const topPlatform = Object.entries(platformCount).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+
+  const totalsHTML = `
+    <div class="settlement-totals">
+      <div class="settlement-total-item">
+        <div class="settlement-total-label">💜 Flucy transfirió</div>
+        <div class="settlement-total-value">${formatMoney(totalP1Paid)}</div>
+      </div>
+      <div class="settlement-total-item">
+        <div class="settlement-total-label">💗 Neitor transfirió</div>
+        <div class="settlement-total-value">${formatMoney(totalP2Paid)}</div>
+      </div>
+      <div class="settlement-total-item">
+        <div class="settlement-total-label">🏦 Plataforma más usada</div>
+        <div class="settlement-total-value" style="font-size:13px;">${topPlatform}</div>
+      </div>
+    </div>
+  `;
+
+  const monthsHTML = entries.map(({ month, entry }) => {
+    const [y, m] = month.split('-');
+    const monthName = new Date(parseInt(y), parseInt(m) - 1, 1).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+    const totalPaid = entry.payments.reduce((s, p) => s + p.amount, 0);
+    const isDone = !!entry.settledAt;
+    const statusHTML = isDone
+      ? '<span class="settlement-status done">✓ Saldado</span>'
+      : '<span class="settlement-status partial">Parcial</span>';
+
+    const paymentsHTML = entry.payments.map(p => {
+      const byName = p.by === 'p1' ? '💜 Flucy' : '💗 Neitor';
+      const dateStr = new Date(p.date).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+      return `<div class="settlement-payment">
+        <span>${byName} · ${p.platform} · ${dateStr}${p.comment ? ` · "${escapeHtml(p.comment)}"` : ''}</span>
+        <b>${formatMoney(p.amount)}</b>
+      </div>`;
+    }).join('');
+
+    return `
+      <div class="settlement-month">
+        <div class="settlement-month-header">
+          <div class="settlement-month-name">${monthName} · ${formatMoney(totalPaid)}</div>
+          ${statusHTML}
+        </div>
+        <div class="settlement-payments">${paymentsHTML}</div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = totalsHTML + monthsHTML;
 }
 
 // ============ STATS / KPIs ============
@@ -4957,6 +5877,7 @@ function renderStats() {
   const filteredInstances = getFilteredInstances();
 
   renderStatsFilterChips();
+  renderSettlementHistory();
 
   if (allInstances.length === 0) {
     document.getElementById('kpiTotalP1').textContent = '$0';
@@ -5098,7 +6019,7 @@ function renderStats() {
     return new Date(parseInt(y), parseInt(mo) - 1, 1).toLocaleDateString('es-AR', { month: 'short', year: '2-digit' });
   });
 
-  // Bar chart: pagado por persona (aplica filtros menos persona)
+  // Bar chart: pagado por persona STACKED (aplica filtros menos persona)
   const p1Data = showMonths.map(m => {
     let s = 0;
     allInstances.forEach(e => {
@@ -5141,13 +6062,13 @@ function renderStats() {
         }
       },
       scales: {
-        y: { beginAtZero: true, ticks: { color: textColor, callback: v => '$' + Math.round(v/1000) + 'k' }, grid: { color: gridColor } },
-        x: { ticks: { color: textColor }, grid: { display: false } }
+        y: { stacked: true, beginAtZero: true, ticks: { color: textColor, callback: v => formatMoneyShort(v) }, grid: { color: gridColor } },
+        x: { stacked: true, ticks: { color: textColor }, grid: { display: false } }
       }
     }
   });
 
-  // Line chart: acumulado mes a mes (con filtros)
+  // Line chart: acumulado mes a mes (con filtros) - CORTADO EN MES ACTUAL
   let acc = 0;
   const accumData = showMonths.map(m => {
     let monthSum = 0;
@@ -5162,47 +6083,109 @@ function renderStats() {
   });
 
   if (statsAccumChart) statsAccumChart.destroy();
+  // Índice donde cortamos: real hasta mes actual, proyección desde ahí
+  const currentMonthIdx = showMonths.findIndex(m => m > currentYearMonth);
+  const splitIdx = currentMonthIdx === -1 ? showMonths.length : currentMonthIdx;
+  // Datos: reales (hasta mes actual) y proyectados (futuros, línea punteada)
+  const accumReal = accumData.map((v, i) => i < splitIdx ? v : null);
+  const accumProjection = accumData.map((v, i) => {
+    // Punto de unión: incluimos el último valor real para que la línea proyectada arranque desde ahí
+    if (i === splitIdx - 1) return v;
+    return i >= splitIdx ? v : null;
+  });
+
   statsAccumChart = new Chart(document.getElementById('statsAccumChart'), {
     type: 'line',
     data: {
       labels: monthLabels,
-      datasets: [{
-        label: 'Acumulado',
-        data: accumData,
-        borderColor: '#10b981',
-        backgroundColor: 'rgba(16,185,129,0.15)',
-        fill: true,
-        tension: 0.3,
-        borderWidth: 3,
-        pointBackgroundColor: '#10b981',
-        pointRadius: 5,
-        pointHoverRadius: 8
-      }]
+      datasets: [
+        {
+          label: 'Real',
+          data: accumReal,
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16,185,129,0.15)',
+          fill: true,
+          tension: 0.3,
+          borderWidth: 3,
+          pointBackgroundColor: '#10b981',
+          pointRadius: 5,
+          pointHoverRadius: 8,
+          spanGaps: false
+        },
+        {
+          label: 'Proyección (cuotas futuras)',
+          data: accumProjection,
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16,185,129,0.05)',
+          fill: true,
+          tension: 0.3,
+          borderWidth: 2,
+          borderDash: [6, 6],
+          pointBackgroundColor: '#10b981',
+          pointRadius: 4,
+          pointHoverRadius: 8,
+          spanGaps: false
+        }
+      ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       onClick: (evt, items) => {
         if (items.length > 0) setStatsFilter('month', showMonths[items[0].index]);
       },
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: textColor, boxWidth: 12, padding: 10, font: { size: 11 } }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.dataset.label}: ${formatMoney(ctx.parsed.y)}`
+          }
+        }
+      },
       scales: {
-        y: { beginAtZero: true, ticks: { color: textColor, callback: v => '$' + Math.round(v/1000) + 'k' }, grid: { color: gridColor } },
+        y: { beginAtZero: true, ticks: { color: textColor, callback: v => formatMoneyShort(v) }, grid: { color: gridColor } },
         x: { ticks: { color: textColor }, grid: { display: false } }
       }
     }
   });
 
   // Pie chart: distribución por categoría (con filtros, sobre el rango visible)
-  const catTotals = {};
+  // Agrupamos categorías con < 3% del total bajo "Otros" para evitar clutter
+  const catTotalsRaw = {};
   filteredInstances.forEach(e => {
     if (e.capital === true || e._isReintegro === true) return;
     if (!showMonths.includes(e._yearMonth)) return;
-    catTotals[e.category] = (catTotals[e.category] || 0) + e.amount;
+    catTotalsRaw[e.category] = (catTotalsRaw[e.category] || 0) + e.amount;
   });
-  const catSorted = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
-  const catLabels = catSorted.map(([k]) => getCategoryInfo(k).name);
+  const catSortedRaw = Object.entries(catTotalsRaw).sort((a, b) => b[1] - a[1]);
+  const totalAllCat = catSortedRaw.reduce((s, [_, v]) => s + v, 0);
+
+  const catSorted = [];
+  let othersSum = 0;
+  let othersKeys = [];
+  catSortedRaw.forEach(([k, v]) => {
+    const pct = totalAllCat > 0 ? (v / totalAllCat) * 100 : 0;
+    // Si la categoría representa < 3% Y no es una de las top-6, va a "Otros agrupados"
+    if (pct < 3 && catSorted.length >= 6) {
+      othersSum += v;
+      othersKeys.push(k);
+    } else {
+      catSorted.push([k, v]);
+    }
+  });
+  if (othersSum > 0) {
+    catSorted.push(['__grouped_others__', othersSum]);
+  }
+
+  const catLabels = catSorted.map(([k]) =>
+    k === '__grouped_others__' ? `Otros (${othersKeys.length})` : getCategoryInfo(k).name
+  );
   const catData = catSorted.map(([_, v]) => Math.round(v));
-  const catColors = catSorted.map(([k]) => getCategoryInfo(k).color);
+  const catColors = catSorted.map(([k]) =>
+    k === '__grouped_others__' ? '#94a3b8' : getCategoryInfo(k).color
+  );
   const catKeys = catSorted.map(([k]) => k);
   const totalCat = catData.reduce((a, b) => a + b, 0);
 
@@ -5216,7 +6199,10 @@ function renderStats() {
     options: {
       responsive: true, maintainAspectRatio: false, cutout: '55%',
       onClick: (evt, items) => {
-        if (items.length > 0) setStatsFilter('category', catKeys[items[0].index]);
+        if (items.length > 0) {
+          const key = catKeys[items[0].index];
+          if (key !== '__grouped_others__') setStatsFilter('category', key);
+        }
       },
       plugins: {
         legend: {
@@ -5235,9 +6221,82 @@ function renderStats() {
       }
     }
   });
-}
 
-// ESC para cerrar el quickAdd
+  // Line chart: evolución por categoría (top 5, últimos 6 meses hasta el actual)
+  const evoMonths = rangeMonths.filter(m => m <= currentYearMonth).slice(-6);
+  const evoLabels = evoMonths.map(m => {
+    const [y, mo] = m.split('-');
+    return new Date(parseInt(y), parseInt(mo) - 1, 1).toLocaleDateString('es-AR', { month: 'short', year: '2-digit' });
+  });
+
+  // Determinar el top 5 de categorías por total en el rango
+  const evoTotalsByCat = {};
+  allInstances.forEach(e => {
+    if (e.capital === true || e._isReintegro === true) return;
+    if (!evoMonths.includes(e._yearMonth)) return;
+    if (statsFilter.person && e.payer !== statsFilter.person) return;
+    evoTotalsByCat[e.category] = (evoTotalsByCat[e.category] || 0) + e.amount;
+  });
+  const topCats = Object.entries(evoTotalsByCat)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([k]) => k);
+
+  const evoDatasets = topCats.map(cat => {
+    const info = getCategoryInfo(cat);
+    const data = evoMonths.map(m => {
+      let s = 0;
+      allInstances.forEach(e => {
+        if (e.capital === true || e._isReintegro === true) return;
+        if (e._yearMonth !== m || e.category !== cat) return;
+        if (statsFilter.person && e.payer !== statsFilter.person) return;
+        s += e.amount;
+      });
+      return Math.round(s);
+    });
+    return {
+      label: `${info.icon} ${info.name}`,
+      data,
+      borderColor: info.color,
+      backgroundColor: info.color + '20',
+      tension: 0.3,
+      borderWidth: 2.5,
+      pointBackgroundColor: info.color,
+      pointRadius: 4,
+      pointHoverRadius: 7,
+      fill: false
+    };
+  });
+
+  if (window.statsCategoryEvolutionChart && typeof window.statsCategoryEvolutionChart.destroy === 'function') {
+    window.statsCategoryEvolutionChart.destroy();
+  }
+  if (evoDatasets.length > 0) {
+    window.statsCategoryEvolutionChart = new Chart(document.getElementById('statsCategoryEvolutionChart'), {
+      type: 'line',
+      data: { labels: evoLabels, datasets: evoDatasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: textColor, boxWidth: 10, padding: 8, font: { size: 11 } }
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.dataset.label}: ${formatMoney(ctx.parsed.y)}`
+            }
+          }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: textColor, callback: v => formatMoneyShort(v) }, grid: { color: gridColor } },
+          x: { ticks: { color: textColor }, grid: { display: false } }
+        }
+      }
+    });
+  }
+}
 document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape' && document.getElementById('quickAddModal').classList.contains('open')) {
     closeQuickAdd();
