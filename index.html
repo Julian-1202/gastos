@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
@@ -441,56 +442,7 @@
   }
   .btn-secondary:hover { background: var(--border); }
 
-  /* Expense list */
-  .expense-list { display: flex; flex-direction: column; gap: 8px; }
-  .expense-item {
-    display: grid;
-    grid-template-columns: 36px 1fr auto auto auto 28px;
-    gap: 12px;
-    align-items: center;
-    padding: 12px 14px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    transition: all 0.2s;
-    background: var(--card);
-  }
-  .expense-item:hover {
-    border-color: var(--primary);
-    transform: translateX(2px);
-    box-shadow: var(--shadow);
-  }
-  .expense-icon {
-    width: 36px; height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-  }
-  .expense-info .name {
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 2px;
-  }
-  .expense-info .meta {
-    font-size: 12px;
-    color: var(--text-soft);
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-  .expense-info .meta .dot {
-    width: 4px; height: 4px;
-    background: var(--text-soft);
-    border-radius: 50%;
-  }
-  .expense-payer {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--text-soft);
-  }
+  /* Avatar (usado en header, comentarios, grupos, notificaciones) */
   .avatar {
     width: 22px; height: 22px;
     border-radius: 50%;
@@ -501,25 +453,104 @@
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
+    flex-shrink: 0;
   }
   .avatar.p2 { background: var(--p2); }
-  .expense-split {
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-weight: 600;
-    background: var(--bg-soft);
-    color: var(--text-soft);
-  }
-  .expense-split.s5050 { background: var(--primary-soft); color: var(--primary); }
-  .expense-split.s100p1 { background: var(--primary-soft); color: var(--p1); }
-  .expense-split.s100p2 { background: #fce7f3; color: var(--p2); }
-  body.dark .expense-split.s100p2 { background: #500724; color: #f9a8d4; }
-  .expense-amount {
+
+  /* Expense table (vista Lista/Categoría/Persona) */
+  .expense-list { display: flex; flex-direction: column; }
+  .expense-table { display: flex; flex-direction: column; }
+  .expense-table-header {
+    display: grid;
+    grid-template-columns: 64px 1fr 84px 100px 120px 56px;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 12px 8px;
+    font-size: 10px;
     font-weight: 700;
-    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-soft);
+    border-bottom: 2px solid var(--border);
+  }
+  .expense-table-header .col-amount { text-align: right; }
+  .expense-row {
+    display: grid;
+    grid-template-columns: 64px 1fr 84px 100px 120px 56px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .expense-row:hover { background: var(--bg-soft); }
+  .expense-row.capital { border-left: 3px solid var(--success); }
+  .expense-row.reintegro { border-left: 3px solid var(--success); }
+  .expense-row.installment { border-left: 3px solid var(--primary); }
+  .expense-row .col-date {
+    font-size: 12px;
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+  .expense-row .col-desc {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .row-icon {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .row-desc-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .expense-row .col-payer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+  .payer-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--p1);
+    flex-shrink: 0;
+  }
+  .payer-dot.p2 { background: var(--p2); }
+  .expense-row .col-split {
+    font-size: 12px;
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+  .expense-row .col-amount {
+    font-weight: 700;
+    font-size: 14px;
     text-align: right;
-    min-width: 90px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .col-amount-sub {
+    font-size: 9px;
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+  .expense-row .col-actions {
+    display: flex;
+    gap: 2px;
+    justify-content: flex-end;
   }
   .delete-btn {
     background: none;
@@ -776,8 +807,7 @@
   }
   .user-selector button:not(.active):hover { color: var(--text); }
 
-  /* Expense item clickeable + contador de comentarios */
-  .expense-item { cursor: pointer; }
+  /* Contador de comentarios en fila de gasto */
   .expense-comments-badge {
     display: inline-flex;
     align-items: center;
@@ -1223,10 +1253,6 @@
     font-size: 13px;
     color: var(--text);
   }
-  .expense-item.capital {
-    border-color: var(--success);
-    background: linear-gradient(to right, rgba(16,185,129,0.08), transparent 40%);
-  }
   .capital-tag {
     display: inline-block;
     font-size: 9px;
@@ -1239,7 +1265,7 @@
     margin-right: 4px;
     vertical-align: middle;
   }
-  .expense-amount.capital-amount {
+  .capital-amount {
     color: var(--success);
   }
   .cat-capital { background: var(--success-soft); color: var(--success); }
@@ -1691,10 +1717,6 @@
   }
 
   /* Reintegro chip en lista de gastos */
-  .expense-item.reintegro {
-    border-left: 3px solid var(--success);
-    background: linear-gradient(to right, rgba(16,185,129,0.06), transparent 50%);
-  }
   .reintegro-tag {
     display: inline-block;
     font-size: 9px;
@@ -1796,38 +1818,6 @@
     box-shadow: var(--shadow);
   }
 
-  /* ============ LISTA COMPACTA ============ */
-  .expense-item.compact {
-    grid-template-columns: 28px 1fr auto auto 26px;
-    gap: 10px;
-    padding: 9px 12px;
-    border-radius: 8px;
-  }
-  .expense-item.compact .expense-icon {
-    width: 28px; height: 28px;
-    font-size: 13px;
-  }
-  .expense-item.compact .expense-info .name { font-size: 13px; }
-  .expense-item.compact .expense-info .meta { font-size: 11px; }
-  .expense-item.compact .expense-amount { font-size: 13px; min-width: 75px; }
-  .expense-item.compact .expense-amount-sub { font-size: 9px; }
-  .expense-item.compact .expense-payer-mini {
-    display: flex;
-    align-items: center;
-    font-size: 11px;
-    color: var(--text-soft);
-  }
-  .expense-item.compact .expense-payer-mini .avatar {
-    width: 18px; height: 18px; font-size: 9px;
-  }
-  .expense-item.compact .expense-split { font-size: 10px; padding: 2px 6px; }
-  .expense-item.compact .delete-btn { padding: 2px 4px; }
-
-  .expense-actions {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-  }
   .edit-btn {
     background: none;
     border: none;
@@ -1896,143 +1886,6 @@
   .group-content.collapsed {
     display: none;
   }
-
-  /* ============ VISTA TARJETAS ============ */
-  .expense-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
-  }
-  .expense-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .expense-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary);
-  }
-  .expense-card.reintegro {
-    border-left: 3px solid var(--success);
-  }
-  .expense-card.capital {
-    border-left: 3px solid var(--success);
-    background: linear-gradient(to right, rgba(16,185,129,0.05), transparent 60%);
-  }
-  .expense-card.installment {
-    border-left: 3px solid var(--primary);
-  }
-  .expense-card-head {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .expense-card-icon {
-    width: 38px; height: 38px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .expense-card-icon.cat-comida { background: #fef3c7; color: #d97706; }
-  .expense-card-icon.cat-alquiler { background: #dbeafe; color: #2563eb; }
-  .expense-card-icon.cat-servicios { background: #ede9fe; color: #7c3aed; }
-  .expense-card-icon.cat-ocio { background: #fce7f3; color: #db2777; }
-  .expense-card-icon.cat-transporte { background: #d1fae5; color: #059669; }
-  .expense-card-icon.cat-salud { background: #fee2e2; color: #dc2626; }
-  .expense-card-icon.cat-hogar { background: #cffafe; color: #0891b2; }
-  .expense-card-icon.cat-otros { background: #f3f4f6; color: #4b5563; }
-  .expense-card-icon.cat-capital { background: var(--success-soft); color: var(--success); }
-  body.dark .expense-card-icon.cat-comida { background: #422006; color: #fbbf24; }
-  body.dark .expense-card-icon.cat-alquiler { background: #1e293b; color: #60a5fa; }
-  body.dark .expense-card-icon.cat-servicios { background: #2e1065; color: #a78bfa; }
-  body.dark .expense-card-icon.cat-ocio { background: #500724; color: #f472b6; }
-  body.dark .expense-card-icon.cat-transporte { background: #064e3b; color: #34d399; }
-  body.dark .expense-card-icon.cat-salud { background: #450a0a; color: #f87171; }
-  body.dark .expense-card-icon.cat-hogar { background: #083344; color: #22d3ee; }
-  body.dark .expense-card-icon.cat-otros { background: #2d3142; color: #9ca3af; }
-  body.dark .expense-card-icon.cat-capital { background: #064e3b; color: #6ee7b7; }
-
-  .expense-card-title {
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 3px;
-    line-height: 1.3;
-  }
-  .expense-card-meta {
-    font-size: 11px;
-    color: var(--text-soft);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .expense-card-amount {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    line-height: 1;
-  }
-  .expense-card-amount.capital-amount { color: var(--success); }
-  .expense-card-amount-sub {
-    font-size: 10px;
-    color: var(--text-soft);
-    font-weight: 500;
-    margin-top: 3px;
-  }
-  .expense-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 8px;
-    border-top: 1px dashed var(--border);
-  }
-  .expense-card-tags {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .expense-card-tag {
-    font-size: 10px;
-    background: var(--bg-soft);
-    color: var(--text-soft);
-    padding: 3px 7px;
-    border-radius: 5px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-  }
-  .expense-card-tag.p1 { background: var(--primary-soft); color: var(--primary); }
-  .expense-card-tag.p2 { background: #fce7f3; color: var(--p2); }
-  body.dark .expense-card-tag.p2 { background: #500724; color: #f9a8d4; }
-  .expense-card-actions {
-    display: flex;
-    gap: 4px;
-  }
-  .expense-card-actions button {
-    background: none;
-    border: none;
-    color: var(--text-soft);
-    padding: 4px 6px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-  }
-  .expense-card-actions button:hover { background: var(--bg-soft); }
-  .expense-card-actions .delete-btn:hover { background: var(--danger-soft); color: var(--danger); }
-  .expense-card-actions .edit-btn:hover { background: var(--primary-soft); color: var(--primary); }
 
   /* ============ STATS / KPIs ============ */
   .stats-filter-chips {
@@ -2233,6 +2086,16 @@
     color: white;
   }
 
+  .capital-reintegro-note {
+    margin-top: 12px;
+    padding: 9px 12px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: white;
+  }
+
   /* ============ PAGOS PARCIALES ============ */
   .partial-badge {
     display: inline-block;
@@ -2427,19 +2290,11 @@
     font-size: 18px;
   }
 
-  /* Mes saldado: estilo de los items */
-  body.month-settled .expense-item {
+  /* Mes saldado: estilo de las filas */
+  body.month-settled .expense-row {
     opacity: 0.92;
   }
-  .expense-item.installment {
-    border-left: 3px solid var(--primary);
-  }
-  .expense-amount-sub {
-    font-size: 10px;
-    color: var(--text-soft);
-    font-weight: 500;
-    margin-top: 2px;
-  }
+
   /* Progreso de cuotas en el ticket */
   .installment-progress {
     background: var(--bg-soft);
@@ -2735,18 +2590,18 @@
     .tab-content#tab-gastos.active ~ .fab { display: flex; }
     .fab { display: flex; align-items: center; justify-content: center; }
 
-    /* Lista de gastos: compactar */
-    .expense-item {
-      grid-template-columns: 32px 1fr auto;
-      gap: 10px;
-      padding: 10px 12px;
+    /* Lista de gastos: compactar (esconder Pagó y División, se ven en el ticket) */
+    .expense-table-header,
+    .expense-row {
+      grid-template-columns: 48px 1fr 86px 40px;
+      gap: 8px;
+      padding: 9px 10px;
     }
-    .expense-icon { width: 32px; height: 32px; font-size: 14px; }
-    .expense-info .name { font-size: 13px; }
-    .expense-info .meta { font-size: 11px; }
-    .expense-payer { display: none; } /* se ve en el ticket */
-    .expense-split { display: none; } /* se ve en el ticket */
-    .expense-amount { font-size: 14px; min-width: 70px; }
+    .col-payer, .col-split { display: none; }
+    .row-icon { width: 18px; height: 18px; font-size: 11px; }
+    .expense-row .col-date { font-size: 11px; }
+    .expense-row .col-desc { font-size: 13px; }
+    .expense-row .col-amount { font-size: 13px; }
     .delete-btn { display: none; } /* delete desde el ticket */
 
     /* Charts más chicos */
@@ -2860,6 +2715,10 @@
             <span>📄</span>
             <span>Importar resumen de tarjeta</span>
           </button>
+          <button class="user-menu-item" onclick="exportAllDataToExcel()" title="Descarga un Excel con todos los gastos, cuotas, fijos, ahorro y saldos">
+            <span>📥</span>
+            <span>Exportar todo a Excel</span>
+          </button>
           <div class="user-menu-divider"></div>
           <button class="user-menu-item" onclick="toggleTheme()">
             <span id="themeMenuIcon">🌙</span>
@@ -2891,25 +2750,26 @@
         <div class="balance-message" id="balanceMessage">Calculando...</div>
         <div class="balance-amount" id="balanceAmount">$0</div>
         <div class="balance-totals">
-          <div class="total">
+          <div class="total" title="Lo que pagó ese mes, descontando los aportes de capital que se quedó (devoluciones, ventas) y los reintegros que recibió">
             <div class="label">💜 Flucy pagó</div>
             <div class="value" id="totalP1">$0</div>
           </div>
-          <div class="total">
+          <div class="total" title="Lo que pagó ese mes, descontando los aportes de capital que se quedó (devoluciones, ventas) y los reintegros que recibió">
             <div class="label">💗 Neitor pagó</div>
             <div class="value" id="totalP2">$0</div>
           </div>
-          <div class="total">
-            <div class="label">💸 Total del mes</div>
+          <div class="total" title="Suma de lo que pagó cada uno (aportes y reintegros ya descontados). Puede no coincidir con la suma de 'Por categoría', que muestra solo el gasto bruto.">
+            <div class="label">💸 Total neto</div>
             <div class="value" id="totalMonth">$0</div>
           </div>
         </div>
+        <div id="capitalReintegroNote" style="display:none;"></div>
         <div id="settleActions"></div>
         <div id="settledInfo" style="display:none;" class="settled-info"></div>
       </div>
 
       <div class="card">
-        <h2>Por categoría</h2>
+        <h2 title="Gasto bruto por categoría: no descuenta aportes ni reintegros">Por categoría</h2>
         <div class="categories-list" id="categoriesList"></div>
       </div>
     </div>
@@ -2930,9 +2790,8 @@
             <input type="text" id="searchInput" placeholder="Buscar gasto por descripción..." oninput="onSearchInput()">
           </div>
           <div class="view-toggle">
-            <button class="active" data-view="cards" onclick="setViewMode('cards')">🎴 Tarjetas</button>
             <button data-view="list" onclick="setViewMode('list')">📋 Lista</button>
-            <button data-view="cat" onclick="setViewMode('cat')">🏷️ Categoría</button>
+            <button class="active" data-view="cat" onclick="setViewMode('cat')">🏷️ Categoría</button>
             <button data-view="person" onclick="setViewMode('person')">👥 Persona</button>
           </div>
         </div>
@@ -2958,37 +2817,37 @@
     <div class="stats-filter-chips" id="statsFilterChips" style="display:none;"></div>
 
     <div class="stats-grid">
-      <div class="kpi-card">
+      <div class="kpi-card" title="Suma neta pagada por Flucy en el rango, descontando sus aportes y reintegros">
         <div class="kpi-label">💜 Total Flucy</div>
         <div class="kpi-value" id="kpiTotalP1">$0</div>
         <div class="kpi-sub" id="kpiTotalP1Sub">En el rango visible</div>
       </div>
-      <div class="kpi-card">
+      <div class="kpi-card" title="Suma neta pagada por Neitor en el rango, descontando sus aportes y reintegros">
         <div class="kpi-label">💗 Total Neitor</div>
         <div class="kpi-value" id="kpiTotalP2">$0</div>
         <div class="kpi-sub" id="kpiTotalP2Sub">En el rango visible</div>
       </div>
-      <div class="kpi-card">
+      <div class="kpi-card" title="Total Flucy + Total Neitor, netos de aportes y reintegros">
         <div class="kpi-label">📊 Total acumulado</div>
         <div class="kpi-value" id="kpiTotalAcc">$0</div>
         <div class="kpi-sub" id="kpiTotalAccSub">Flucy + Neitor</div>
       </div>
-      <div class="kpi-card">
+      <div class="kpi-card" title="Suma de todas las cuotas futuras de TODOS los gastos, sin importar el rango de meses que estés mirando">
         <div class="kpi-label">📅 Cuotas pendientes</div>
         <div class="kpi-value" id="kpiPendingInst">$0</div>
         <div class="kpi-sub" id="kpiPendingInstSub">A pagar a futuro</div>
       </div>
-      <div class="kpi-card">
+      <div class="kpi-card" title="Promedio de gasto bruto por mes (no descuenta aportes ni reintegros), sobre los meses del rango que tuvieron gastos">
         <div class="kpi-label">💰 Promedio mensual</div>
         <div class="kpi-value" id="kpiAvgMonth" style="font-size:22px;">$0</div>
         <div class="kpi-sub" id="kpiAvgMonthSub">En el rango visible</div>
       </div>
-      <div class="kpi-card">
+      <div class="kpi-card" title="Categoría con mayor aumento en % comparando el mes actual contra el anterior (siempre esos dos meses, sin importar el filtro)">
         <div class="kpi-label">📈 Más creció</div>
         <div class="kpi-value" id="kpiGrowCat" style="font-size:16px;">-</div>
         <div class="kpi-sub" id="kpiGrowCatSub">vs mes anterior</div>
       </div>
-      <div class="kpi-card">
+      <div class="kpi-card" title="Categoría con mayor caída en % comparando el mes actual contra el anterior (siempre esos dos meses, sin importar el filtro)">
         <div class="kpi-label">📉 Más bajó</div>
         <div class="kpi-value" id="kpiDropCat" style="font-size:16px;">-</div>
         <div class="kpi-sub" id="kpiDropCatSub">vs mes anterior</div>
@@ -3012,7 +2871,7 @@
     </div>
 
     <div class="stats-chart-card">
-      <h3>📉 Evolución por categoría <span style="font-size:11px; font-weight:500; color:var(--text-soft);">(últimos 6 meses)</span></h3>
+      <h3 title="Muestra siempre las top 5 categorías, incluso si filtraste por una categoría en otro gráfico">📉 Evolución por categoría <span style="font-size:11px; font-weight:500; color:var(--text-soft);">(últimos 6 meses)</span></h3>
       <div class="chart-container"><canvas id="statsCategoryEvolutionChart"></canvas></div>
     </div>
 
@@ -3030,7 +2889,7 @@
         <button class="btn btn-small" onclick="addRecurring()">+ Nuevo fijo</button>
       </div>
       <p style="color: var(--text-soft); font-size: 13px; margin-bottom: 16px;">
-        Configurá tus servicios mensuales. Los montos se pueden editar cada mes (ya sabés cómo es Argentina 😅).
+        Configurá tus servicios mensuales. Los montos se pueden editar cada mes.
       </p>
       <div style="overflow-x: auto;">
         <table class="recurring-table">
@@ -3050,11 +2909,11 @@
       </div>
 
       <div style="margin-top: 20px; padding: 16px; background: var(--bg-soft); border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <div style="font-size: 12px; color: var(--text-soft); margin-bottom: 4px;">Total fijos del mes</div>
+        <div title="Suma de TODOS los gastos fijos configurados, estén pagados o no">
+          <div style="font-size: 12px; color: var(--text-soft); margin-bottom: 4px;">Total fijos configurados</div>
           <div style="font-size: 24px; font-weight: 800;" id="recurringTotal">$0</div>
         </div>
-        <button class="btn btn-success btn-small" onclick="importRecurringToExpenses()">↓ Cargar pagados a gastos del mes</button>
+        <button class="btn btn-success btn-small" onclick="importRecurringToExpenses()" title="Toma los fijos marcados como 'Pagado' este mes y crea un gasto por cada uno en la pestaña Gastos">↓ Cargar pagados a gastos del mes</button>
       </div>
     </div>
   </div>
@@ -3105,7 +2964,7 @@
         </div>
         <div class="form-group">
           <label>Tipo de cambio (opc.)</label>
-          <input type="number" id="savingsRate" placeholder="Ej: 1180" step="0.01">
+          <input type="text" id="savingsRate" placeholder="Ej: 1.180" inputmode="decimal">
         </div>
         <button class="btn btn-success" onclick="addSavings()">+ Guardar</button>
       </div>
@@ -3266,7 +3125,7 @@
 
     <div class="quick-field">
       <label>Monto a pagar ahora</label>
-      <input type="number" id="settleAmount" placeholder="0" step="0.01" min="1" inputmode="decimal">
+      <input type="text" id="settleAmount" placeholder="0" inputmode="decimal">
       <div class="settle-amount-hint" id="settleAmountHint"></div>
     </div>
 
@@ -3311,7 +3170,7 @@
 
     <div class="quick-amount-display">
       <div class="label">Monto</div>
-      <input type="number" id="quickAmount" placeholder="$ 0" step="0.01" inputmode="decimal">
+      <input type="text" id="quickAmount" placeholder="$ 0" inputmode="decimal">
     </div>
 
     <div class="quick-field">
@@ -3326,7 +3185,7 @@
       </div>
       <div class="quick-field">
         <label>Reintegro ($)</label>
-        <input type="number" id="quickReintegro" placeholder="0" step="0.01" inputmode="decimal" min="0">
+        <input type="text" id="quickReintegro" placeholder="0" inputmode="decimal">
       </div>
     </div>
 
@@ -3370,7 +3229,7 @@
     <div class="quick-capital-row">
       <label class="capital-toggle">
         <input type="checkbox" id="quickCapital">
-        <span class="capital-toggle-label">💰 Es un aporte (ingreso de plata, suma al balance)</span>
+        <span class="capital-toggle-label" title="Para devoluciones, reintegros de compras o venta de algo: quien figura en 'Pagó' es quien SE QUEDA esa plata, y según la división reduce lo que le corresponde pagar">💰 Es un aporte de capital (plata que entró y se quedó quien figura en "Pagó")</span>
       </label>
     </div>
 
@@ -3387,7 +3246,7 @@ let savingTimer = null;
 let isApplyingRemoteUpdate = false;
 
 // Estado de UI (no se sincroniza con Firestore — es por sesión)
-let viewMode = 'cards'; // 'cards' | 'list' | 'cat' | 'person'
+let viewMode = 'cat'; // 'list' | 'cat' | 'person'
 let searchQuery = '';
 let filterPayer = 'all';
 let editingExpenseId = null;
@@ -3492,6 +3351,62 @@ function formatMoneyShort(n) {
   if (abs >= 1_000) return '$' + (n / 1_000).toLocaleString('es-AR', { maximumFractionDigits: 1 }) + 'k';
   return '$' + Math.round(n);
 }
+
+// ============ SEPARADOR DE MILES EN CAMPOS DE MONTO ============
+// Mientras se tipea, formatea en vivo: "1000000" -> "1.000.000". Admite decimales con coma: "1500,50".
+function formatAmountInputValue(raw) {
+  if (!raw) return '';
+  // Dejar solo dígitos y coma (separador decimal argentino)
+  let cleaned = raw.replace(/[^\d,]/g, '');
+  // Si el usuario tipeó más de una coma, nos quedamos con la primera
+  const firstComma = cleaned.indexOf(',');
+  if (firstComma !== -1) {
+    cleaned = cleaned.slice(0, firstComma + 1) + cleaned.slice(firstComma + 1).replace(/,/g, '');
+  }
+  let [intPart, decPart] = cleaned.split(',');
+  intPart = (intPart || '').replace(/^0+(?=\d)/, ''); // sin ceros a la izquierda
+  let result = intPart ? Number(intPart).toLocaleString('es-AR') : '';
+  if (decPart !== undefined) result += ',' + decPart.slice(0, 2);
+  return result;
+}
+
+// Convierte el valor formateado ("1.000.000,50") de vuelta a número JS (1000000.5)
+function parseAmountInput(value) {
+  if (value === null || value === undefined || value === '') return NaN;
+  const cleaned = String(value).replace(/\./g, '').replace(',', '.');
+  return parseFloat(cleaned);
+}
+
+// Setea el valor de un input de monto ya formateado, a partir de un número JS
+function setAmountInputValue(input, numericValue) {
+  if (!input) return;
+  if (numericValue === null || numericValue === undefined || numericValue === '' || isNaN(numericValue)) {
+    input.value = '';
+    return;
+  }
+  const num = Number(numericValue);
+  const hasCents = Math.round(num * 100) % 100 !== 0;
+  input.value = num.toLocaleString('es-AR', hasCents
+    ? { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+    : { maximumFractionDigits: 0 });
+}
+
+// Aplica el formateo en vivo a un <input> de monto (idempotente)
+function attachAmountFormatting(input) {
+  if (!input || input.dataset.amountFmt === '1') return;
+  input.dataset.amountFmt = '1';
+  input.addEventListener('input', () => {
+    const atEnd = input.selectionStart === input.value.length;
+    input.value = formatAmountInputValue(input.value);
+    if (atEnd) input.setSelectionRange(input.value.length, input.value.length);
+  });
+}
+
+// Aplicar el formateo en vivo a los campos de monto fijos del DOM
+['quickAmount', 'quickReintegro', 'settleAmount', 'savingsRate'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) attachAmountFormatting(el);
+});
 
 // ============ TEMA ============
 function toggleTheme() {
@@ -3642,6 +3557,17 @@ function addMonthsToDateStr(dateStr, n) {
   return newDate.toISOString().split('T')[0];
 }
 
+// Igual que addMonthsToDateStr pero recibe/devuelve un objeto Date en vez de string.
+// Evita el bug de "31 de enero + 1 mes" saltando a marzo (porque febrero no tiene 31 días):
+// sin este clamp, new Date(y, m+1, 31) directamente se corre al mes siguiente.
+function addMonthsToDate(baseDate, n) {
+  const day = baseDate.getDate();
+  const newDate = new Date(baseDate.getFullYear(), baseDate.getMonth() + n, 1);
+  const lastDayOfMonth = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
+  newDate.setDate(Math.min(day, lastDayOfMonth));
+  return newDate;
+}
+
 // Devuelve cuántos meses hay entre dateStr y el currentDate (puede ser negativo)
 function monthsDiffFromCurrent(dateStr) {
   const d = new Date(dateStr + 'T00:00');
@@ -3709,7 +3635,11 @@ function calculateBalance() {
     const amt = e.amount;
     const isCapital = e.capital === true;
     const isReintegro = e._isReintegro === true;
-    // capital y reintegro = +; gasto normal/cuota = -
+    // El aporte de capital NO es plata que alguien "pone" en el pozo (no es un gasto invertido).
+    // Es plata que ENTRA de afuera (una devolución, la venta de algo) y que se queda UNA de las
+    // dos personas — el campo "Pagó" para un aporte significa "quién se quedó la plata", no
+    // "quién la puso". Como esa persona se queda con algo que en teoría era compartido según la
+    // división, eso reduce lo que esa persona tiene a favor (mismo signo que un reintegro).
     const sign = (isCapital || isReintegro) ? -1 : 1;
     const effectiveAmount = amt * sign;
 
@@ -3729,6 +3659,30 @@ function renderBalance() {
   document.getElementById('totalP2').textContent = formatMoney(p2Paid);
   const totalMonth = Math.max(0, p1Paid) + Math.max(0, p2Paid);
   document.getElementById('totalMonth').textContent = formatMoney(totalMonth);
+
+  // Nota aclaratoria: si este mes hay aportes de capital y/o reintegros, avisar
+  // que ya están incluidos en los números de arriba (para que no sorprendan).
+  const noteEl = document.getElementById('capitalReintegroNote');
+  const monthExpensesForNote = getCurrentMonthExpenses();
+  let capitalTotal = 0, capitalCount = 0, reintegroTotal = 0, reintegroCount = 0;
+  monthExpensesForNote.forEach(e => {
+    if (e._isReintegro) { reintegroTotal += e.amount; reintegroCount++; }
+    else if (e.capital === true) { capitalTotal += e.amount; capitalCount++; }
+  });
+  if (capitalCount > 0 || reintegroCount > 0) {
+    const parts = [];
+    if (capitalCount > 0) {
+      parts.push(`💰 ${capitalCount} aporte${capitalCount !== 1 ? 's' : ''} de capital por ${formatMoney(capitalTotal)} (devolución/venta que se quedó quien figura como "Pagó" — ya descontado${capitalCount !== 1 ? 's' : ''} arriba, según su división)`);
+    }
+    if (reintegroCount > 0) {
+      parts.push(`↩️ ${reintegroCount} reintegro${reintegroCount !== 1 ? 's' : ''} por ${formatMoney(reintegroTotal)} (ya descontado${reintegroCount !== 1 ? 's' : ''} arriba)`);
+    }
+    noteEl.className = 'capital-reintegro-note';
+    noteEl.innerHTML = parts.join('<br>');
+    noteEl.style.display = '';
+  } else {
+    noteEl.style.display = 'none';
+  }
 
   const msg = document.getElementById('balanceMessage');
   const amt = document.getElementById('balanceAmount');
@@ -3885,7 +3839,8 @@ function applyFilters(items) {
 // ===== HTML de un item individual (extraído para reuso entre vistas) =====
 function renderExpenseItemHTML(e) {
   const info = getCategoryInfo(e.category);
-  const payerAvatar = e.payer === 'p1' ? '<div class="avatar">F</div>' : '<div class="avatar p2">N</div>';
+  const payerName = e.payer === 'p1' ? 'Flucy' : 'Neitor';
+  const payerCls = e.payer === 'p1' ? 'p1' : 'p2';
   const splitLabel = { '5050': '50/50', '100p1': '100% Flucy', '100p2': '100% Neitor' }[e.split];
   const dateStr = new Date(e.date + 'T00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
   const commentsCount = (e.comments || []).length;
@@ -3896,23 +3851,24 @@ function renderExpenseItemHTML(e) {
 
   // === Caso reintegro ===
   if (e._isReintegro) {
-    return `<div class="expense-item compact reintegro" onclick="openTicket(${e._realId})">
-      <div class="expense-icon cat-capital">💸</div>
-      <div class="expense-info">
-        <div class="name"><span class="reintegro-tag">REINTEGRO</span>${escapeHtml(e.desc)}</div>
-        <div class="meta"><span>${dateStr}</span><span class="dot"></span><span>Crédito a favor</span></div>
+    return `<div class="expense-row reintegro" onclick="openTicket(${e._realId})">
+      <div class="col-date">${dateStr}</div>
+      <div class="col-desc">
+        <span class="row-icon cat-capital">💸</span>
+        <span class="row-desc-text"><span class="reintegro-tag">REINTEGRO</span>${escapeHtml(e.desc)}</span>
       </div>
-      <div class="expense-payer-mini">${payerAvatar}</div>
-      <div class="expense-amount capital-amount">+ ${formatMoney(e.amount)}</div>
-      <div class="expense-actions">
-        <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${e._realId})">✕</button>
+      <div class="col-payer"><span class="payer-dot ${payerCls}"></span>${payerName}</div>
+      <div class="col-split">Crédito</div>
+      <div class="col-amount capital-amount">+ ${formatMoney(e.amount)}</div>
+      <div class="col-actions">
+        <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${e._realId})" title="Eliminar">✕</button>
       </div>
     </div>`;
   }
 
   const isCapital = e.capital === true;
   const isInstallment = e._isVirtual === true;
-  const itemClass = 'expense-item compact'
+  const rowClass = 'expense-row'
     + (isCapital ? ' capital' : '')
     + (isInstallment ? ' installment' : '');
   const amountText = isCapital ? '+ ' + formatMoney(e.amount) : formatMoney(e.amount);
@@ -3921,106 +3877,27 @@ function renderExpenseItemHTML(e) {
   const installmentBadge = isInstallment
     ? `<span class="installment-tag">CUOTA ${e._installmentNum}/${e.installments.total}</span>`
     : '';
-  const nameDisplay = (isCapital ? `<span class="capital-tag">APORTE</span> ` : '')
-    + escapeHtml(e.desc)
-    + installmentBadge;
+  const capitalBadge = isCapital ? `<span class="capital-tag">APORTE</span> ` : '';
   const totalDisplay = isInstallment
-    ? `<div class="expense-amount-sub">de ${formatMoney(e.amount * e.installments.total)}</div>`
+    ? `<div class="col-amount-sub">de ${formatMoney(e.amount * e.installments.total)}</div>`
     : '';
   const clickId = isInstallment ? e._realId : e.id;
 
-  return `<div class="${itemClass}" onclick="openTicket(${clickId})">
-    <div class="expense-icon ${iconCls}">${iconDisplay}</div>
-    <div class="expense-info">
-      <div class="name">${nameDisplay} ${commentsBadge}</div>
-      <div class="meta"><span>${dateStr}</span><span class="dot"></span><span>${info.name}</span><span class="dot"></span><span>${splitLabel}</span></div>
+  return `<div class="${rowClass}" onclick="openTicket(${clickId})">
+    <div class="col-date">${dateStr}</div>
+    <div class="col-desc">
+      <span class="row-icon ${iconCls}">${iconDisplay}</span>
+      <span class="row-desc-text">${capitalBadge}${escapeHtml(e.desc)}${installmentBadge} ${commentsBadge}</span>
     </div>
-    <div class="expense-payer-mini">${payerAvatar}</div>
-    <div class="expense-amount ${isCapital ? 'capital-amount' : ''}">
+    <div class="col-payer"><span class="payer-dot ${payerCls}"></span>${payerName}</div>
+    <div class="col-split">${splitLabel}</div>
+    <div class="col-amount ${isCapital ? 'capital-amount' : ''}">
       ${amountText}
       ${totalDisplay}
     </div>
-    <div class="expense-actions">
+    <div class="col-actions">
       <button class="edit-btn" onclick="event.stopPropagation(); editExpense(${clickId})" title="Editar">✏️</button>
       <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${clickId})" title="Eliminar">✕</button>
-    </div>
-  </div>`;
-}
-
-// Render de un gasto como tarjeta (vista cards)
-function renderExpenseCardHTML(e) {
-  const info = getCategoryInfo(e.category);
-  const payerName = e.payer === 'p1' ? 'Flucy' : 'Neitor';
-  const splitLabel = { '5050': '50/50', '100p1': '100% Flucy', '100p2': '100% Neitor' }[e.split];
-  const dateStr = new Date(e.date + 'T00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
-  const commentsCount = (e.comments || []).length;
-
-  // === Caso reintegro ===
-  if (e._isReintegro) {
-    return `<div class="expense-card reintegro" onclick="openTicket(${e._realId})">
-      <div class="expense-card-head">
-        <div class="expense-card-icon cat-capital">💸</div>
-        <div style="flex:1; min-width:0;">
-          <div class="expense-card-title"><span class="reintegro-tag">REINTEGRO</span>${escapeHtml(e.desc)}</div>
-          <div class="expense-card-meta">${dateStr} · Crédito a favor</div>
-        </div>
-        <div class="expense-card-actions">
-          <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${e._realId})">✕</button>
-        </div>
-      </div>
-      <div class="expense-card-amount capital-amount">+ ${formatMoney(e.amount)}</div>
-      <div class="expense-card-footer">
-        <div class="expense-card-tags">
-          <span class="expense-card-tag ${e.payer}">${e.payer === 'p1' ? '💜 Flucy' : '💗 Neitor'}</span>
-          <span class="expense-card-tag">${splitLabel}</span>
-        </div>
-        ${commentsCount > 0 ? `<span class="expense-card-tag">💬 ${commentsCount}</span>` : ''}
-      </div>
-    </div>`;
-  }
-
-  const isCapital = e.capital === true;
-  const isInstallment = e._isVirtual === true;
-  const cardClass = 'expense-card'
-    + (isCapital ? ' capital' : '')
-    + (isInstallment ? ' installment' : '');
-  const amountText = isCapital ? '+ ' + formatMoney(e.amount) : formatMoney(e.amount);
-  const iconDisplay = isCapital ? '💰' : info.icon;
-  const iconCls = isCapital ? 'cat-capital' : info.cls;
-  const installmentBadge = isInstallment
-    ? `<span class="installment-tag">CUOTA ${e._installmentNum}/${e.installments.total}</span>`
-    : '';
-  const titleDisplay = (isCapital ? `<span class="capital-tag">APORTE</span> ` : '')
-    + escapeHtml(e.desc)
-    + ' '
-    + installmentBadge;
-  const subAmount = isInstallment
-    ? `<div class="expense-card-amount-sub">de ${formatMoney(e.amount * e.installments.total)} total</div>`
-    : '';
-  const clickId = isInstallment ? e._realId : e.id;
-
-  return `<div class="${cardClass}" onclick="openTicket(${clickId})">
-    <div class="expense-card-head">
-      <div class="expense-card-icon ${iconCls}">${iconDisplay}</div>
-      <div style="flex:1; min-width:0;">
-        <div class="expense-card-title">${titleDisplay}</div>
-        <div class="expense-card-meta">${dateStr} · ${info.name}</div>
-      </div>
-      <div class="expense-card-actions">
-        <button class="edit-btn" onclick="event.stopPropagation(); editExpense(${clickId})" title="Editar">✏️</button>
-        <button class="delete-btn" onclick="event.stopPropagation(); deleteExpense(${clickId})" title="Eliminar">✕</button>
-      </div>
-    </div>
-    <div>
-      <div class="expense-card-amount ${isCapital ? 'capital-amount' : ''}">${amountText}</div>
-      ${subAmount}
-    </div>
-    <div class="expense-card-footer">
-      <div class="expense-card-tags">
-        <span class="expense-card-tag ${e.payer}">${e.payer === 'p1' ? '💜 Flucy' : '💗 Neitor'}</span>
-        <span class="expense-card-tag">${splitLabel}</span>
-      </div>
-      ${commentsCount > 0 ? `<span class="expense-card-tag">💬 ${commentsCount}</span>` : ''}
     </div>
   </div>`;
 }
@@ -4030,6 +3907,17 @@ function toggleGroup(groupKey) {
   else collapsedGroups.add(groupKey);
   renderExpenseList();
 }
+
+const EXPENSE_TABLE_HEADER = `
+  <div class="expense-table-header">
+    <div class="col-date">Fecha</div>
+    <div class="col-desc">Descripción</div>
+    <div class="col-payer">Pagó</div>
+    <div class="col-split">División</div>
+    <div class="col-amount">Monto</div>
+    <div class="col-actions"></div>
+  </div>
+`;
 
 function renderExpenseList() {
   const list = document.getElementById('expenseList');
@@ -4046,19 +3934,6 @@ function renderExpenseList() {
     return;
   }
 
-  if (viewMode === 'cards') {
-    // Vista tarjetas: grid
-    const sorted = [...filtered].sort((a, b) => {
-      const da = new Date(a.date), db = new Date(b.date);
-      if (db - da !== 0) return db - da;
-      if (a._isReintegro && !b._isReintegro) return 1;
-      if (!a._isReintegro && b._isReintegro) return -1;
-      return 0;
-    });
-    list.innerHTML = `<div class="expense-cards">${sorted.map(renderExpenseCardHTML).join('')}</div>`;
-    return;
-  }
-
   if (viewMode === 'list') {
     const sorted = [...filtered].sort((a, b) => {
       const da = new Date(a.date), db = new Date(b.date);
@@ -4067,7 +3942,7 @@ function renderExpenseList() {
       if (!a._isReintegro && b._isReintegro) return -1;
       return 0;
     });
-    list.innerHTML = sorted.map(renderExpenseItemHTML).join('');
+    list.innerHTML = EXPENSE_TABLE_HEADER + `<div class="expense-table">${sorted.map(renderExpenseItemHTML).join('')}</div>`;
     return;
   }
 
@@ -4091,7 +3966,7 @@ function renderExpenseList() {
     }
     const sortedGroups = Object.entries(groups).sort((a, b) => Math.abs(b[1].total) - Math.abs(a[1].total));
 
-    list.innerHTML = sortedGroups.map(([catKey, group]) => {
+    list.innerHTML = EXPENSE_TABLE_HEADER + sortedGroups.map(([catKey, group]) => {
       let icon, name, cls;
       if (group.special === 'reintegros') {
         icon = '💸'; name = 'Reintegros'; cls = 'cat-capital';
@@ -4115,7 +3990,7 @@ function renderExpenseList() {
             <span class="group-toggle">▾</span>
           </div>
         </div>
-        <div class="group-content ${isCollapsed ? 'collapsed' : ''}">
+        <div class="group-content expense-table ${isCollapsed ? 'collapsed' : ''}">
           ${group.items
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .map(renderExpenseItemHTML).join('')}
@@ -4134,7 +4009,7 @@ function renderExpenseList() {
       target.total += isCapitalOrReintegro ? -e.amount : e.amount;
     });
 
-    list.innerHTML = ['p1', 'p2'].map(p => {
+    list.innerHTML = EXPENSE_TABLE_HEADER + ['p1', 'p2'].map(p => {
       const group = groups[p];
       if (group.items.length === 0) return '';
       const name = p === 'p1' ? 'Flucy' : 'Neitor';
@@ -4156,7 +4031,7 @@ function renderExpenseList() {
             <span class="group-toggle">▾</span>
           </div>
         </div>
-        <div class="group-content ${isCollapsed ? 'collapsed' : ''}">
+        <div class="group-content expense-table ${isCollapsed ? 'collapsed' : ''}">
           ${group.items
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .map(renderExpenseItemHTML).join('')}
@@ -4239,7 +4114,7 @@ function renderRecurring() {
     return `<tr>
       <td><input type="text" value="${r.name}" onchange="updateRecurring(${r.id}, 'name', this.value)"></td>
       <td><input type="number" value="${r.dueDay}" min="1" max="31" onchange="updateRecurring(${r.id}, 'dueDay', parseInt(this.value))" style="text-align:center;"></td>
-      <td><input type="number" value="${r.amount}" step="0.01" onchange="updateRecurring(${r.id}, 'amount', parseFloat(this.value))"></td>
+      <td><input type="text" inputmode="decimal" value="${r.amount.toLocaleString('es-AR')}" oninput="this.value = formatAmountInputValue(this.value)" onchange="updateRecurring(${r.id}, 'amount', parseAmountInput(this.value) || 0)"></td>
       <td><select onchange="updateRecurring(${r.id}, 'split', this.value)">${splitOptions}</select></td>
       <td><select onchange="updateRecurring(${r.id}, 'payer', this.value)">
         <option value="p1" ${r.payer === 'p1' ? 'selected' : ''}>Flucy</option>
@@ -4327,19 +4202,23 @@ function importRecurringToExpenses() {
 
 // ============ AHORRO ============
 function renderSavings() {
-  let totalUSD = 0, p1USD = 0, p2USD = 0, totalARS = 0;
+  let totalUSD = 0, p1USD = 0, p2USD = 0, totalARS = 0, withoutRateCount = 0;
   savings.forEach(s => {
     const sign = s.type === 'out' ? -1 : 1;
     const signed = s.usd * sign;
     totalUSD += signed;
-    totalARS += signed * (s.rate || 0);
+    if (s.rate) totalARS += signed * s.rate;
+    else withoutRateCount++;
     if (s.who === 'p1') p1USD += signed;
     else if (s.who === 'p2') p2USD += signed;
     else { p1USD += signed / 2; p2USD += signed / 2; }
   });
 
   document.getElementById('savingsTotalUSD').textContent = formatUSD(totalUSD);
-  document.getElementById('savingsTotalARS').textContent = '≈ AR$ ' + Number(totalARS).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' acumulado';
+  const arsNote = withoutRateCount > 0
+    ? ` (${withoutRateCount} movimiento${withoutRateCount !== 1 ? 's' : ''} sin cotización no incluido${withoutRateCount !== 1 ? 's' : ''})`
+    : '';
+  document.getElementById('savingsTotalARS').textContent = '≈ AR$ ' + Number(totalARS).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' según cotización de cada movimiento' + arsNote;
   document.getElementById('savingsP1').textContent = formatUSD(p1USD);
   document.getElementById('savingsP2').textContent = formatUSD(p2USD);
 
@@ -4373,7 +4252,7 @@ function addSavings() {
   const who = document.getElementById('savingsWho').value;
   const type = document.getElementById('savingsType')?.value || 'in';
   const usd = parseFloat(document.getElementById('savingsUSD').value);
-  const rate = parseFloat(document.getElementById('savingsRate').value) || null;
+  const rate = parseAmountInput(document.getElementById('savingsRate').value) || null;
   if (!month || !usd || usd <= 0) { alert('Completá mes y monto en USD'); return; }
   savings.push({ id: Date.now(), month, who, usd, rate, type });
   document.getElementById('savingsUSD').value = '';
@@ -4743,10 +4622,10 @@ function openQuickAdd(editId = null) {
       split: editingExpense.split,
       category: editingExpense.category
     };
-    document.getElementById('quickAmount').value = editingExpense.amount;
+    setAmountInputValue(document.getElementById('quickAmount'), editingExpense.amount);
     document.getElementById('quickDesc').value = editingExpense.desc;
     document.getElementById('quickDate').value = editingExpense.date;
-    document.getElementById('quickReintegro').value = editingExpense.reintegro || '';
+    setAmountInputValue(document.getElementById('quickReintegro'), editingExpense.reintegro || '');
     document.getElementById('quickCapital').checked = editingExpense.capital === true;
 
     if (editingExpense.installments) {
@@ -4839,14 +4718,14 @@ function addCategoryFromQuick() {
 
 function submitQuickAdd() {
   const desc = document.getElementById('quickDesc').value.trim();
-  const amount = parseFloat(document.getElementById('quickAmount').value);
+  const amount = parseAmountInput(document.getElementById('quickAmount').value);
   if (!desc || !amount || amount <= 0) {
     alert('Completá monto y descripción');
     return;
   }
   const isCapital = document.getElementById('quickCapital').checked;
   const date = document.getElementById('quickDate').value || new Date().toISOString().split('T')[0];
-  const reintegro = parseFloat(document.getElementById('quickReintegro').value) || 0;
+  const reintegro = parseAmountInput(document.getElementById('quickReintegro').value) || 0;
 
   // Cuotas
   let installments = null;
@@ -4973,8 +4852,7 @@ function openSettleModal() {
 
   // Monto prellenado con el total restante (se puede achicar para pago parcial)
   const amountInput = document.getElementById('settleAmount');
-  amountInput.value = Math.round(amount);
-  amountInput.max = Math.ceil(amount);
+  setAmountInputValue(amountInput, amount);
   updateSettleAmountHint();
   amountInput.oninput = updateSettleAmountHint;
 
@@ -5006,7 +4884,7 @@ function selectSettlePlatform(p) {
 function updateSettleAmountHint() {
   const state = getSettleState();
   const totalRemaining = Math.abs(state.remaining);
-  const val = parseFloat(document.getElementById('settleAmount').value) || 0;
+  const val = parseAmountInput(document.getElementById('settleAmount').value) || 0;
   const hint = document.getElementById('settleAmountHint');
   if (!hint) return;
   if (val <= 0) {
@@ -5032,7 +4910,7 @@ function confirmSettle() {
   }
 
   const totalRemaining = Math.abs(remaining);
-  const payAmount = parseFloat(document.getElementById('settleAmount').value) || 0;
+  const payAmount = parseAmountInput(document.getElementById('settleAmount').value) || 0;
   if (payAmount <= 0) { alert('Ingresá un monto mayor a 0'); return; }
   if (payAmount > totalRemaining + 1) {
     alert(`El monto supera lo adeudado (${formatMoney(totalRemaining)}). Ajustalo.`);
@@ -5148,6 +5026,116 @@ function celebrate() {
     document.body.appendChild(piece);
     setTimeout(() => piece.remove(), 5000);
   }
+}
+
+// ============ EXPORTAR A EXCEL ============
+// Genera un .xlsx con 5 hojas: gastos por mes (para pivots), gastos como se cargaron,
+// gastos fijos, ahorro en USD, e historial de saldos entre Flucy y Neitor.
+function toSheetSafe(data, emptyMsg) {
+  if (!data || data.length === 0) return XLSX.utils.json_to_sheet([{ 'Info': emptyMsg }]);
+  return XLSX.utils.json_to_sheet(data);
+}
+
+const SPLIT_LABELS = { '5050': '50/50', '100p1': '100% Flucy', '100p2': '100% Neitor', 'none': 'Sin dividir' };
+
+function exportAllDataToExcel() {
+  if (typeof XLSX === 'undefined') {
+    alert('No se pudo cargar la librería de exportación. Revisá tu conexión a internet e intentá de nuevo.');
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  // --- Hoja 1: Gastos por mes (una fila por cuota/mes — ideal para tablas dinámicas) ---
+  const instances = getAllExpenseInstances();
+  const sheet1Data = instances
+    .sort((a, b) => a._yearMonth.localeCompare(b._yearMonth) || a.date.localeCompare(b.date))
+    .map(e => ({
+      'Mes': e._yearMonth,
+      'Fecha original del gasto': e.date,
+      'Descripción': e.desc,
+      'Categoría': e._isReintegro ? 'Reintegro' : getCategoryInfo(e.category).name,
+      'Monto': e.amount,
+      'Pagó': e.payer === 'p1' ? 'Flucy' : 'Neitor',
+      'División': SPLIT_LABELS[e.split] || e.split,
+      'Tipo': e._isReintegro ? 'Reintegro' : (e.capital ? 'Aporte' : 'Gasto'),
+      'Cuota N°': e._isVirtual ? e._installmentNum : '',
+      'Total cuotas': e._isVirtual ? e.installments.total : ''
+    }));
+  XLSX.utils.book_append_sheet(wb, toSheetSafe(sheet1Data, 'Todavía no hay gastos cargados'), 'Gastos por mes');
+
+  // --- Hoja 2: Gastos tal cual se cargaron (un registro por gasto, sin expandir cuotas) ---
+  const sheet2Data = [...expenses]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map(e => ({
+      'ID': e.id,
+      'Fecha': e.date,
+      'Descripción': e.desc,
+      'Categoría': getCategoryInfo(e.category).name,
+      'Monto (por cuota si aplica)': e.amount,
+      'Pagó': e.payer === 'p1' ? 'Flucy' : 'Neitor',
+      'División': SPLIT_LABELS[e.split] || e.split,
+      'Es aporte': e.capital ? 'Sí' : 'No',
+      'Reintegro': e.reintegro || '',
+      'Cuota actual': e.installments ? e.installments.currentAt : '',
+      'Total cuotas': e.installments ? e.installments.total : '',
+      'Cantidad de comentarios': (e.comments || []).length
+    }));
+  XLSX.utils.book_append_sheet(wb, toSheetSafe(sheet2Data, 'Todavía no hay gastos cargados'), 'Gastos (registros)');
+
+  // --- Hoja 3: Gastos fijos ---
+  const sheet3Data = recurring.map(r => {
+    const paidMonths = r.paidMonths
+      ? Object.keys(r.paidMonths).filter(k => r.paidMonths[k]).sort().join(', ')
+      : '';
+    return {
+      'Servicio': r.name,
+      'Día de vencimiento': r.dueDay,
+      'Monto actual': r.amount,
+      'División': SPLIT_LABELS[r.split] || r.split,
+      'Paga': r.payer === 'p1' ? 'Flucy' : 'Neitor',
+      'Meses pagados': paidMonths
+    };
+  });
+  XLSX.utils.book_append_sheet(wb, toSheetSafe(sheet3Data, 'Todavía no hay gastos fijos configurados'), 'Gastos fijos');
+
+  // --- Hoja 4: Ahorro USD ---
+  const sheet4Data = [...savings]
+    .sort((a, b) => a.month.localeCompare(b.month))
+    .map(s => ({
+      'Mes': s.month,
+      'Tipo': s.type === 'out' ? 'Egreso' : 'Ingreso',
+      'Quién': s.who === 'p1' ? 'Flucy' : s.who === 'p2' ? 'Neitor' : 'Compartido',
+      'USD': s.usd,
+      'Cotización': s.rate || '',
+      'Equivalente ARS (a la cotización cargada)': s.rate ? Math.round(s.usd * s.rate * 100) / 100 : ''
+    }));
+  XLSX.utils.book_append_sheet(wb, toSheetSafe(sheet4Data, 'Todavía no hay movimientos de ahorro'), 'Ahorro USD');
+
+  // --- Hoja 5: Historial de saldos entre Flucy y Neitor ---
+  const sheet5Data = [];
+  Object.entries(settledMonths || {}).forEach(([month, raw]) => {
+    const entry = normalizeSettleEntry(raw);
+    if (!entry || !Array.isArray(entry.payments)) return;
+    entry.payments.forEach(p => {
+      sheet5Data.push({
+        'Mes': month,
+        'Quién pagó': p.by === 'p1' ? 'Flucy' : 'Neitor',
+        'Monto': p.amount,
+        'Plataforma': p.platform,
+        'Comentario': p.comment || '',
+        'Fecha del pago': new Date(p.date).toLocaleDateString('es-AR'),
+        'Registrado por': p.recordedBy === 'p1' ? 'Flucy' : (p.recordedBy === 'p2' ? 'Neitor' : ''),
+        'Estado del mes': entry.settledAt ? 'Saldado' : 'Parcial'
+      });
+    });
+  });
+  sheet5Data.sort((a, b) => a['Mes'].localeCompare(b['Mes']));
+  XLSX.utils.book_append_sheet(wb, toSheetSafe(sheet5Data, 'Todavía no hay pagos registrados'), 'Historial de saldos');
+
+  document.querySelector('.user-menu-wrap')?.classList.remove('open');
+  const today = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(wb, `cuchugastos-export-${today}.xlsx`);
 }
 
 // ============ IMPORTADOR DE RESUMEN DE TARJETA ============
@@ -5486,7 +5474,7 @@ function renderImportCard() {
         </div>
         <div>
           <label>Monto</label>
-          <input type="number" step="0.01" value="${item.amount}" onchange="updateImportItem('amount', parseFloat(this.value))">
+          <input type="text" inputmode="decimal" value="${item.amount.toLocaleString('es-AR')}" oninput="this.value = formatAmountInputValue(this.value)" onchange="updateImportItem('amount', parseAmountInput(this.value) || 0)">
         </div>
         <div>
           <label>Fecha</label>
@@ -5782,7 +5770,7 @@ function getAllExpenseInstances() {
       const startDate = new Date(e.date + 'T00:00');
       const startedAt = e.installments.currentAt || 1;
       for (let i = 0; i < e.installments.total; i++) {
-        const cuotaDate = new Date(startDate.getFullYear(), startDate.getMonth() + i - (startedAt - 1), startDate.getDate());
+        const cuotaDate = addMonthsToDate(startDate, i - (startedAt - 1));
         out.push({
           ...e,
           _isVirtual: true,
@@ -5792,7 +5780,7 @@ function getAllExpenseInstances() {
         });
       }
       if (e.reintegro && e.reintegro > 0) {
-        const firstDate = new Date(startDate.getFullYear(), startDate.getMonth() - (startedAt - 1), startDate.getDate());
+        const firstDate = addMonthsToDate(startDate, -(startedAt - 1));
         out.push({
           ...e,
           _isReintegro: true,
@@ -5906,6 +5894,7 @@ function renderStats() {
   let totalP1 = 0, totalP2 = 0;
   filteredInstances.forEach(e => {
     if (!showMonths.includes(e._yearMonth)) return;
+    // Igual que en calculateBalance: el aporte lo pone quien SE QUEDA la plata, y se resta.
     const sign = (e.capital === true || e._isReintegro === true) ? -1 : 1;
     if (e.payer === 'p1') totalP1 += e.amount * sign;
     else totalP2 += e.amount * sign;
@@ -6069,6 +6058,9 @@ function renderStats() {
   });
 
   // Line chart: acumulado mes a mes (con filtros) - CORTADO EN MES ACTUAL
+  // OJO: esto es "gasto neto del hogar" (gastos - aportes - reintegros), una métrica DISTINTA
+  // de "quién le debe a quién" (calculateBalance). Acá el aporte SÍ resta, porque representa
+  // plata que bajó el costo real total, no una cuenta a favor de una persona específica.
   let acc = 0;
   const accumData = showMonths.map(m => {
     let monthSum = 0;
